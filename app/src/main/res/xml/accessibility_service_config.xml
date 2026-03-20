@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Configuration du service d'accessibilité — réservé pour la Phase 2.
+    Ce fichier sera complété lors de l'implémentation de KeyInterceptorService.
+
+    Permissions requises :
+    - canRetrieveWindowContent : false (pas besoin de lire le contenu des fenêtres)
+    - accessibilityEventTypes  : TYPE_VIEW_ACCESSIBILITY_FOCUSED (minimaliste)
+    - flags                    : flagRequestFilterKeyEvents (interception des touches)
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeAllMask"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagRequestFilterKeyEvents"
+    android:canRetrieveWindowContent="false"
+    android:description="@string/accessibility_service_description"
+    android:notificationTimeout="100"
+    android:packageNames="@null"
+    android:settingsActivity="dev.cavatz.keybindertv.MainActivity" />

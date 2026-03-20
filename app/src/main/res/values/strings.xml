@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KeyBinder TV</string>
+
+    <!-- Navigation -->
+    <string name="screen_home">Home</string>
+    <string name="screen_mappings">Mappings</string>
+    <string name="screen_learning">Learning</string>
+    <string name="screen_settings">Settings</string>
+    <string name="screen_import_export">Import / Export</string>
+
+    <!-- Actions génériques -->
+    <string name="action_add">Add</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_enable">Enable</string>
+    <string name="action_disable">Disable</string>
+
+    <!-- Mappings -->
+    <string name="mapping_short_press">Short press</string>
+    <string name="mapping_long_press">Long press</string>
+    <string name="mapping_enabled">Enabled</string>
+    <string name="mapping_disabled">Disabled</string>
+    <string name="mapping_no_action">No action assigned</string>
+
+    <!-- Paramètres -->
+    <string name="settings_show_overlay">Show notification on remap</string>
+    <string name="settings_long_press_threshold">Long press duration (ms)</string>
+
+    <!-- Accessibilité -->
+    <string name="accessibility_service_label">KeyBinder TV — Button Remapper</string>
+    <string name="accessibility_service_description">Intercepts remote control buttons to remap them to other applications.</string>
+</resources>

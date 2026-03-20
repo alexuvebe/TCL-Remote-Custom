@@ -1,0 +1,22 @@
+# Fichiers générés par Android Studio
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+
+# Artefacts de build
+build/
+app/build/
+
+# Fichiers de signature — ne jamais committer
+*.jks
+*.keystore
+key.properties
+
+# Fichiers de configuration locale
+local.properties
+
+# Couverture de tests
+*.exec
+*.ec
