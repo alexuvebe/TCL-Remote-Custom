@@ -58,6 +58,15 @@
     <string name="settings_longpress_threshold">Délai long press : %1$d ms</string>
     <string name="settings_accessibility">Paramètres d\'accessibilité</string>
     <string name="importexport_title">Import / Export</string>
+    <string name="importexport_export_file">Export as JSON file</string>
+    <string name="importexport_generate_qr">Generate QR code</string>
+    <string name="importexport_import_file">Import from JSON file</string>
+    <string name="importexport_import_paste_hint">Or paste your JSON here</string>
+    <string name="importexport_import_button">Import</string>
+    <string name="importexport_qr_too_large">Config too large for QR — use file export</string>
+    <string name="importexport_qr_prompt">Press « Generate QR code » to display</string>
+    <string name="importexport_section_export">Export</string>
+    <string name="importexport_section_import">Import</string>
     <string name="press_type_short">Court</string>
     <string name="press_type_long">Long</string>
 </resources>

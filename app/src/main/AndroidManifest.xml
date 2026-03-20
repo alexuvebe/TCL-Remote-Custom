@@ -74,6 +74,15 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
+        <!-- Receiver de démarrage automatique — vérifie le service d'accessibilité au boot -->
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

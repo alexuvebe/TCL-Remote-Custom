@@ -87,7 +87,7 @@ fun KeyBinderNavGraph(
         }
 
         composable(route = Screen.ImportExport.route) {
-            ImportExportScreen()
+            ImportExportScreen(repository = mappingRepository)
         }
     }
 }
