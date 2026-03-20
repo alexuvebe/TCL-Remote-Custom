@@ -1,6 +1,7 @@
 package dev.cavatz.keybindertv.ui.screen.home
 
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,11 +50,16 @@ fun HomeScreen(
     )
     val uiState: HomeViewModel.HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     HomeContent(
         uiState = uiState,
         onNavigateMappings = { navController.navigate(Screen.MappingList.route) },
         onNavigateSettings = { navController.navigate(Screen.Settings.route) },
-        onNavigateImportExport = { navController.navigate(Screen.ImportExport.route) }
+        onNavigateImportExport = { navController.navigate(Screen.ImportExport.route) },
+        onSupportDeveloper = {
+            val uri = Uri.parse(context.getString(R.string.support_url))
+            context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+        }
     )
 }
 
@@ -63,7 +69,8 @@ private fun HomeContent(
     uiState: HomeViewModel.HomeUiState,
     onNavigateMappings: () -> Unit,
     onNavigateSettings: () -> Unit,
-    onNavigateImportExport: () -> Unit
+    onNavigateImportExport: () -> Unit,
+    onSupportDeveloper: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -92,6 +99,8 @@ private fun HomeContent(
             onNavigateSettings = onNavigateSettings,
             onNavigateImportExport = onNavigateImportExport
         )
+        Spacer(modifier = Modifier.height(VerticalSpacing * 2))
+        SupportButton(onClick = onSupportDeveloper)
     }
 }
 
@@ -123,6 +132,14 @@ private fun MappingsCountText(active: Int, total: Int) {
         text = stringResource(R.string.home_mappings_count, active, total),
         style = MaterialTheme.typography.bodyLarge
     )
+}
+
+/** Bouton Buy Me a Coffee — lien vers la page de soutien */
+@Composable
+private fun SupportButton(onClick: () -> Unit) {
+    Button(onClick = onClick) {
+        Text(text = stringResource(R.string.support_button))
+    }
 }
 
 /** Boutons de navigation vers les autres écrans */

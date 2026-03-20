@@ -69,4 +69,8 @@
     <string name="importexport_section_import">Import</string>
     <string name="press_type_short">Court</string>
     <string name="press_type_long">Long</string>
+
+    <!-- Buy Me a Coffee -->
+    <string name="support_button">☕ Support the developer</string>
+    <string name="support_url" translatable="false">https://buymeacoffee.com/keybindertv</string>
 </resources>
