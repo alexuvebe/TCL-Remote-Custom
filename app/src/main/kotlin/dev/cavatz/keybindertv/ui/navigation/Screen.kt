@@ -12,8 +12,23 @@ sealed class Screen(val route: String) {
     /** Liste complète des mappings configurés */
     object MappingList : Screen("mappings")
 
-    /** Mode apprentissage — détection des boutons de télécommande */
-    object Learning : Screen("learning")
+    /**
+     * Mode apprentissage — détection des boutons de télécommande.
+     *
+     * @param mappingId Identifiant UUID du mapping en cours de création
+     */
+    object Learning : Screen("learning/{mappingId}") {
+        companion object {
+            /** Route template avec argument */
+            const val ROUTE: String = "learning/{mappingId}"
+
+            /** Nom de l'argument de navigation */
+            const val ARG_MAPPING_ID: String = "mappingId"
+
+            /** Construit la route concrète avec l'identifiant du mapping */
+            fun createRoute(mappingId: String): String = "learning/$mappingId"
+        }
+    }
 
     /**
      * Sélecteur d'application pour un mapping donné.

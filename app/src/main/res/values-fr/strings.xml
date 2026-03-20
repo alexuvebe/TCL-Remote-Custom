@@ -32,4 +32,32 @@
     <!-- Accessibilité -->
     <string name="accessibility_service_label">KeyBinder TV — Remappeur de boutons</string>
     <string name="accessibility_service_description">Intercepte les boutons de la télécommande pour les rediriger vers d\'autres applications.</string>
+
+    <!-- Écrans Phase 3 -->
+    <string name="home_title">KeyBinderTv</string>
+    <string name="home_service_active">Service actif</string>
+    <string name="home_service_inactive">Service inactif</string>
+    <string name="home_enable_service">Activer le service</string>
+    <string name="home_mappings_count">%1$d mappings actifs sur %2$d</string>
+    <string name="home_manage_mappings">Gérer les mappings</string>
+    <string name="home_settings">Paramètres</string>
+    <string name="home_import_export">Import / Export</string>
+    <string name="mappings_empty">Aucun mapping configuré</string>
+    <string name="mappings_add">Ajouter un mapping</string>
+    <string name="learning_title">Détecter le bouton</string>
+    <string name="learning_instructions">Appuyez sur le bouton à remapper...</string>
+    <string name="learning_timeout">Aucun bouton détecté — réessayez</string>
+    <string name="learning_confirm">Confirmer</string>
+    <string name="learning_retry">Réessayer</string>
+    <string name="learning_cancel">Annuler</string>
+    <string name="learning_service_inactive">Service inactif — activez le service d\'accessibilité</string>
+    <string name="appchooser_title">Choisir l\'application</string>
+    <string name="appchooser_search">Rechercher une application...</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_overlay">Notification lors du remapping</string>
+    <string name="settings_longpress_threshold">Délai long press : %1$d ms</string>
+    <string name="settings_accessibility">Paramètres d\'accessibilité</string>
+    <string name="importexport_title">Import / Export</string>
+    <string name="press_type_short">Court</string>
+    <string name="press_type_long">Long</string>
 </resources>

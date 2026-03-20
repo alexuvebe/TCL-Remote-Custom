@@ -7,32 +7,57 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import dev.cavatz.keybindertv.data.repository.MappingRepository
+import dev.cavatz.keybindertv.ui.screen.appchooser.AppChooserScreen
+import dev.cavatz.keybindertv.ui.screen.home.HomeScreen
+import dev.cavatz.keybindertv.ui.screen.importexport.ImportExportScreen
+import dev.cavatz.keybindertv.ui.screen.learning.LearningScreen
+import dev.cavatz.keybindertv.ui.screen.mappings.MappingListScreen
+import dev.cavatz.keybindertv.ui.screen.settings.SettingsScreen
 
 /**
  * Graphe de navigation principal de l'application.
- * Chaque écran est déclaré avec un composable vide pour la Phase 1.
- * Les implémentations seront ajoutées lors des phases suivantes.
+ * Connecte chaque route à son écran Compose réel.
  *
  * @param navController Contrôleur de navigation partagé entre les écrans
+ * @param mappingRepository Repository transmis aux écrans qui en ont besoin
  */
 @Composable
 fun KeyBinderNavGraph(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    mappingRepository: MappingRepository
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route
     ) {
         composable(route = Screen.Home.route) {
-            HomeScreenPlaceholder()
+            HomeScreen(
+                navController = navController,
+                repository = mappingRepository
+            )
         }
 
         composable(route = Screen.MappingList.route) {
-            MappingListScreenPlaceholder()
+            MappingListScreen(
+                navController = navController,
+                repository = mappingRepository
+            )
         }
 
-        composable(route = Screen.Learning.route) {
-            LearningScreenPlaceholder()
+        composable(
+            route = Screen.Learning.ROUTE,
+            arguments = listOf(
+                navArgument(Screen.Learning.ARG_MAPPING_ID) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val mappingId: String = backStackEntry.arguments
+                ?.getString(Screen.Learning.ARG_MAPPING_ID) ?: return@composable
+            LearningScreen(
+                navController = navController,
+                mappingId = mappingId,
+                repository = mappingRepository
+            )
         }
 
         composable(
@@ -41,37 +66,28 @@ fun KeyBinderNavGraph(
                 navArgument(Screen.AppChooser.ARG_MAPPING_ID) { type = NavType.StringType },
                 navArgument(Screen.AppChooser.ARG_PRESS_TYPE) { type = NavType.StringType }
             )
-        ) {
-            AppChooserScreenPlaceholder()
+        ) { backStackEntry ->
+            val mappingId: String = backStackEntry.arguments
+                ?.getString(Screen.AppChooser.ARG_MAPPING_ID) ?: return@composable
+            val pressType: String = backStackEntry.arguments
+                ?.getString(Screen.AppChooser.ARG_PRESS_TYPE) ?: return@composable
+            AppChooserScreen(
+                navController = navController,
+                repository = mappingRepository,
+                mappingId = mappingId,
+                pressType = pressType
+            )
         }
 
         composable(route = Screen.Settings.route) {
-            SettingsScreenPlaceholder()
+            SettingsScreen(
+                navController = navController,
+                repository = mappingRepository
+            )
         }
 
         composable(route = Screen.ImportExport.route) {
-            ImportExportScreenPlaceholder()
+            ImportExportScreen()
         }
     }
 }
-
-// ---- Composables squelettes — Phase 1 ----
-// Chaque écran sera implémenté dans sa propre phase de développement.
-
-@Composable
-private fun HomeScreenPlaceholder() { /* Phase 3 */ }
-
-@Composable
-private fun MappingListScreenPlaceholder() { /* Phase 3 */ }
-
-@Composable
-private fun LearningScreenPlaceholder() { /* Phase 3 */ }
-
-@Composable
-private fun AppChooserScreenPlaceholder() { /* Phase 3 */ }
-
-@Composable
-private fun SettingsScreenPlaceholder() { /* Phase 3 */ }
-
-@Composable
-private fun ImportExportScreenPlaceholder() { /* Phase 4 */ }

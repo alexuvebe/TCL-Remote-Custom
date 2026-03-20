@@ -15,10 +15,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val app: KeyBinderTvApp = application as KeyBinderTvApp
         setContent {
             KeyBinderTvTheme {
                 val navController = rememberNavController()
-                KeyBinderNavGraph(navController = navController)
+                KeyBinderNavGraph(
+                    navController = navController,
+                    mappingRepository = app.mappingRepository
+                )
             }
         }
     }
