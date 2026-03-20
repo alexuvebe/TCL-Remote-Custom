@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Thème de base pour l'activité — remplacé par le thème Compose au runtime -->
+    <style name="Theme.KeyBinderTv" parent="android:Theme.Material.NoActionBar" />
+</resources>

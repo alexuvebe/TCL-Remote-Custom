@@ -18,16 +18,14 @@ sealed class Screen(val route: String) {
      * @param mappingId Identifiant UUID du mapping en cours de création
      */
     object Learning : Screen("learning/{mappingId}") {
-        companion object {
-            /** Route template avec argument */
-            const val ROUTE: String = "learning/{mappingId}"
+        /** Route template avec argument */
+        const val ROUTE: String = "learning/{mappingId}"
 
-            /** Nom de l'argument de navigation */
-            const val ARG_MAPPING_ID: String = "mappingId"
+        /** Nom de l'argument de navigation */
+        const val ARG_MAPPING_ID: String = "mappingId"
 
-            /** Construit la route concrète avec l'identifiant du mapping */
-            fun createRoute(mappingId: String): String = "learning/$mappingId"
-        }
+        /** Construit la route concrète avec l'identifiant du mapping */
+        fun createRoute(mappingId: String): String = "learning/$mappingId"
     }
 
     /**

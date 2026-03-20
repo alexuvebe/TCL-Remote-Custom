@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Lettre K stylisée pour KeyBinderTv -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,26 L38,82 L50,82 L50,58 L70,82 L85,82 L62,54 L84,26 L69,26 L50,50 L50,26 Z" />
+</vector>
