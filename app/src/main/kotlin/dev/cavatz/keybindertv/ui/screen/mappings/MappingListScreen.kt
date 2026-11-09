@@ -197,7 +197,7 @@ private fun MappingItem(
                     checked = mapping.isEnabled,
                     onCheckedChange = onToggle
                 )
-                TextButton(onClick = onRemove, colors = androidx.compose.material3.TextButtonDefaults.textButtonColors(contentColor = ActionRed)) {
+                TextButton(onClick = onRemove, colors = ButtonDefaults.textButtonColors(contentColor = ActionRed)) {
                     Text(text = stringResource(R.string.action_delete))
                 }
             }
