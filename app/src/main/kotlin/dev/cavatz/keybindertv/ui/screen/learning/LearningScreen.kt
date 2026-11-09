@@ -147,7 +147,7 @@ private fun WaitingContent(remainingSeconds: Int, onCancel: () -> Unit) {
         style = MaterialTheme.typography.titleLarge
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
-    TextButton(onClick = onCancel, colors = androidx.compose.material3.TextButtonDefaults.textButtonColors(contentColor = ActionGray)) {
+    TextButton(onClick = onCancel, colors = ButtonDefaults.textButtonColors(contentColor = ActionGray)) {
         Text(text = stringResource(R.string.learning_cancel))
     }
 }
@@ -163,7 +163,7 @@ private fun ButtonDetectedContent(
         identifier.keyCode?.toString() ?: identifier.sourcePackage ?: "Botón desconocido"
     }
     Text(
-        text = "Bouton détecté : $label",
+        text = "Botón detectado: $label",
         style = MaterialTheme.typography.titleMedium
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
@@ -171,7 +171,7 @@ private fun ButtonDetectedContent(
         Button(onClick = onConfirm, colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)) {
             Text(text = stringResource(R.string.learning_confirm))
         }
-        TextButton(onClick = onRetry, colors = androidx.compose.material3.TextButtonDefaults.textButtonColors(contentColor = ActionBlue)) {
+        TextButton(onClick = onRetry, colors = ButtonDefaults.textButtonColors(contentColor = ActionBlue)) {
             Text(text = stringResource(R.string.learning_retry))
         }
     }
