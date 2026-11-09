@@ -164,15 +164,15 @@ private fun ExportSection(
         verticalArrangement = Arrangement.spacedBy(VerticalSpacing)
     ) {
         Text(
-            text = "Export",
+            text = stringResource(R.string.importexport_section_export),
             style = MaterialTheme.typography.titleMedium
         )
         Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
             Button(onClick = onExportFile) {
-                Text(text = "Exporter en fichier JSON")
+                Text(text = stringResource(R.string.importexport_export_file))
             }
             Button(onClick = onGenerateQr) {
-                Text(text = "Générer QR code")
+                Text(text = stringResource(R.string.importexport_generate_qr))
             }
         }
         QrCodeBlock(
@@ -199,7 +199,7 @@ private fun QrCodeBlock(
     when {
         isQrTooLarge -> {
             Text(
-                text = "Configuration trop grande pour un QR code — utilisez l'export fichier",
+                text = stringResource(R.string.importexport_qr_too_large),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error
             )
@@ -212,7 +212,7 @@ private fun QrCodeBlock(
         }
         else -> {
             Text(
-                text = "Appuyez sur « Générer QR code » pour afficher",
+                text = stringResource(R.string.importexport_qr_prompt),
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -238,11 +238,11 @@ private fun ImportSection(
         verticalArrangement = Arrangement.spacedBy(VerticalSpacing)
     ) {
         Text(
-            text = "Import",
+            text = stringResource(R.string.importexport_section_import),
             style = MaterialTheme.typography.titleMedium
         )
         Button(onClick = onImportFile) {
-            Text(text = "Importer depuis un fichier JSON")
+            Text(text = stringResource(R.string.importexport_import_file))
         }
         OutlinedTextField(
             value = pastedJson,
@@ -250,14 +250,14 @@ private fun ImportSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp),
-            label = { Text(text = "Ou collez votre JSON ici") },
+            label = { Text(text = stringResource(R.string.importexport_import_paste_hint)) },
             maxLines = 8
         )
         Button(
             onClick = { onImportJson(pastedJson) },
             enabled = pastedJson.isNotBlank()
         ) {
-            Text(text = "Importer")
+            Text(text = stringResource(R.string.importexport_import_button))
         }
     }
 }
