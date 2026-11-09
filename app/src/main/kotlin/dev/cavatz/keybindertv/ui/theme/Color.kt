@@ -2,26 +2,32 @@ package dev.cavatz.keybindertv.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ---- Palette principale ----
-// Inspirée d'une interface TV sombre avec accents bleus/violets
+// Colores de acción de alto contraste para distinguir los controles en TV.
+val ActionRed = Color(0xFFE53935)
+val ActionBlue = Color(0xFF1565C0)
+val ActionGreen = Color(0xFF2E9D50)
+val ActionYellow = Color(0xFFF9A825)
+val ActionPurple = Color(0xFF7B1FA2)
+val ActionGray = Color(0xFF424242)
 
-val PrimaryBlue = Color(0xFF4FC3F7)
-val PrimaryBlueDark = Color(0xFF0288D1)
-val SecondaryPurple = Color(0xFFCE93D8)
-val SecondaryPurpleDark = Color(0xFF7B1FA2)
+// Colores principales del tema.
+val PrimaryBlue = ActionBlue
+val PrimaryBlueDark = Color(0xFF0D47A1)
+val SecondaryPurple = Color(0xFFB388FF)
+val SecondaryPurpleDark = ActionPurple
 
-// ---- Surfaces et fonds ----
-val BackgroundDark = Color(0xFF0E0E0E)
-val SurfaceDark = Color(0xFF1C1C1E)
-val SurfaceVariantDark = Color(0xFF2C2C2E)
-val OutlineDark = Color(0xFF3A3A3C)
+// Fondos oscuros y superficies.
+val BackgroundDark = Color(0xFF101216)
+val SurfaceDark = Color(0xFF1C222B)
+val SurfaceVariantDark = Color(0xFF303944)
+val OutlineDark = Color(0xFF657180)
 
-// ---- États ----
-val ErrorRed = Color(0xFFCF6679)
-val SuccessGreen = Color(0xFF4CAF50)
-val WarningAmber = Color(0xFFFFB300)
+// Estados.
+val ErrorRed = ActionRed
+val SuccessGreen = ActionGreen
+val WarningAmber = ActionYellow
 
-// ---- Texte ----
-val OnPrimaryDark = Color(0xFF003049)
-val OnSurfaceDark = Color(0xFFE5E5EA)
-val OnSurfaceVariantDark = Color(0xFFAEAEB2)
+// Texto: blanco para máximo contraste sobre botones intensos.
+val OnPrimaryDark = Color.White
+val OnSurfaceDark = Color(0xFFFFFFFF)
+val OnSurfaceVariantDark = Color(0xFFE0E6ED)
