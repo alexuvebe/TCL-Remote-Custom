@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.screen.appchooser.AppChooserScreen
 import dev.cavatz.keybindertv.ui.screen.home.HomeScreen
+import dev.cavatz.keybindertv.ui.screen.importexport.ImportExportScreen
 import dev.cavatz.keybindertv.ui.screen.learning.LearningScreen
 import dev.cavatz.keybindertv.ui.screen.mappings.MappingListScreen
 import dev.cavatz.keybindertv.ui.screen.settings.SettingsScreen
@@ -24,19 +25,11 @@ fun KeyBinderNavGraph(
         startDestination = Screen.Home.route
     ) {
         composable(route = Screen.Home.route) {
-            HomeScreen(
-                navController = navController,
-                repository = mappingRepository
-            )
+            HomeScreen(navController = navController, repository = mappingRepository)
         }
-
         composable(route = Screen.MappingList.route) {
-            MappingListScreen(
-                navController = navController,
-                repository = mappingRepository
-            )
+            MappingListScreen(navController = navController, repository = mappingRepository)
         }
-
         composable(
             route = Screen.Learning.ROUTE,
             arguments = listOf(
@@ -51,7 +44,6 @@ fun KeyBinderNavGraph(
                 repository = mappingRepository
             )
         }
-
         composable(
             route = Screen.AppChooser.ROUTE,
             arguments = listOf(
@@ -70,12 +62,11 @@ fun KeyBinderNavGraph(
                 pressType = pressType
             )
         }
-
         composable(route = Screen.Settings.route) {
-            SettingsScreen(
-                navController = navController,
-                repository = mappingRepository
-            )
+            SettingsScreen(navController = navController, repository = mappingRepository)
+        }
+        composable(route = Screen.ImportExport.route) {
+            ImportExportScreen(repository = mappingRepository)
         }
     }
 }
