@@ -15,9 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,25 +33,16 @@ import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.TvCard
 import dev.cavatz.keybindertv.ui.navigation.Screen
 import dev.cavatz.keybindertv.ui.theme.ActionBlue
+import dev.cavatz.keybindertv.ui.theme.ActionGray
+import dev.cavatz.keybindertv.ui.theme.ActionGreen
 import dev.cavatz.keybindertv.ui.theme.ActionRed
+import dev.cavatz.keybindertv.ui.theme.BackgroundDark
 import kotlinx.coroutines.launch
 
-/** Espacement interne des cartes de mapping */
-private val CardPadding = 12.dp
-
-/** Espacement entre les éléments de la liste */
-private val ItemSpacing = 8.dp
-
-/** Padding global de l'écran */
+private val CardPadding = 16.dp
+private val ItemSpacing = 12.dp
 private val ScreenPadding = 16.dp
 
-/**
- * Écran de liste des mappings configurés.
- * Permet d'activer/désactiver, supprimer et créer de nouveaux mappings.
- *
- * @param navController Contrôleur de navigation
- * @param repository Repository des mappings
- */
 @Composable
 fun MappingListScreen(
     navController: NavHostController,
@@ -71,7 +60,6 @@ fun MappingListScreen(
         onRemove = { id -> viewModel.removeMapping(id) },
         onAddMapping = {
             coroutineScope.launch {
-                // Crée le mapping vide puis navigue vers LearningScreen avec son ID
                 val newMappingId: String = viewModel.createNewMapping()
                 navController.navigate(Screen.Learning.createRoute(newMappingId))
             }
@@ -79,7 +67,6 @@ fun MappingListScreen(
     )
 }
 
-/** Contenu stateless de la liste des mappings */
 @Composable
 private fun MappingListContent(
     uiState: MappingViewModel.MappingListUiState,
@@ -88,21 +75,29 @@ private fun MappingListContent(
     onAddMapping: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        when {
-            uiState.isLoading -> LoadingIndicator()
-            uiState.mappings.isEmpty() -> EmptyMappingList(onAddMapping = onAddMapping)
-            else -> MappingList(
-                mappings = uiState.mappings,
-                onToggle = onToggle,
-                onRemove = onRemove
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 88.dp)
+        ) {
+            when {
+                uiState.isLoading -> LoadingIndicator()
+                uiState.mappings.isEmpty() -> EmptyMappingList(onAddMapping = onAddMapping)
+                else -> MappingList(
+                    mappings = uiState.mappings,
+                    onToggle = onToggle,
+                    onRemove = onRemove
+                )
+            }
         }
 
-        // Bouton "+" toujours visible sauf pendant le chargement
         if (!uiState.isLoading) {
             Button(
                 onClick = onAddMapping,
-                colors = ButtonDefaults.buttonColors(containerColor = ActionBlue, contentColor = Color.White),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ActionBlue,
+                    contentColor = Color.White
+                ),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(ScreenPadding)
@@ -113,38 +108,36 @@ private fun MappingListContent(
     }
 }
 
-/** Indicateur de chargement centré */
 @Composable
 private fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(color = ActionBlue)
     }
 }
 
-/** Message affiché quand la liste est vide */
 @Composable
 private fun EmptyMappingList(onAddMapping: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.mappings_empty),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White
             )
             Spacer(modifier = Modifier.height(ItemSpacing))
-            Button(onClick = onAddMapping) {
+            Button(
+                onClick = onAddMapping,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ActionBlue,
+                    contentColor = Color.White
+                )
+            ) {
                 Text(text = stringResource(R.string.mappings_add))
             }
         }
     }
 }
 
-/** Liste scrollable des mappings */
 @Composable
 private fun MappingList(
     mappings: List<KeyMapping>,
@@ -157,10 +150,7 @@ private fun MappingList(
             .padding(ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(ItemSpacing)
     ) {
-        items(
-            items = mappings,
-            key = { mapping -> mapping.id }
-        ) { mapping ->
+        items(items = mappings, key = { mapping -> mapping.id }) { mapping ->
             MappingItem(
                 mapping = mapping,
                 onToggle = { enabled -> onToggle(mapping.id, enabled) },
@@ -170,34 +160,43 @@ private fun MappingList(
     }
 }
 
-/** Tarjeta de una asignación individual. */
 @Composable
 private fun MappingItem(
     mapping: KeyMapping,
     onToggle: (Boolean) -> Unit,
     onRemove: () -> Unit
 ) {
-    TvCard(
-        onClick = {},
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
+    TvCard(modifier = Modifier.fillMaxWidth()) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(CardPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            MappingInfo(
-                mapping = mapping,
-                modifier = Modifier.weight(1f)
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(
-                    checked = mapping.isEnabled,
-                    onCheckedChange = onToggle
-                )
-                TextButton(onClick = onRemove, colors = ButtonDefaults.textButtonColors(contentColor = ActionRed)) {
+            MappingInfo(mapping = mapping)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = { onToggle(!mapping.isEnabled) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (mapping.isEnabled) ActionGray else ActionGreen,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = if (mapping.isEnabled) "Desactivar" else "Activar"
+                    )
+                }
+                Button(
+                    onClick = onRemove,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ActionRed,
+                        contentColor = Color.White
+                    )
+                ) {
                     Text(text = stringResource(R.string.action_delete))
                 }
             }
@@ -205,34 +204,39 @@ private fun MappingItem(
     }
 }
 
-/** Informations textuelles d'un mapping */
 @Composable
-private fun MappingInfo(
-    mapping: KeyMapping,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
+private fun MappingInfo(mapping: KeyMapping) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text = mapping.button.userLabel.ifEmpty { "Botón #${mapping.id.take(8)}" },
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White
         )
         mapping.shortPressAction?.let { action ->
             Text(
-                text = "${stringResource(R.string.mapping_short_press)} : ${action.appLabel}",
-                style = MaterialTheme.typography.bodySmall
+                text = "${stringResource(R.string.mapping_short_press)}: ${action.appLabel}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         mapping.longPressAction?.let { action ->
             Text(
-                text = "${stringResource(R.string.mapping_long_press)} : ${action.appLabel}",
-                style = MaterialTheme.typography.bodySmall
+                text = "${stringResource(R.string.mapping_long_press)}: ${action.appLabel}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         if (mapping.shortPressAction == null && mapping.longPressAction == null) {
             Text(
                 text = stringResource(R.string.mapping_no_action),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        Text(
+            text = if (mapping.isEnabled) "Estado: Activado" else "Estado: Desactivado",
+            style = MaterialTheme.typography.labelMedium,
+            color = if (mapping.isEnabled) ActionGreen else ActionRed
+        )
     }
 }
