@@ -48,7 +48,8 @@ fun HomeScreen(
     HomeContent(
         uiState = uiState,
         onNavigateMappings = { navController.navigate(Screen.MappingList.route) },
-        onNavigateSettings = { navController.navigate(Screen.Settings.route) }
+        onNavigateSettings = { navController.navigate(Screen.Settings.route) },
+        onNavigateBackup = { navController.navigate(Screen.ImportExport.route) }
     )
 }
 
@@ -56,7 +57,8 @@ fun HomeScreen(
 private fun HomeContent(
     uiState: HomeViewModel.HomeUiState,
     onNavigateMappings: () -> Unit,
-    onNavigateSettings: () -> Unit
+    onNavigateSettings: () -> Unit,
+    onNavigateBackup: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -82,7 +84,8 @@ private fun HomeContent(
         Spacer(modifier = Modifier.height(VerticalSpacing * 2))
         NavigationButtons(
             onNavigateMappings = onNavigateMappings,
-            onNavigateSettings = onNavigateSettings
+            onNavigateSettings = onNavigateSettings,
+            onNavigateBackup = onNavigateBackup
         )
     }
 }
@@ -123,7 +126,8 @@ private fun MappingsCountText(active: Int, total: Int) {
 @Composable
 private fun NavigationButtons(
     onNavigateMappings: () -> Unit,
-    onNavigateSettings: () -> Unit
+    onNavigateSettings: () -> Unit,
+    onNavigateBackup: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -146,6 +150,15 @@ private fun NavigationButtons(
             )
         ) {
             Text(text = stringResource(R.string.home_settings))
+        }
+        Button(
+            onClick = onNavigateBackup,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = ActionYellow,
+                contentColor = Color(0xFF202020)
+            )
+        ) {
+            Text(text = stringResource(R.string.home_import_export))
         }
     }
 }
