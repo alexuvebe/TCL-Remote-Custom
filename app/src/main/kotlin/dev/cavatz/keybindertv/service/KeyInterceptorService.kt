@@ -12,53 +12,26 @@ import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.util.LongPressDetector
 
 /**
- * Service d'accessibilité — cœur de KeyBinderTv.
- *
- * Deux flux d'interception :
- * - Flux A (onKeyEvent) : boutons qui génèrent des KeyEvents → consommation directe
- * - Flux B (onAccessibilityEvent) : apps lancées directement → remplacement par-dessus
- *
- * Mode apprentissage :
- * - [startLearningMode] active la capture du prochain bouton
- * - [stopLearningMode] désactive
- *
- * Singleton via [instance] pour communication avec l'UI.
+ * Servicio de accesibilidad que intercepta pulsaciones y ejecuta los remapeos.
  */
 class KeyInterceptorService : AccessibilityService() {
 
     companion object {
         private const val TAG: String = "KeyInterceptorService"
-
-        /** Fenêtre de déduplication KeyEvent + Intent en millisecondes */
         private const val DEDUP_WINDOW_MS: Long = 2000L
 
-        /** Référence statique pour communication avec l'UI (nullable si service inactif) */
         var instance: KeyInterceptorService? = null
             private set
     }
 
-    /** Callback de mode apprentissage — appelé quand un bouton est détecté */
     var learningCallback: ((ButtonIdentifier) -> Unit)? = null
         private set
 
     private lateinit var repository: MappingRepository
     private lateinit var remapExecutor: RemapExecutor
 
-    /**
-     * Table des détecteurs long press actifs, indexés par keyCode.
-     * Un détecteur est créé à la première réception d'un keyCode et réutilisé ensuite.
-     */
     private val longPressDetectors: MutableMap<Int, LongPressDetector> = mutableMapOf()
-
-    /**
-     * Horodatages des derniers événements traités, pour déduplication KeyEvent/Intent.
-     * Clé : "keycode_<code>" ou "package_<packageName>".
-     */
     private val recentlyHandledKeys: MutableMap<String, Long> = mutableMapOf()
-
-    // -------------------------------------------------------------------------
-    // Cycle de vie du service
-    // -------------------------------------------------------------------------
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -66,46 +39,35 @@ class KeyInterceptorService : AccessibilityService() {
         repository = app.mappingRepository
         remapExecutor = RemapExecutor(applicationContext)
         instance = this
-        Log.i(TAG, "Service d'accessibilité connecté")
+        Log.i(TAG, "Servicio de accesibilidad conectado")
     }
 
     override fun onDestroy() {
         instance = null
         longPressDetectors.values.forEach { it.cancel() }
         longPressDetectors.clear()
-        Log.i(TAG, "Service d'accessibilité détruit")
+        Log.i(TAG, "Servicio de accesibilidad detenido")
         super.onDestroy()
     }
 
     override fun onInterrupt() {
-        Log.w(TAG, "Service d'accessibilité interrompu")
+        Log.w(TAG, "Servicio de accesibilidad interrumpido")
     }
 
-    // -------------------------------------------------------------------------
-    // Mode apprentissage
-    // -------------------------------------------------------------------------
-
-    /** Active le mode apprentissage. Le prochain bouton détecté invoquera [callback]. */
     fun startLearningMode(callback: (ButtonIdentifier) -> Unit) {
         learningCallback = callback
-        Log.d(TAG, "Mode apprentissage activé")
+        Log.d(TAG, "Modo aprendizaje activado")
     }
 
-    /** Désactive le mode apprentissage sans invoquer de callback. */
     fun stopLearningMode() {
         learningCallback = null
-        Log.d(TAG, "Mode apprentissage désactivé")
+        Log.d(TAG, "Modo aprendizaje desactivado")
     }
 
-    // -------------------------------------------------------------------------
-    // Flux A — interception par KeyEvent
-    // -------------------------------------------------------------------------
-
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        // Mode apprentissage : capturer le premier keyCode reçu
-        if (learningCallback != null
-            && event.action == KeyEvent.ACTION_DOWN
-            && event.repeatCount == 0
+        if (learningCallback != null &&
+            event.action == KeyEvent.ACTION_DOWN &&
+            event.repeatCount == 0
         ) {
             val identifier = ButtonIdentifier(
                 keyCode = event.keyCode,
@@ -125,16 +87,18 @@ class KeyInterceptorService : AccessibilityService() {
             m.isEnabled && m.button.keyCode == event.keyCode
         } ?: return false
 
-        val dedupKey: String = "keycode_${event.keyCode}"
-        if (isDuplicate(dedupKey)) return false
-
+        /*
+         * No deduplicar ACTION_DOWN y ACTION_UP por separado: ambos forman una
+         * única pulsación y LongPressDetector debe consumir los dos. La
+         * deduplicación anterior marcaba ACTION_UP como duplicado del ACTION_DOWN,
+         * devolvía false y dejaba que Android/TCL ejecutase la acción original
+         * del botón (por ejemplo, abrir Netflix).
+         *
+         * LongPressDetector ya controla repeatCount y el estado de cada pulsación.
+         */
         return dispatchToLongPressDetector(event, mapping, config)
     }
 
-    /**
-     * Crée ou réutilise un [LongPressDetector] pour le keyCode donné,
-     * puis lui délègue l'événement.
-     */
     private fun dispatchToLongPressDetector(
         event: KeyEvent,
         mapping: KeyMapping,
@@ -146,7 +110,6 @@ class KeyInterceptorService : AccessibilityService() {
         return detector.onKeyEvent(event)
     }
 
-    /** Construit un [LongPressDetector] configuré pour un mapping donné. */
     private fun buildDetector(mapping: KeyMapping, config: KeyBinderConfig): LongPressDetector {
         return LongPressDetector(
             thresholdMs = config.longPressThresholdMs,
@@ -162,19 +125,12 @@ class KeyInterceptorService : AccessibilityService() {
         )
     }
 
-    // -------------------------------------------------------------------------
-    // Flux B — interception par changement de fenêtre (Intent direct)
-    // -------------------------------------------------------------------------
-
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
 
         val packageName: String = event.packageName?.toString() ?: return
-
-        // Ignorer les événements provenant de notre propre application
         if (packageName == applicationContext.packageName) return
 
-        // Mode apprentissage : capturer le package source
         if (learningCallback != null) {
             val identifier = ButtonIdentifier(
                 sourcePackage = packageName,
@@ -193,30 +149,20 @@ class KeyInterceptorService : AccessibilityService() {
         val dedupKey: String = "package_$packageName"
         if (isDuplicate(dedupKey)) return
 
-        // Flux B : toujours short press — l'app source s'est déjà ouverte, on la remplace
         val target = mapping.shortPressAction ?: return
         remapExecutor.launchAndKillSource(target, packageName, config.showOverlayNotification)
     }
 
-    // -------------------------------------------------------------------------
-    // Déduplication
-    // -------------------------------------------------------------------------
-
-    /**
-     * Vérifie si la clé [key] a déjà été traitée dans la fenêtre [DEDUP_WINDOW_MS].
-     * Enregistre la clé si elle est nouvelle. Nettoie les entrées expirées.
-     */
     private fun isDuplicate(key: String): Boolean {
         val now: Long = System.currentTimeMillis()
         val lastHandled: Long? = recentlyHandledKeys[key]
 
         if (lastHandled != null && now - lastHandled < DEDUP_WINDOW_MS) {
-            Log.d(TAG, "Événement dupliqué ignoré : $key")
+            Log.d(TAG, "Evento duplicado ignorado: $key")
             return true
         }
 
         recentlyHandledKeys[key] = now
-        // Nettoyage des entrées expirées pour éviter une fuite mémoire
         recentlyHandledKeys.entries.removeIf { now - it.value > DEDUP_WINDOW_MS * 2 }
         return false
     }
