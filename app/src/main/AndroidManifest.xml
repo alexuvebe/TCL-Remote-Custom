@@ -60,10 +60,10 @@
             </intent-filter>
         </activity>
 
-        <!-- Service d'accessibilité — interception des boutons de télécommande -->
+        <!-- Le système debe poder enlazar este servicio; BIND_ACCESSIBILITY_SERVICE limita el acceso al sistema -->
         <service
             android:name=".service.KeyInterceptorService"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/accessibility_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
