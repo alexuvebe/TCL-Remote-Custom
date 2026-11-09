@@ -1,10 +1,9 @@
-
 name: TCL Remote Custom - Android APK
 
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, feature-spanish-high-contrast]
   pull_request:
     branches: [main]
 
