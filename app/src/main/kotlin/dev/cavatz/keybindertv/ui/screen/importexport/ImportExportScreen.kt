@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,6 +36,9 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.QrCodeDisplay
+import dev.cavatz.keybindertv.ui.theme.ActionBlue
+import dev.cavatz.keybindertv.ui.theme.ActionGreen
+import dev.cavatz.keybindertv.ui.theme.ActionYellow
 
 /** Espacement vertical standard entre les éléments */
 private val VerticalSpacing = 12.dp
@@ -168,10 +173,10 @@ private fun ExportSection(
             style = MaterialTheme.typography.titleMedium
         )
         Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
-            Button(onClick = onExportFile) {
+            Button(onClick = onExportFile, colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)) {
                 Text(text = stringResource(R.string.importexport_export_file))
             }
-            Button(onClick = onGenerateQr) {
+            Button(onClick = onGenerateQr, colors = ButtonDefaults.buttonColors(containerColor = ActionYellow, contentColor = Color(0xFF202020))) {
                 Text(text = stringResource(R.string.importexport_generate_qr))
             }
         }
@@ -241,7 +246,7 @@ private fun ImportSection(
             text = stringResource(R.string.importexport_section_import),
             style = MaterialTheme.typography.titleMedium
         )
-        Button(onClick = onImportFile) {
+        Button(onClick = onImportFile, colors = ButtonDefaults.buttonColors(containerColor = ActionBlue, contentColor = Color.White)) {
             Text(text = stringResource(R.string.importexport_import_file))
         }
         OutlinedTextField(
@@ -255,7 +260,8 @@ private fun ImportSection(
         )
         Button(
             onClick = { onImportJson(pastedJson) },
-            enabled = pastedJson.isNotBlank()
+            enabled = pastedJson.isNotBlank(),
+            colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)
         ) {
             Text(text = stringResource(R.string.importexport_import_button))
         }
