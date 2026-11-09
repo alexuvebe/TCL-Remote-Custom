@@ -147,7 +147,7 @@ private fun WaitingContent(remainingSeconds: Int, onCancel: () -> Unit) {
         style = MaterialTheme.typography.titleLarge
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
-    TextButton(onClick = onCancel, colors = ButtonDefaults.buttonColors(containerColor = ActionGray, contentColor = Color.White)) {
+    TextButton(onClick = onCancel, colors = androidx.compose.material3.TextButtonDefaults.textButtonColors(contentColor = ActionGray)) {
         Text(text = stringResource(R.string.learning_cancel))
     }
 }
