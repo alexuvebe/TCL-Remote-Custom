@@ -32,16 +32,9 @@ import dev.cavatz.keybindertv.ui.theme.ActionPurple
 import dev.cavatz.keybindertv.ui.theme.ActionRed
 import dev.cavatz.keybindertv.ui.theme.ActionYellow
 
-/** Espacement vertical entre les éléments principaux */
 private val VerticalSpacing = 16.dp
-
-/** Padding autour du contenu */
 private val ContentPadding = 32.dp
 
-/**
- * Écran d'accueil de KeyBinderTv.
- * Affiche le statut du service, les compteurs de mappings et les boutons de navigation.
- */
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -55,18 +48,15 @@ fun HomeScreen(
     HomeContent(
         uiState = uiState,
         onNavigateMappings = { navController.navigate(Screen.MappingList.route) },
-        onNavigateSettings = { navController.navigate(Screen.Settings.route) },
-        onNavigateImportExport = { navController.navigate(Screen.ImportExport.route) }
+        onNavigateSettings = { navController.navigate(Screen.Settings.route) }
     )
 }
 
-/** Contenido stateless de la pantalla de inicio */
 @Composable
 private fun HomeContent(
     uiState: HomeViewModel.HomeUiState,
     onNavigateMappings: () -> Unit,
-    onNavigateSettings: () -> Unit,
-    onNavigateImportExport: () -> Unit
+    onNavigateSettings: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -92,13 +82,11 @@ private fun HomeContent(
         Spacer(modifier = Modifier.height(VerticalSpacing * 2))
         NavigationButtons(
             onNavigateMappings = onNavigateMappings,
-            onNavigateSettings = onNavigateSettings,
-            onNavigateImportExport = onNavigateImportExport
+            onNavigateSettings = onNavigateSettings
         )
     }
 }
 
-/** Título principal de la aplicación */
 @Composable
 private fun AppTitle() {
     Text(
@@ -107,7 +95,6 @@ private fun AppTitle() {
     )
 }
 
-/** Botón de apertura de los ajustes de accesibilidad de Android */
 @Composable
 private fun EnableServiceButton() {
     val context = LocalContext.current
@@ -125,7 +112,6 @@ private fun EnableServiceButton() {
     }
 }
 
-/** Texto que indica el número de mappings activos */
 @Composable
 private fun MappingsCountText(active: Int, total: Int) {
     Text(
@@ -134,12 +120,10 @@ private fun MappingsCountText(active: Int, total: Int) {
     )
 }
 
-/** Botones de navegación a las demás pantallas */
 @Composable
 private fun NavigationButtons(
     onNavigateMappings: () -> Unit,
-    onNavigateSettings: () -> Unit,
-    onNavigateImportExport: () -> Unit
+    onNavigateSettings: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -162,15 +146,6 @@ private fun NavigationButtons(
             )
         ) {
             Text(text = stringResource(R.string.home_settings))
-        }
-        Button(
-            onClick = onNavigateImportExport,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = ActionYellow,
-                contentColor = Color(0xFF202020)
-            )
-        ) {
-            Text(text = stringResource(R.string.home_import_export))
         }
     }
 }
