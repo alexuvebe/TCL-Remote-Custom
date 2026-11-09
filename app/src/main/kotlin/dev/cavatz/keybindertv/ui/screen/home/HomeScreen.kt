@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,11 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 import dev.cavatz.keybindertv.ui.navigation.Screen
+import dev.cavatz.keybindertv.ui.theme.ActionBlue
+import dev.cavatz.keybindertv.ui.theme.ActionGray
+import dev.cavatz.keybindertv.ui.theme.ActionPurple
+import dev.cavatz.keybindertv.ui.theme.ActionRed
+import dev.cavatz.keybindertv.ui.theme.ActionYellow
 
 /** Espacement vertical entre les éléments principaux */
 private val VerticalSpacing = 16.dp
@@ -120,7 +127,7 @@ private fun EnableServiceButton() {
     Button(onClick = {
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         context.startActivity(intent)
-    }) {
+    }, colors = ButtonDefaults.buttonColors(containerColor = ActionRed, contentColor = Color.White)) {
         Text(text = stringResource(R.string.home_enable_service))
     }
 }
@@ -137,7 +144,7 @@ private fun MappingsCountText(active: Int, total: Int) {
 /** Bouton Buy Me a Coffee — lien vers la page de soutien */
 @Composable
 private fun SupportButton(onClick: () -> Unit) {
-    Button(onClick = onClick) {
+    Button(onClick = onClick, colors = ButtonDefaults.buttonColors(containerColor = ActionGray, contentColor = Color.White)) {
         Text(text = stringResource(R.string.support_button))
     }
 }
@@ -153,13 +160,13 @@ private fun NavigationButtons(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(VerticalSpacing)
     ) {
-        Button(onClick = onNavigateMappings) {
+        Button(onClick = onNavigateMappings, colors = ButtonDefaults.buttonColors(containerColor = ActionBlue, contentColor = Color.White)) {
             Text(text = stringResource(R.string.home_manage_mappings))
         }
-        Button(onClick = onNavigateSettings) {
+        Button(onClick = onNavigateSettings, colors = ButtonDefaults.buttonColors(containerColor = ActionPurple, contentColor = Color.White)) {
             Text(text = stringResource(R.string.home_settings))
         }
-        Button(onClick = onNavigateImportExport) {
+        Button(onClick = onNavigateImportExport, colors = ButtonDefaults.buttonColors(containerColor = ActionYellow, contentColor = Color(0xFF202020))) {
             Text(text = stringResource(R.string.home_import_export))
         }
     }
