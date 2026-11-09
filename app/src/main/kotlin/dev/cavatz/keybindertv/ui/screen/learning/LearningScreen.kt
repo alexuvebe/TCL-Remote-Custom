@@ -160,7 +160,7 @@ private fun ButtonDetectedContent(
     onRetry: () -> Unit
 ) {
     val label: String = identifier.userLabel.ifEmpty {
-        identifier.keyCode?.toString() ?: identifier.sourcePackage ?: "Bouton inconnu"
+        identifier.keyCode?.toString() ?: identifier.sourcePackage ?: "Botón desconocido"
     }
     Text(
         text = "Bouton détecté : $label",
