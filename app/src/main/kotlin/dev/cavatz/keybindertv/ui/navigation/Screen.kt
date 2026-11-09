@@ -1,61 +1,36 @@
 package dev.cavatz.keybindertv.ui.navigation
 
-/**
- * Destinations de navigation de l'application.
- * Chaque objet/classe scellée représente un écran avec sa route associée.
- */
+/** Destinos de navegación de la aplicación. */
 sealed class Screen(val route: String) {
 
-    /** Écran d'accueil — vue synthétique des mappings actifs */
+    /** Pantalla de inicio */
     object Home : Screen("home")
 
-    /** Liste complète des mappings configurés */
+    /** Lista de asignaciones configuradas */
     object MappingList : Screen("mappings")
 
-    /**
-     * Mode apprentissage — détection des boutons de télécommande.
-     *
-     * @param mappingId Identifiant UUID du mapping en cours de création
-     */
+    /** Detección de botones del mando */
     object Learning : Screen("learning/{mappingId}") {
-        /** Route template avec argument */
         const val ROUTE: String = "learning/{mappingId}"
-
-        /** Nom de l'argument de navigation */
         const val ARG_MAPPING_ID: String = "mappingId"
-
-        /** Construit la route concrète avec l'identifiant du mapping */
         fun createRoute(mappingId: String): String = "learning/$mappingId"
     }
 
-    /**
-     * Sélecteur d'application pour un mapping donné.
-     *
-     * @param mappingId Identifiant UUID du mapping à modifier
-     * @param pressType Type d'appui : "short" ou "long"
-     */
+    /** Selector de aplicación para una asignación */
     data class AppChooser(
         val mappingId: String,
         val pressType: String
     ) : Screen(ROUTE) {
-
         companion object {
-            /** Route template utilisée pour la déclaration dans le NavGraph */
             const val ROUTE: String = "appchooser/{mappingId}/{pressType}"
-
-            /** Constantes pour les noms d'arguments de navigation */
             const val ARG_MAPPING_ID: String = "mappingId"
             const val ARG_PRESS_TYPE: String = "pressType"
 
-            /** Construit la route concrète avec les valeurs d'arguments */
             fun createRoute(mappingId: String, pressType: String): String =
                 "appchooser/$mappingId/$pressType"
         }
     }
 
-    /** Écran de paramètres globaux */
+    /** Ajustes globales */
     object Settings : Screen("settings")
-
-    /** Import / Export de la configuration via QR code ou fichier */
-    object ImportExport : Screen("importexport")
 }
