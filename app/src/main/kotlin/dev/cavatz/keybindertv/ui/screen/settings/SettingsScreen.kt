@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -28,6 +30,7 @@ import androidx.navigation.NavHostController
 import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
+import dev.cavatz.keybindertv.ui.theme.ActionPurple
 
 /** Espacement vertical entre les sections de paramètres */
 private val SectionSpacing = 24.dp
@@ -141,7 +144,7 @@ private fun AccessibilityButton() {
     Button(onClick = {
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         context.startActivity(intent)
-    }) {
+    }, colors = ButtonDefaults.buttonColors(containerColor = ActionPurple, contentColor = Color.White)) {
         Text(text = stringResource(R.string.settings_accessibility))
     }
 }
