@@ -208,7 +208,7 @@ private fun MappingInfo(
 ) {
     Column(modifier = modifier) {
         Text(
-            text = mapping.button.userLabel.ifEmpty { "Bouton #${mapping.id.take(8)}" },
+            text = mapping.button.userLabel.ifEmpty { "Botón #${mapping.id.take(8)}" },
             style = MaterialTheme.typography.titleMedium
         )
         mapping.shortPressAction?.let { action ->
