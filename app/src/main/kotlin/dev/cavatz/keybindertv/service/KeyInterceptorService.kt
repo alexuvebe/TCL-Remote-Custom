@@ -140,10 +140,22 @@ class KeyInterceptorService : AccessibilityService() {
         mapping: KeyMapping,
         config: KeyBinderConfig
     ): Boolean {
-        val detector: LongPressDetector = longPressDetectors.getOrPut(event.keyCode) {
-            buildDetector(mapping, config)
+        val detector: LongPressDetector = if (
+            event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0
+        ) {
+            // Recréer le détecteur à chaque nouvel appui pour prendre en compte
+            // immédiatement toute modification du mapping ou des paramètres.
+            longPressDetectors.remove(event.keyCode)?.cancel()
+            buildDetector(mapping, config).also { longPressDetectors[event.keyCode] = it }
+        } else {
+            longPressDetectors[event.keyCode] ?: return false
         }
-        return detector.onKeyEvent(event)
+
+        val handled = detector.onKeyEvent(event)
+        if (event.action == KeyEvent.ACTION_UP) {
+            longPressDetectors.remove(event.keyCode)
+        }
+        return handled
     }
 
     /** Construit un [LongPressDetector] configuré pour un mapping donné. */
