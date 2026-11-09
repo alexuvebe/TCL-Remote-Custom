@@ -3,6 +3,7 @@ package dev.cavatz.keybindertv.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 /** Tema oscuro con colores de acción claramente diferenciados. */
 private val KeyBinderColorScheme = darkColorScheme(
@@ -11,7 +12,7 @@ private val KeyBinderColorScheme = darkColorScheme(
     primaryContainer = PrimaryBlueDark,
     secondary = ActionGreen,
     onSecondary = OnPrimaryDark,
-    secondaryContainer = ColorSchemePurpleContainer,
+    secondaryContainer = ActionGreen,
     tertiary = ActionPurple,
     onTertiary = OnPrimaryDark,
     tertiaryContainer = SecondaryPurpleDark,
@@ -25,8 +26,6 @@ private val KeyBinderColorScheme = darkColorScheme(
     error = ErrorRed,
     onError = Color.White
 )
-
-private val ColorSchemePurpleContainer = ActionPurple
 
 @Composable
 fun KeyBinderTvTheme(
