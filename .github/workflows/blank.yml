@@ -1,5 +1,6 @@
 
 name: TCL Remote Custom - Android APK
+# Compile la version de la rama actual.
 
 on:
   workflow_dispatch:
