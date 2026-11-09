@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,6 +29,9 @@ import dev.cavatz.keybindertv.data.model.ButtonIdentifier
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.service.KeyInterceptorService
 import dev.cavatz.keybindertv.ui.navigation.Screen
+import dev.cavatz.keybindertv.ui.theme.ActionBlue
+import dev.cavatz.keybindertv.ui.theme.ActionGray
+import dev.cavatz.keybindertv.ui.theme.ActionGreen
 import kotlinx.coroutines.launch
 
 /** Espacement vertical entre les éléments */
@@ -142,7 +147,7 @@ private fun WaitingContent(remainingSeconds: Int, onCancel: () -> Unit) {
         style = MaterialTheme.typography.titleLarge
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
-    TextButton(onClick = onCancel) {
+    TextButton(onClick = onCancel, colors = ButtonDefaults.buttonColors(containerColor = ActionGray, contentColor = Color.White)) {
         Text(text = stringResource(R.string.learning_cancel))
     }
 }
@@ -163,10 +168,10 @@ private fun ButtonDetectedContent(
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
     Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
-        Button(onClick = onConfirm) {
+        Button(onClick = onConfirm, colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)) {
             Text(text = stringResource(R.string.learning_confirm))
         }
-        TextButton(onClick = onRetry) {
+        TextButton(onClick = onRetry, colors = androidx.compose.material3.TextButtonDefaults.textButtonColors(contentColor = ActionBlue)) {
             Text(text = stringResource(R.string.learning_retry))
         }
     }
@@ -182,7 +187,7 @@ private fun TimeoutContent(onRetry: () -> Unit, onCancel: () -> Unit) {
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
     Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
-        Button(onClick = onRetry) {
+        Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = ActionBlue, contentColor = Color.White)) {
             Text(text = stringResource(R.string.learning_retry))
         }
         TextButton(onClick = onCancel) {
