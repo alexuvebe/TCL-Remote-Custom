@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +34,8 @@ import dev.cavatz.keybindertv.data.model.KeyMapping
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.TvCard
 import dev.cavatz.keybindertv.ui.navigation.Screen
+import dev.cavatz.keybindertv.ui.theme.ActionBlue
+import dev.cavatz.keybindertv.ui.theme.ActionRed
 import kotlinx.coroutines.launch
 
 /** Espacement interne des cartes de mapping */
@@ -98,6 +102,7 @@ private fun MappingListContent(
         if (!uiState.isLoading) {
             Button(
                 onClick = onAddMapping,
+                colors = ButtonDefaults.buttonColors(containerColor = ActionBlue, contentColor = Color.White),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(ScreenPadding)
@@ -192,7 +197,7 @@ private fun MappingItem(
                     checked = mapping.isEnabled,
                     onCheckedChange = onToggle
                 )
-                TextButton(onClick = onRemove) {
+                TextButton(onClick = onRemove, colors = androidx.compose.material3.TextButtonDefaults.textButtonColors(contentColor = ActionRed)) {
                     Text(text = stringResource(R.string.action_delete))
                 }
             }
