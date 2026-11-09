@@ -65,6 +65,9 @@ fun MappingListScreen(
         uiState = uiState,
         onToggle = { id, enabled -> viewModel.toggleMapping(id, enabled) },
         onRemove = { id -> viewModel.removeMapping(id) },
+        onEditMapping = { id ->
+            navController.navigate(Screen.AppChooser.createRoute(id, "short"))
+        },
         onAddMapping = {
             coroutineScope.launch {
                 // Crée le mapping vide puis navigue vers LearningScreen avec son ID
@@ -81,6 +84,7 @@ private fun MappingListContent(
     uiState: MappingViewModel.MappingListUiState,
     onToggle: (String, Boolean) -> Unit,
     onRemove: (String) -> Unit,
+    onEditMapping: (String) -> Unit,
     onAddMapping: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -90,7 +94,8 @@ private fun MappingListContent(
             else -> MappingList(
                 mappings = uiState.mappings,
                 onToggle = onToggle,
-                onRemove = onRemove
+                onRemove = onRemove,
+                onEditMapping = onEditMapping
             )
         }
 
@@ -144,7 +149,8 @@ private fun EmptyMappingList(onAddMapping: () -> Unit) {
 private fun MappingList(
     mappings: List<KeyMapping>,
     onToggle: (String, Boolean) -> Unit,
-    onRemove: (String) -> Unit
+    onRemove: (String) -> Unit,
+    onEditMapping: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -159,7 +165,8 @@ private fun MappingList(
             MappingItem(
                 mapping = mapping,
                 onToggle = { enabled -> onToggle(mapping.id, enabled) },
-                onRemove = { onRemove(mapping.id) }
+                onRemove = { onRemove(mapping.id) },
+                onEdit = { onEditMapping(mapping.id) }
             )
         }
     }
@@ -170,10 +177,11 @@ private fun MappingList(
 private fun MappingItem(
     mapping: KeyMapping,
     onToggle: (Boolean) -> Unit,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    onEdit: () -> Unit
 ) {
     TvCard(
-        onClick = {},
+        onClick = onEdit,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
