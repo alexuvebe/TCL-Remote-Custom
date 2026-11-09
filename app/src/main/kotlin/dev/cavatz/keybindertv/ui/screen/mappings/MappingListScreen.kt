@@ -170,7 +170,7 @@ private fun MappingList(
     }
 }
 
-/** Carte d'un mapping individuel */
+/** Tarjeta de una asignación individual. */
 @Composable
 private fun MappingItem(
     mapping: KeyMapping,
