@@ -10,18 +10,10 @@ import androidx.navigation.navArgument
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.screen.appchooser.AppChooserScreen
 import dev.cavatz.keybindertv.ui.screen.home.HomeScreen
-import dev.cavatz.keybindertv.ui.screen.importexport.ImportExportScreen
 import dev.cavatz.keybindertv.ui.screen.learning.LearningScreen
 import dev.cavatz.keybindertv.ui.screen.mappings.MappingListScreen
 import dev.cavatz.keybindertv.ui.screen.settings.SettingsScreen
 
-/**
- * Graphe de navigation principal de l'application.
- * Connecte chaque route à son écran Compose réel.
- *
- * @param navController Contrôleur de navigation partagé entre les écrans
- * @param mappingRepository Repository transmis aux écrans qui en ont besoin
- */
 @Composable
 fun KeyBinderNavGraph(
     navController: NavHostController = rememberNavController(),
@@ -84,10 +76,6 @@ fun KeyBinderNavGraph(
                 navController = navController,
                 repository = mappingRepository
             )
-        }
-
-        composable(route = Screen.ImportExport.route) {
-            ImportExportScreen(repository = mappingRepository)
         }
     }
 }
