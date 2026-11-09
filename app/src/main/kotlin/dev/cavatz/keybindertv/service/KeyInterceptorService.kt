@@ -125,9 +125,9 @@ class KeyInterceptorService : AccessibilityService() {
             m.isEnabled && m.button.keyCode == event.keyCode
         } ?: return false
 
-        val dedupKey: String = "keycode_${event.keyCode}"
-        if (isDuplicate(dedupKey)) return false
-
+        // Ne pas dédupliquer les KeyEvents : ACTION_UP doit parvenir au détecteur.
+        // Le filtre précédent rejetait aussi les nouvelles pressions de la même touche
+        // pendant 2 secondes, ce qui perturbait les appuis courts et répétés.
         return dispatchToLongPressDetector(event, mapping, config)
     }
 
