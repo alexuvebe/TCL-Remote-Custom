@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Copia en la cuenta Google del dispositivo. -->
+        <include
+            domain="file"
+            path="datastore/keybinder_config.json" />
+    </cloud-backup>
+    <device-transfer>
+        <!-- Permite transferir la configuración al migrar de dispositivo. -->
+        <include
+            domain="file"
+            path="datastore/keybinder_config.json" />
+    </device-transfer>
+</data-extraction-rules>
