@@ -15,5 +15,7 @@ data class KeyMapping(
     val longPressAction: ActionTarget? = null,
     val isEnabled: Boolean = true,
     val shortPressUseDefault: Boolean = false,
-    val longPressUseDefault: Boolean = false
+    val longPressUseDefault: Boolean = false,
+    val shortPressEnabled: Boolean = true,
+    val longPressEnabled: Boolean = true
 )
