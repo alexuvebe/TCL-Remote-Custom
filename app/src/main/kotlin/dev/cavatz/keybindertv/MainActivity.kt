@@ -41,7 +41,10 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                         confirmButton = {
-                            Button(onClick = { app.updateManager.downloadAndInstall() }) {
+                            Button(onClick = {
+                                app.updateManager.dismissNotice()
+                                app.updateManager.downloadAndInstall()
+                            }) {
                                 Text("Descargar e instalar")
                             }
                         },
