@@ -45,8 +45,8 @@ jobs:
       - name: Publicar APK para descarga directa
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2026.11.10-6
-          name: MANDO TCL - 10 noviembre 2026 (actualización 6)
-          body: APK compilado automáticamente. Corrige la apertura de fábrica de Prime Video y TCL TV, añade compatibilidad con actividades Android TV y muestra el código junto a la aplicación original y compacta los controles de cada botón en una sola línea.
+          tag_name: v2026.11.10-7
+          name: MANDO TCL - 10 noviembre 2026 (actualización 7)
+          body: APK compilado automáticamente. Corrige la apertura de fábrica de Prime Video y TCL TV, añade compatibilidad con actividades Android TV y muestra el código junto a la aplicación original y muestra las aplicaciones asignadas junto a cada tipo de pulsación y compacta los controles en dos líneas.
           files: app/build/outputs/apk/debug/*.apk
           fail_on_unmatched_files: true
