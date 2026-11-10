@@ -1,17 +1,23 @@
-
 name: TCL Remote Custom - Android APK
+# Build trigger after permanent signing secret setup
 
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, feature-spanish-high-contrast]
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_SIGNING_BUNDLE_BASE64: ${{ secrets.ANDROID_SIGNING_BUNDLE_BASE64 }}
 
     steps:
       - name: Descargar codigo
@@ -29,12 +35,37 @@ jobs:
           gradle-version: '8.6'
           validate-wrappers: false
 
-      - name: Compilar APK
-        run: gradle --no-daemon assembleDebug
+      - name: Preparar firma permanente
+        if: env.ANDROID_SIGNING_BUNDLE_BASE64 != ''
+        run: |
+          echo "$ANDROID_SIGNING_BUNDLE_BASE64" | base64 --decode > /tmp/mandotcl-signing.zip
+          unzip -o /tmp/mandotcl-signing.zip -d .
+          test -s keybindertv.keystore
+          test -s key.properties
+
+      - name: Compilar APK firmado para actualizaciones
+        if: env.ANDROID_SIGNING_BUNDLE_BASE64 != ''
+        run: |
+          gradle --no-daemon assembleRelease -PAPP_VERSION_CODE=${{ github.run_number }} -PAPP_VERSION_NAME=2026.11.10.${{ github.run_number }}
+          cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/mando-tcl.apk
+
+      - name: Compilar APK de prueba (sin firma permanente)
+        if: env.ANDROID_SIGNING_BUNDLE_BASE64 == ''
+        run: gradle --no-daemon assembleDebug -PAPP_VERSION_CODE=${{ github.run_number }} -PAPP_VERSION_NAME=2026.11.10.${{ github.run_number }}
 
       - name: Guardar APK
         uses: actions/upload-artifact@v4
         with:
-          name: TCL-Remote-Custom-APK
-          path: app/build/outputs/apk/debug/*.apk
+          name: MANDO-TCL-APK
+          path: app/build/outputs/apk/**/*.apk
           if-no-files-found: error
+
+      - name: Publicar APK firmado para descarga desde la app
+        if: env.ANDROID_SIGNING_BUNDLE_BASE64 != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2026.11.10-${{ github.run_number }}
+          name: MANDO TCL - actualización ${{ github.run_number }}
+          body: Nueva versión firmada de MANDO TCL. Se puede descargar e instalar desde la propia aplicación. Conserva las asignaciones de botones.
+          files: app/build/outputs/apk/release/mando-tcl.apk
+          fail_on_unmatched_files: true
