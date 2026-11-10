@@ -42,7 +42,7 @@
     <string name="appchooser_title">Elegir aplicación</string>
     <string name="appchooser_search">Buscar una aplicación…</string>
     <string name="appchooser_factory">De fábrica</string>
-    <string name="appchooser_factory_description">Usar la acción original del botón cuando se pueda identificar.</string>
+    <string name="appchooser_factory_description">Usa la acción original si se reconoce (Netflix, YouTube o Prime Video). En otros botones, se conserva la acción nativa si ambas pulsaciones están en «De fábrica».</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_overlay">Mostrar aviso al reasignar</string>
     <string name="settings_longpress_threshold">Duración de pulsación larga: %1$d ms</string>
