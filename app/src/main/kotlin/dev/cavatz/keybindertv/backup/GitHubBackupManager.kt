@@ -158,7 +158,7 @@ class GitHubBackupManager(
         error("El código ha caducado. Vuelve a intentarlo.")
     }
 
-    private fun initializeGist() {
+    private suspend fun initializeGist() {
         var existingId = prefs.getString(KEY_GIST_ID, null)
         val token = readToken() ?: error("No se ha guardado la autorización de GitHub")
         if (existingId == null) {
@@ -195,7 +195,7 @@ class GitHubBackupManager(
         prefs.edit().putString(KEY_GIST_ID, id).apply()
     }
 
-    private fun uploadCurrentConfig() {
+    private suspend fun uploadCurrentConfig() {
         val token = readToken() ?: error("Conecta primero con GitHub")
         val id = prefs.getString(KEY_GIST_ID, null) ?: error("No existe una copia privada; vuelve a conectar")
         val config = repository.configFlow.first()
@@ -207,7 +207,7 @@ class GitHubBackupManager(
         requestJson("https://api.github.com/gists/$id", "PATCH", body, token)
     }
 
-    private fun downloadConfig(): KeyBinderConfig {
+    private suspend fun downloadConfig(): KeyBinderConfig {
         val token = readToken() ?: error("Conecta primero con GitHub")
         val id = prefs.getString(KEY_GIST_ID, null) ?: error("No hay copia privada asociada")
         val gist = requestJson("https://api.github.com/gists/$id", "GET", null, token).jsonObject
