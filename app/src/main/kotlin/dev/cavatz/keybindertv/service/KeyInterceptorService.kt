@@ -30,7 +30,7 @@ class KeyInterceptorService : AccessibilityService() {
     private lateinit var repository: MappingRepository
     private lateinit var remapExecutor: RemapExecutor
 
-    private val longPressDetectors: MutableMap<Int, LongPressDetector> = mutableMapOf()
+    private data class DetectorEntry(val mapping: KeyMapping, val thresholdMs: Long, val detector: LongPressDetector)\n\n    private val longPressDetectors: MutableMap<Int, DetectorEntry> = mutableMapOf()
     private val recentlyHandledKeys: MutableMap<String, Long> = mutableMapOf()
 
     override fun onServiceConnected() {
@@ -44,7 +44,7 @@ class KeyInterceptorService : AccessibilityService() {
 
     override fun onDestroy() {
         instance = null
-        longPressDetectors.values.forEach { it.cancel() }
+        longPressDetectors.values.forEach { it.detector.cancel() }
         longPressDetectors.clear()
         Log.i(TAG, "Servicio de accesibilidad detenido")
         super.onDestroy()
@@ -104,10 +104,21 @@ class KeyInterceptorService : AccessibilityService() {
         mapping: KeyMapping,
         config: KeyBinderConfig
     ): Boolean {
-        val detector: LongPressDetector = longPressDetectors.getOrPut(event.keyCode) {
-            buildDetector(mapping, config)
+        val current = longPressDetectors[event.keyCode]
+        val entry = if (current == null ||
+            current.mapping != mapping ||
+            current.thresholdMs != config.longPressThresholdMs
+        ) {
+            current?.detector?.cancel()
+            DetectorEntry(
+                mapping = mapping,
+                thresholdMs = config.longPressThresholdMs,
+                detector = buildDetector(mapping, config)
+            ).also { longPressDetectors[event.keyCode] = it }
+        } else {
+            current
         }
-        return detector.onKeyEvent(event)
+        return entry.detector.onKeyEvent(event)
     }
 
     private fun buildDetector(mapping: KeyMapping, config: KeyBinderConfig): LongPressDetector {
