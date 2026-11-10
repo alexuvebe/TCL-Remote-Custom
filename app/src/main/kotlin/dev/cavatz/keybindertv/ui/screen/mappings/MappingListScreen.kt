@@ -254,6 +254,12 @@ private fun MappingInfo(mapping: KeyMapping) {
             style = MaterialTheme.typography.titleMedium,
             color = Color.White
         )
+        val factoryAppLabel = factoryAppForKeyCode(mapping.button.keyCode)
+        Text(
+            text = "Código: ${mapping.button.keyCode ?: "—"} · De fábrica: $factoryAppLabel",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         val shortLabel = when {
             mapping.shortPressUseDefault -> "De fábrica"
             mapping.shortPressAction != null -> mapping.shortPressAction.appLabel
@@ -289,5 +295,17 @@ private fun MappingInfo(mapping: KeyMapping) {
             style = MaterialTheme.typography.labelMedium,
             color = if (mapping.isEnabled) ActionGreen else ActionRed
         )
+    }
+}
+
+private fun factoryAppForKeyCode(keyCode: Int?): String {
+    return when (keyCode) {
+        4062 -> "Netflix"
+        4099 -> "Prime Video"
+        4140 -> "Guard"
+        4057 -> "Media"
+        4065 -> "YouTube"
+        4020 -> "TCL Channel"
+        else -> "No identificada"
     }
 }
