@@ -172,7 +172,7 @@ class GitHubBackupManager(
         }
         if (existingId != null) {
             val local = repository.configFlow.first()
-            if (local.mappings.isEmpty()) {
+            if (local == KeyBinderConfig()) {
                 repository.replaceConfig(downloadConfig())
                 return
             }
