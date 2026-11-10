@@ -1,5 +1,7 @@
 package dev.cavatz.keybindertv.ui.screen.learning
 
+import android.view.KeyEvent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +20,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -162,18 +167,33 @@ private fun ButtonDetectedContent(
     val label: String = identifier.userLabel.ifEmpty {
         identifier.keyCode?.toString() ?: identifier.sourcePackage ?: "Botón desconocido"
     }
-    Text(
-        text = "Botón detectado: $label",
-        style = MaterialTheme.typography.titleMedium
-    )
-    Text(
-        text = "Código: ${identifier.keyCode ?: "No disponible"}",
-        style = MaterialTheme.typography.bodyMedium
-    )
-    Text(
-        text = "Aplicación original: ${originalAppFor(identifier)}",
-        style = MaterialTheme.typography.bodyMedium
-    )
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(VerticalSpacing),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RemoteDiagram(identifier = identifier)
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(
+                text = "Botón detectado: $label",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "Código: ${identifier.keyCode ?: "No disponible"}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Aplicación original: ${originalAppFor(identifier)}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            if (remoteButtonPosition(identifier) == null) {
+                Text(
+                    text = "Posición física no identificada en este esquema",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
     Spacer(modifier = Modifier.height(VerticalSpacing))
     Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
         Button(onClick = onConfirm, colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)) {
@@ -226,6 +246,54 @@ private fun ServiceInactiveMessage(onCancel: () -> Unit) {
     }
 }
 
+
+
+/** Esquema genérico del mando TCL; solo resalta posiciones con código conocido. */
+@Composable
+private fun RemoteDiagram(identifier: ButtonIdentifier) {
+    val position = remoteButtonPosition(identifier)
+    Canvas(modifier = Modifier.size(width = 104.dp, height = 230.dp)) {
+        val w = size.width
+        val h = size.height
+        drawRoundRect(
+            color = Color(0xFF303944),
+            cornerRadius = CornerRadius(w * 0.22f)
+        )
+        drawCircle(Color(0xFF9AA6B2), radius = w * 0.07f, center = Offset(w * 0.78f, h * 0.09f))
+        drawCircle(Color(0xFF657180), radius = w * 0.13f, center = Offset(w * 0.5f, h * 0.34f))
+        drawCircle(Color(0xFF9AA6B2), radius = w * 0.055f, center = Offset(w * 0.5f, h * 0.34f))
+        drawLine(Color(0xFF9AA6B2), Offset(w * 0.5f, h * 0.20f), Offset(w * 0.5f, h * 0.48f), strokeWidth = 3f)
+        drawLine(Color(0xFF9AA6B2), Offset(w * 0.36f, h * 0.34f), Offset(w * 0.64f, h * 0.34f), strokeWidth = 3f)
+        drawCircle(Color(0xFF657180), radius = w * 0.055f, center = Offset(w * 0.32f, h * 0.53f))
+        drawCircle(Color(0xFF657180), radius = w * 0.055f, center = Offset(w * 0.68f, h * 0.53f))
+        drawRoundRect(Color(0xFF657180), topLeft = Offset(w * 0.24f, h * 0.64f), size = androidx.compose.ui.geometry.Size(w * 0.2f, h * 0.055f), cornerRadius = CornerRadius(8f))
+        drawRoundRect(Color(0xFF657180), topLeft = Offset(w * 0.56f, h * 0.64f), size = androidx.compose.ui.geometry.Size(w * 0.2f, h * 0.055f), cornerRadius = CornerRadius(8f))
+        drawRoundRect(Color(0xFFE53935), topLeft = Offset(w * 0.31f, h * 0.81f), size = androidx.compose.ui.geometry.Size(w * 0.38f, h * 0.065f), cornerRadius = CornerRadius(8f))
+        if (position != null) {
+            drawCircle(
+                color = Color(0xFFFFD740),
+                radius = w * 0.12f,
+                center = Offset(w * position.first, h * position.second),
+                style = Stroke(width = 6f)
+            )
+        }
+    }
+}
+
+/** Coordenadas normalizadas de teclas cuya posición se puede representar con seguridad. */
+private fun remoteButtonPosition(identifier: ButtonIdentifier): Pair<Float, Float>? {
+    return when (identifier.keyCode) {
+        4062 -> 0.5f to 0.842f // Netflix: botón de acceso directo inferior
+        KeyEvent.KEYCODE_DPAD_UP -> 0.5f to 0.22f
+        KeyEvent.KEYCODE_DPAD_DOWN -> 0.5f to 0.46f
+        KeyEvent.KEYCODE_DPAD_LEFT -> 0.38f to 0.34f
+        KeyEvent.KEYCODE_DPAD_RIGHT -> 0.62f to 0.34f
+        KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> 0.5f to 0.34f
+        KeyEvent.KEYCODE_BACK -> 0.32f to 0.53f
+        KeyEvent.KEYCODE_HOME -> 0.68f to 0.53f
+        else -> null
+    }
+}
 
 /** Devuelve la aplicación de fábrica únicamente para códigos verificados del mando TCL. */
 private fun originalAppFor(identifier: ButtonIdentifier): String {
