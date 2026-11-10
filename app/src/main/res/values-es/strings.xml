@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KeyBinder TV</string>
+    <string name="app_name">MANDO TCL</string>
     <string name="screen_home">Inicio</string>
     <string name="screen_mappings">Asignaciones</string>
     <string name="screen_learning">Detección</string>
@@ -20,9 +20,9 @@
     <string name="mapping_no_action">Sin acción asignada</string>
     <string name="settings_show_overlay">Mostrar aviso al reasignar un botón</string>
     <string name="settings_long_press_threshold">Duración de la pulsación larga (ms)</string>
-    <string name="accessibility_service_label">KeyBinder TV — Reasignador de botones</string>
+    <string name="accessibility_service_label">MANDO TCL — Reasignador de botones</string>
     <string name="accessibility_service_description">Intercepta los botones del mando a distancia para asignarlos a otras aplicaciones.</string>
-    <string name="home_title">KeyBinder TV</string>
+    <string name="home_title">MANDO TCL</string>
     <string name="home_service_active">Servicio activo</string>
     <string name="home_service_inactive">Servicio inactivo</string>
     <string name="home_enable_service">Activar servicio</string>
@@ -41,6 +41,8 @@
     <string name="learning_service_inactive">El servicio está inactivo. Activa el servicio de accesibilidad.</string>
     <string name="appchooser_title">Elegir aplicación</string>
     <string name="appchooser_search">Buscar una aplicación…</string>
+    <string name="appchooser_factory">De fábrica</string>
+    <string name="appchooser_factory_description">Usar la acción original del botón cuando se pueda identificar.</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_overlay">Mostrar aviso al reasignar</string>
     <string name="settings_longpress_threshold">Duración de pulsación larga: %1$d ms</string>
@@ -53,6 +55,4 @@
     <string name="importexport_section_export">Copia de seguridad</string>
     <string name="press_type_short">Corta</string>
     <string name="press_type_long">Larga</string>
-    <string name="support_button">☕ Apoyar al desarrollador</string>
-    <string name="support_url" translatable="false">https://buymeacoffee.com/anthoctz</string>
 </resources>
