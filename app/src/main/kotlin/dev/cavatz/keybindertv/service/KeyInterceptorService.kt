@@ -194,12 +194,15 @@ class KeyInterceptorService : AccessibilityService() {
      * En el TCL probado, el código 4062 corresponde a Netflix.
      */
     private fun launchOriginalAction(button: ButtonIdentifier, showOverlay: Boolean) {
-        val target = when {
-            button.keyCode == 4062 ->
-                ActionTarget("com.netflix.ninja", "Netflix")
-            !button.sourcePackage.isNullOrBlank() ->
+        val target = when (button.keyCode) {
+            4062 -> ActionTarget("com.netflix.ninja", "Netflix")
+            4065 -> ActionTarget("com.google.android.youtube.tv", "YouTube")
+            4099 -> ActionTarget("com.amazon.amazonvideo.livingroom", "Prime Video")
+            else -> if (!button.sourcePackage.isNullOrBlank()) {
                 ActionTarget(button.sourcePackage, button.sourcePackage)
-            else -> null
+            } else {
+                null
+            }
         }
 
         if (target == null) {
