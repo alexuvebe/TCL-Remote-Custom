@@ -208,7 +208,7 @@ private fun MappingItem(
                 }
                 Button(
                     onClick = onConfigureLong,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).tvFocusOutline(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ActionGreen,
                         contentColor = Color.White
