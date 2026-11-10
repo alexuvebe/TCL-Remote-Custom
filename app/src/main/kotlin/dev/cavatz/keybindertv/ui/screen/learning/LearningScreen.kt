@@ -31,7 +31,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import dev.cavatz.keybindertv.R
-import dev.cavatz.keybindertv.ui.component.tvFocusOutline
 import dev.cavatz.keybindertv.data.model.ButtonIdentifier
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.service.KeyInterceptorService
@@ -46,9 +45,6 @@ private val VerticalSpacing = 16.dp
 
 /** Padding global de l'écran */
 private val ScreenPadding = 32.dp
-
-/** Type d'appui par défaut après la détection du bouton */
-private const val DEFAULT_PRESS_TYPE: String = "short"
 
 /**
  * Écran de détection du bouton de télécommande.
@@ -80,12 +76,12 @@ fun LearningScreen(
     LearningContent(
         state = state,
         remainingSeconds = remainingSeconds,
-        onConfirm = {
+        onConfirm = { pressType ->
             coroutineScope.launch {
                 viewModel.confirmButton()
                 // Navigation vers AppChooser pour configurer les actions du bouton détecté
                 navController.navigate(
-                    Screen.AppChooser.createRoute(mappingId, DEFAULT_PRESS_TYPE)
+                    Screen.AppChooser.createRoute(mappingId, pressType)
                 ) {
                     popUpTo(Screen.MappingList.route) { inclusive = false }
                 }
@@ -104,7 +100,7 @@ fun LearningScreen(
 private fun LearningContent(
     state: LearningViewModel.LearningState,
     remainingSeconds: Int,
-    onConfirm: () -> Unit,
+    onConfirm: (String) -> Unit,
     onRetry: () -> Unit,
     onCancel: () -> Unit
 ) {
@@ -163,7 +159,7 @@ private fun WaitingContent(remainingSeconds: Int, onCancel: () -> Unit) {
 @Composable
 private fun ButtonDetectedContent(
     identifier: ButtonIdentifier,
-    onConfirm: () -> Unit,
+    onConfirm: (String) -> Unit,
     onRetry: () -> Unit
 ) {
     val label: String = identifier.userLabel.ifEmpty {
@@ -197,13 +193,27 @@ private fun ButtonDetectedContent(
         }
     }
     Spacer(modifier = Modifier.height(VerticalSpacing))
+    Text(
+        text = stringResource(R.string.learning_choose_press_type),
+        style = MaterialTheme.typography.titleMedium
+    )
+    Spacer(modifier = Modifier.height(8.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
-        Button(onClick = onConfirm, colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)) {
-            Text(text = stringResource(R.string.learning_confirm))
+        Button(
+            onClick = { onConfirm("short") },
+            colors = ButtonDefaults.buttonColors(containerColor = ActionBlue, contentColor = Color.White)
+        ) {
+            Text(text = stringResource(R.string.learning_short_press))
         }
-        TextButton(onClick = onRetry, colors = ButtonDefaults.textButtonColors(contentColor = ActionBlue)) {
-            Text(text = stringResource(R.string.learning_retry))
+        Button(
+            onClick = { onConfirm("long") },
+            colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)
+        ) {
+            Text(text = stringResource(R.string.learning_long_press))
         }
+    }
+    TextButton(onClick = onRetry, colors = ButtonDefaults.textButtonColors(contentColor = ActionBlue)) {
+        Text(text = stringResource(R.string.learning_retry))
     }
 }
 
