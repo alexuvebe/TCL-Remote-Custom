@@ -33,13 +33,17 @@ class LongPressDetector(
 
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    /** Indique si un ACTION_DOWN est en attente (timer actif) */
+    /** Indique si un ACTION_DOWN est en attente (timer actif). */
     private var isPending: Boolean = false
+
+    /** Consume el ACTION_UP correspondiente después de ejecutar una pulsación larga. */
+    private var consumeNextActionUp: Boolean = false
 
     /** Runnable déclenchant le long press une fois le seuil atteint */
     private val longPressRunnable: Runnable = Runnable {
         if (isPending) {
             isPending = false
+            consumeNextActionUp = true
             handler.removeCallbacks(safetyRunnable)
             onLongPress()
         }
@@ -49,6 +53,7 @@ class LongPressDetector(
     private val safetyRunnable: Runnable = Runnable {
         if (isPending) {
             isPending = false
+            consumeNextActionUp = true
             handler.removeCallbacks(longPressRunnable)
             onShortPress()
         }
@@ -72,6 +77,7 @@ class LongPressDetector(
     /** Annule tous les timers en cours sans déclencher de callback. */
     fun cancel() {
         isPending = false
+        consumeNextActionUp = false
         handler.removeCallbacks(longPressRunnable)
         handler.removeCallbacks(safetyRunnable)
     }
@@ -81,6 +87,7 @@ class LongPressDetector(
         if (event.repeatCount > 0) return isPending
 
         if (!isPending) {
+            consumeNextActionUp = false
             isPending = true
             handler.postDelayed(longPressRunnable, thresholdMs)
             handler.postDelayed(safetyRunnable, safetyTimeoutMs)
@@ -89,7 +96,13 @@ class LongPressDetector(
     }
 
     private fun handleActionUp(): Boolean {
-        if (!isPending) return false
+        if (!isPending) {
+            if (consumeNextActionUp) {
+                consumeNextActionUp = false
+                return true
+            }
+            return false
+        }
 
         isPending = false
         handler.removeCallbacks(longPressRunnable)
