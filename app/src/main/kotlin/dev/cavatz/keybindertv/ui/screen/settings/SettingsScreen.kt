@@ -30,6 +30,7 @@ import androidx.navigation.NavHostController
 import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.ui.component.tvFocusOutline
 import dev.cavatz.keybindertv.data.repository.MappingRepository
+import dev.cavatz.keybindertv.KeyBinderTvApp
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 import dev.cavatz.keybindertv.ui.theme.ActionPurple
 
@@ -101,6 +102,8 @@ private fun SettingsContent(
         Spacer(modifier = Modifier.height(SectionSpacing))
 
         AccessibilityButton()
+        Spacer(modifier = Modifier.height(SectionSpacing))
+        UpdateSection()
     }
 }
 
@@ -147,5 +150,49 @@ private fun AccessibilityButton() {
         context.startActivity(intent)
     }, colors = ButtonDefaults.buttonColors(containerColor = ActionPurple, contentColor = Color.White)) {
         Text(text = stringResource(R.string.settings_accessibility))
+    }
+}
+
+
+/** Comprobación manual y descarga de nuevas versiones desde GitHub. */
+@Composable
+private fun UpdateSection() {
+    val context = LocalContext.current
+    val manager = (context.applicationContext as KeyBinderTvApp).updateManager
+    val updateState by manager.state.collectAsStateWithLifecycle()
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Actualizaciones", style = MaterialTheme.typography.titleLarge)
+        Text("Versión instalada: ${updateState.currentVersion}")
+        if (updateState.latestVersion.isNotBlank()) {
+            Text("Última versión: ${updateState.latestVersion}")
+        }
+        Text(updateState.message, style = MaterialTheme.typography.bodyMedium)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Button(
+                modifier = Modifier.tvFocusOutline(),
+                onClick = { manager.checkForUpdates() },
+                enabled = !updateState.isChecking && !updateState.isDownloading
+            ) {
+                Text(if (updateState.isChecking) "Comprobando…" else "Buscar actualizaciones")
+            }
+            if (updateState.updateAvailable) {
+                Button(
+                    modifier = Modifier.tvFocusOutline(),
+                    onClick = { manager.downloadAndInstall() },
+                    enabled = !updateState.isDownloading
+                ) {
+                    Text(if (updateState.isDownloading) "Descargando…" else "Descargar e instalar")
+                }
+            } else if (updateState.downloaded) {
+                Button(
+                    modifier = Modifier.tvFocusOutline(),
+                    onClick = { manager.installDownloadedApk() }
+                ) {
+                    Text("Instalar actualización")
+                }
+            }
+        }
     }
 }
