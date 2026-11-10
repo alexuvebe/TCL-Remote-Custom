@@ -115,5 +115,9 @@ class MappingRepositoryImpl(
         }
     }
 
+    override suspend fun replaceConfig(config: KeyBinderConfig) {
+        dataStore.updateData { config }
+    }
+
     override fun getConfigSync(): KeyBinderConfig = configCache.get()
 }
