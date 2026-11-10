@@ -32,6 +32,7 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.AppIcon
 import dev.cavatz.keybindertv.ui.component.TvCard
+import dev.cavatz.keybindertv.ui.component.tvFocusOutline
 import dev.cavatz.keybindertv.util.InstalledAppsProvider
 import kotlinx.coroutines.launch
 
@@ -145,7 +146,8 @@ private fun SearchBar(query: String, onQueryChanged: (String) -> Unit) {
         onValueChange = onQueryChanged,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = GridSpacing),
+            .padding(vertical = GridSpacing)
+            .tvFocusOutline(),
         placeholder = { Text(text = stringResource(R.string.appchooser_search)) },
         singleLine = true
     )
