@@ -250,21 +250,30 @@ private fun MappingInfo(mapping: KeyMapping) {
             style = MaterialTheme.typography.titleMedium,
             color = Color.White
         )
-        mapping.shortPressAction?.let { action ->
-            Text(
-                text = "Pulsación corta: ${action.appLabel}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        val shortLabel = when {
+            mapping.shortPressUseDefault -> "De fábrica"
+            mapping.shortPressAction != null -> mapping.shortPressAction.appLabel
+            else -> "Sin acción"
         }
-        mapping.longPressAction?.let { action ->
-            Text(
-                text = "Pulsación larga: ${action.appLabel}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        val longLabel = when {
+            mapping.longPressUseDefault -> "De fábrica"
+            mapping.longPressAction != null -> mapping.longPressAction.appLabel
+            mapping.shortPressAction != null && !mapping.shortPressUseDefault -> "${mapping.shortPressAction.appLabel} (igual que corta)"
+            else -> "Sin acción"
         }
-        if (mapping.shortPressAction == null && mapping.longPressAction == null) {
+        Text(
+            text = "Pulsación corta: $shortLabel",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = "Pulsación larga: $longLabel",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (mapping.shortPressAction == null && mapping.longPressAction == null &&
+            !mapping.shortPressUseDefault && !mapping.longPressUseDefault
+        ) {
             Text(
                 text = stringResource(R.string.mapping_no_action),
                 style = MaterialTheme.typography.bodySmall,
