@@ -14,6 +14,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -193,7 +197,8 @@ private fun MappingItem(
             MappingInfo(mapping = mapping)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
                     onClick = onConfigureShort,
@@ -201,6 +206,10 @@ private fun MappingItem(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ActionBlue,
                         contentColor = Color.White
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        horizontal = 6.dp,
+                        vertical = 8.dp
                     )
                 ) {
                     Text("Pulsación corta", maxLines = 1, style = MaterialTheme.typography.labelSmall)
@@ -211,35 +220,34 @@ private fun MappingItem(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ActionGreen,
                         contentColor = Color.White
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        horizontal = 6.dp,
+                        vertical = 8.dp
                     )
                 ) {
                     Text("Pulsación larga", maxLines = 1, style = MaterialTheme.typography.labelSmall)
                 }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = { onToggle(!mapping.isEnabled) },
+                Switch(
+                    checked = mapping.isEnabled,
+                    onCheckedChange = onToggle,
                     modifier = Modifier.tvFocusOutline(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (mapping.isEnabled) ActionGray else ActionRed,
-                        contentColor = Color.White
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = ActionGreen,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = ActionGray
                     )
-                ) {
-                    Text(text = if (mapping.isEnabled) "Desactivar" else "Activar")
-                }
-                Button(
+                )
+                FilledIconButton(
                     onClick = onRemove,
                     modifier = Modifier.tvFocusOutline(),
-                    colors = ButtonDefaults.buttonColors(
+                    colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = ActionRed,
                         contentColor = Color.White
                     )
                 ) {
-                    Text(text = stringResource(R.string.action_delete))
+                    Text("×", style = MaterialTheme.typography.titleLarge)
                 }
             }
         }
@@ -290,11 +298,6 @@ private fun MappingInfo(mapping: KeyMapping) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        Text(
-            text = if (mapping.isEnabled) "Estado: Activado" else "Estado: Desactivado",
-            style = MaterialTheme.typography.labelMedium,
-            color = if (mapping.isEnabled) ActionGreen else ActionRed
-        )
     }
 }
 
