@@ -8,6 +8,7 @@ import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.repository.KeyBinderConfigSerializer
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.data.repository.MappingRepositoryImpl
+import dev.cavatz.keybindertv.update.UpdateManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,11 +37,16 @@ class KeyBinderTvApp : Application() {
     lateinit var mappingRepository: MappingRepository
         private set
 
+    /** Gestor de comprobación y descarga de actualizaciones. */
+    lateinit var updateManager: UpdateManager
+        private set
+
     override fun onCreate() {
         super.onCreate()
         mappingRepository = MappingRepositoryImpl(
             dataStore = configDataStore,
             scope = applicationScope
         )
+        updateManager = UpdateManager(this)
     }
 }

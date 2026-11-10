@@ -4,8 +4,10 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Lettre K stylisée pour KeyBinderTv -->
+    <!-- Monograma TCL en rojo sobre fondo blanco -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M38,26 L38,82 L50,82 L50,58 L70,82 L85,82 L62,54 L84,26 L69,26 L50,50 L50,26 Z" />
+        android:fillColor="#E60012"
+        android:pathData="M10,28 H39 V41 H31 V80 H18 V41 H10 Z
+                          M69,28 H48 L40,36 V72 L48,80 H69 V67 H53 V41 H69 Z
+                          M76,28 H90 V67 H106 V80 H76 Z" />
 </vector>

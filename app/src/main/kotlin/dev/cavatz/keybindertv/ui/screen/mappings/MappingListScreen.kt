@@ -12,16 +12,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,25 +36,18 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.model.KeyMapping
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.TvCard
+import dev.cavatz.keybindertv.ui.component.tvFocusOutline
 import dev.cavatz.keybindertv.ui.navigation.Screen
+import dev.cavatz.keybindertv.ui.theme.ActionBlue
+import dev.cavatz.keybindertv.ui.theme.ActionGray
+import dev.cavatz.keybindertv.ui.theme.ActionGreen
+import dev.cavatz.keybindertv.ui.theme.ActionRed
 import kotlinx.coroutines.launch
 
-/** Espacement interne des cartes de mapping */
-private val CardPadding = 12.dp
-
-/** Espacement entre les éléments de la liste */
+private val CardPadding = 10.dp
 private val ItemSpacing = 8.dp
+private val ScreenPadding = 8.dp
 
-/** Padding global de l'écran */
-private val ScreenPadding = 16.dp
-
-/**
- * Écran de liste des mappings configurés.
- * Permet d'activer/désactiver, supprimer et créer de nouveaux mappings.
- *
- * @param navController Contrôleur de navigation
- * @param repository Repository des mappings
- */
 @Composable
 fun MappingListScreen(
     navController: NavHostController,
@@ -65,9 +63,14 @@ fun MappingListScreen(
         uiState = uiState,
         onToggle = { id, enabled -> viewModel.toggleMapping(id, enabled) },
         onRemove = { id -> viewModel.removeMapping(id) },
+        onConfigureShort = { id ->
+            navController.navigate(Screen.AppChooser.createRoute(id, "short"))
+        },
+        onConfigureLong = { id ->
+            navController.navigate(Screen.AppChooser.createRoute(id, "long"))
+        },
         onAddMapping = {
             coroutineScope.launch {
-                // Crée le mapping vide puis navigue vers LearningScreen avec son ID
                 val newMappingId: String = viewModel.createNewMapping()
                 navController.navigate(Screen.Learning.createRoute(newMappingId))
             }
@@ -75,32 +78,45 @@ fun MappingListScreen(
     )
 }
 
-/** Contenu stateless de la liste des mappings */
 @Composable
 private fun MappingListContent(
     uiState: MappingViewModel.MappingListUiState,
     onToggle: (String, Boolean) -> Unit,
     onRemove: (String) -> Unit,
+    onConfigureShort: (String) -> Unit,
+    onConfigureLong: (String) -> Unit,
     onAddMapping: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        when {
-            uiState.isLoading -> LoadingIndicator()
-            uiState.mappings.isEmpty() -> EmptyMappingList(onAddMapping = onAddMapping)
-            else -> MappingList(
-                mappings = uiState.mappings,
-                onToggle = onToggle,
-                onRemove = onRemove
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 64.dp)
+        ) {
+            when {
+                uiState.isLoading -> LoadingIndicator()
+                uiState.mappings.isEmpty() -> EmptyMappingList(onAddMapping = onAddMapping)
+                else -> MappingList(
+                    mappings = uiState.mappings,
+                    onToggle = onToggle,
+                    onRemove = onRemove,
+                    onConfigureShort = onConfigureShort,
+                    onConfigureLong = onConfigureLong
+                )
+            }
         }
 
-        // Bouton "+" toujours visible sauf pendant le chargement
         if (!uiState.isLoading) {
             Button(
                 onClick = onAddMapping,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ActionBlue,
+                    contentColor = Color.White
+                ),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(ScreenPadding)
+                    .padding(8.dp)
+                    .tvFocusOutline()
             ) {
                 Text(text = stringResource(R.string.mappings_add))
             }
@@ -108,43 +124,43 @@ private fun MappingListContent(
     }
 }
 
-/** Indicateur de chargement centré */
 @Composable
 private fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(color = ActionBlue)
     }
 }
 
-/** Message affiché quand la liste est vide */
 @Composable
 private fun EmptyMappingList(onAddMapping: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.mappings_empty),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White
             )
             Spacer(modifier = Modifier.height(ItemSpacing))
-            Button(onClick = onAddMapping) {
+            Button(
+                onClick = onAddMapping,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ActionBlue,
+                    contentColor = Color.White
+                )
+            ) {
                 Text(text = stringResource(R.string.mappings_add))
             }
         }
     }
 }
 
-/** Liste scrollable des mappings */
 @Composable
 private fun MappingList(
     mappings: List<KeyMapping>,
     onToggle: (String, Boolean) -> Unit,
-    onRemove: (String) -> Unit
+    onRemove: (String) -> Unit,
+    onConfigureShort: (String) -> Unit,
+    onConfigureLong: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -152,82 +168,145 @@ private fun MappingList(
             .padding(ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(ItemSpacing)
     ) {
-        items(
-            items = mappings,
-            key = { mapping -> mapping.id }
-        ) { mapping ->
+        items(items = mappings, key = { mapping -> mapping.id }) { mapping ->
             MappingItem(
                 mapping = mapping,
                 onToggle = { enabled -> onToggle(mapping.id, enabled) },
-                onRemove = { onRemove(mapping.id) }
+                onRemove = { onRemove(mapping.id) },
+                onConfigureShort = { onConfigureShort(mapping.id) },
+                onConfigureLong = { onConfigureLong(mapping.id) }
             )
         }
     }
 }
 
-/** Carte d'un mapping individuel */
 @Composable
 private fun MappingItem(
     mapping: KeyMapping,
     onToggle: (Boolean) -> Unit,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    onConfigureShort: () -> Unit,
+    onConfigureLong: () -> Unit
 ) {
-    TvCard(
-        onClick = {},
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
+    TvCard(modifier = Modifier.fillMaxWidth()) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(CardPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            MappingInfo(
-                mapping = mapping,
-                modifier = Modifier.weight(1f)
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            MappingInfo(mapping = mapping)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = onConfigureShort,
+                    modifier = Modifier.weight(1f).tvFocusOutline(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ActionBlue,
+                        contentColor = Color.White
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        horizontal = 6.dp,
+                        vertical = 8.dp
+                    )
+                ) {
+                    Text(text = "Corta · ${shortPressLabel(mapping)}", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall)
+                }
+                Button(
+                    onClick = onConfigureLong,
+                    modifier = Modifier.weight(1f).tvFocusOutline(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ActionGreen,
+                        contentColor = Color.White
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        horizontal = 6.dp,
+                        vertical = 8.dp
+                    )
+                ) {
+                    Text(text = "Larga · ${longPressLabel(mapping)}", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall)
+                }
                 Switch(
                     checked = mapping.isEnabled,
-                    onCheckedChange = onToggle
+                    onCheckedChange = onToggle,
+                    modifier = Modifier.tvFocusOutline(),
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = ActionGreen,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = ActionGray
+                    )
                 )
-                TextButton(onClick = onRemove) {
-                    Text(text = stringResource(R.string.action_delete))
+                FilledIconButton(
+                    onClick = onRemove,
+                    modifier = Modifier.tvFocusOutline(),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = ActionRed,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("×", style = MaterialTheme.typography.titleLarge)
                 }
             }
         }
     }
 }
 
-/** Informations textuelles d'un mapping */
 @Composable
-private fun MappingInfo(
-    mapping: KeyMapping,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
+private fun MappingInfo(mapping: KeyMapping) {
+    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
         Text(
-            text = mapping.button.userLabel.ifEmpty { "Bouton #${mapping.id.take(8)}" },
-            style = MaterialTheme.typography.titleMedium
+            text = mapping.button.userLabel.ifEmpty { "Botón #${mapping.id.take(8)}" },
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White
         )
-        mapping.shortPressAction?.let { action ->
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                text = "${stringResource(R.string.mapping_short_press)} : ${action.appLabel}",
-                style = MaterialTheme.typography.bodySmall
+                text = "Código: ${mapping.button.keyCode ?: "—"} · ${factoryAppForKeyCode(mapping.button.keyCode)}",
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = if (mapping.isEnabled) "Activado" else "Desactivado",
+                maxLines = 1,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (mapping.isEnabled) ActionGreen else ActionRed
             )
         }
-        mapping.longPressAction?.let { action ->
-            Text(
-                text = "${stringResource(R.string.mapping_long_press)} : ${action.appLabel}",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-        if (mapping.shortPressAction == null && mapping.longPressAction == null) {
-            Text(
-                text = stringResource(R.string.mapping_no_action),
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+    }
+}
+
+private fun shortPressLabel(mapping: KeyMapping): String = when {
+    mapping.shortPressUseDefault -> "De fábrica"
+    mapping.shortPressAction != null -> mapping.shortPressAction.appLabel
+    else -> "Sin acción"
+}
+
+private fun longPressLabel(mapping: KeyMapping): String = when {
+    mapping.longPressUseDefault -> "De fábrica"
+    mapping.longPressAction != null -> mapping.longPressAction.appLabel
+    mapping.shortPressAction != null && !mapping.shortPressUseDefault ->
+        "${mapping.shortPressAction.appLabel} (igual que corta)"
+    else -> "Sin acción"
+}
+private fun factoryAppForKeyCode(keyCode: Int?): String {
+    return when (keyCode) {
+        4062 -> "Netflix"
+        4099 -> "Prime Video"
+        4140 -> "Guard"
+        4057 -> "Media"
+        4065 -> "YouTube"
+        4020 -> "TCL Channel"
+        else -> "No identificada"
     }
 }

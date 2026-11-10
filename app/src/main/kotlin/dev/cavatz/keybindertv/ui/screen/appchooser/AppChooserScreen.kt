@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,20 +38,20 @@ import kotlinx.coroutines.launch
 private const val GRID_COLUMNS: Int = 5
 
 /** Taille de l'icône d'application dans la grille */
-private val AppIconSize = 48.dp
+private val AppIconSize = 40.dp
 
 /** Espacement entre les éléments de la grille */
-private val GridSpacing = 8.dp
+private val GridSpacing = 5.dp
 
 /** Padding interne des cartes d'application */
-private val AppCardPadding = 8.dp
+private val AppCardPadding = 5.dp
 
 /** Padding global de l'écran */
-private val ScreenPadding = 16.dp
+private val ScreenPadding = 8.dp
 
 /**
  * Écran de sélection d'application pour un mapping.
- * Affiche une grille d'apps installées avec une barre de recherche.
+ * Affiche directement les applications installées sous forme de grille d'icônes.
  *
  * @param navController Contrôleur de navigation
  * @param repository Repository des mappings
@@ -76,7 +75,12 @@ fun AppChooserScreen(
 
     AppChooserContent(
         uiState = uiState,
-        onSearchQueryChanged = { query -> viewModel.onSearchQueryChanged(query) },
+        onFactorySelected = {
+            coroutineScope.launch {
+                viewModel.selectFactory()
+                navController.popBackStack()
+            }
+        },
         onAppSelected = { app ->
             coroutineScope.launch {
                 viewModel.selectApp(app)
@@ -90,7 +94,7 @@ fun AppChooserScreen(
 @Composable
 private fun AppChooserContent(
     uiState: AppChooserViewModel.AppChooserUiState,
-    onSearchQueryChanged: (String) -> Unit,
+    onFactorySelected: () -> Unit,
     onAppSelected: (InstalledAppsProvider.AppInfo) -> Unit
 ) {
     Column(
@@ -100,35 +104,31 @@ private fun AppChooserContent(
     ) {
         Text(
             text = stringResource(R.string.appchooser_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.titleLarge
         )
-        SearchBar(
-            query = uiState.searchQuery,
-            onQueryChanged = onSearchQueryChanged
-        )
+        TvCard(onClick = onFactorySelected) {
+            Column(modifier = Modifier.padding(AppCardPadding)) {
+                Text(
+                    text = stringResource(R.string.appchooser_factory),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = stringResource(R.string.appchooser_factory_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
 
         when {
             uiState.isLoading -> LoadingGrid()
             else -> AppGrid(
                 apps = uiState.apps,
-                onAppSelected = onAppSelected
+                onAppSelected = onAppSelected,
+                modifier = Modifier.weight(1f).fillMaxWidth()
             )
         }
     }
-}
-
-/** Barre de recherche pour filtrer les applications */
-@Composable
-private fun SearchBar(query: String, onQueryChanged: (String) -> Unit) {
-    TextField(
-        value = query,
-        onValueChange = onQueryChanged,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = GridSpacing),
-        placeholder = { Text(text = stringResource(R.string.appchooser_search)) },
-        singleLine = true
-    )
 }
 
 /** Indicateur de chargement centré */
@@ -146,11 +146,12 @@ private fun LoadingGrid() {
 @Composable
 private fun AppGrid(
     apps: List<InstalledAppsProvider.AppInfo>,
-    onAppSelected: (InstalledAppsProvider.AppInfo) -> Unit
+    onAppSelected: (InstalledAppsProvider.AppInfo) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(GRID_COLUMNS),
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         contentPadding = PaddingValues(GridSpacing),
         verticalArrangement = Arrangement.spacedBy(GridSpacing),
         horizontalArrangement = Arrangement.spacedBy(GridSpacing)

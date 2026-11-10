@@ -3,18 +3,19 @@ package dev.cavatz.keybindertv.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
-/**
- * Schéma de couleurs sombre — les TV utilisent toujours un thème sombre
- * pour réduire la fatigue oculaire et les reflets sur les grands écrans.
- */
+/** Tema oscuro con colores de acción claramente diferenciados. */
 private val KeyBinderColorScheme = darkColorScheme(
-    primary = PrimaryBlue,
+    primary = ActionBlue,
     onPrimary = OnPrimaryDark,
     primaryContainer = PrimaryBlueDark,
-    secondary = SecondaryPurple,
+    secondary = ActionGreen,
     onSecondary = OnPrimaryDark,
-    secondaryContainer = SecondaryPurpleDark,
+    secondaryContainer = ActionGreen,
+    tertiary = ActionPurple,
+    onTertiary = OnPrimaryDark,
+    tertiaryContainer = SecondaryPurpleDark,
     background = BackgroundDark,
     onBackground = OnSurfaceDark,
     surface = SurfaceDark,
@@ -22,15 +23,10 @@ private val KeyBinderColorScheme = darkColorScheme(
     surfaceVariant = SurfaceVariantDark,
     onSurfaceVariant = OnSurfaceVariantDark,
     outline = OutlineDark,
-    error = ErrorRed
+    error = ErrorRed,
+    onError = Color.White
 )
 
-/**
- * Thème principal de l'application KeyBinderTv.
- * Toujours en mode sombre, adapté aux interfaces TV.
- *
- * @param content Contenu Compose à encapsuler dans le thème
- */
 @Composable
 fun KeyBinderTvTheme(
     content: @Composable () -> Unit

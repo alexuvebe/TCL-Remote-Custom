@@ -1,32 +1,56 @@
 package dev.cavatz.keybindertv.ui.component
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.tv.material3.Card
-import androidx.tv.material3.CardDefaults
-import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Surface
+import dev.cavatz.keybindertv.ui.theme.SurfaceDark
 
 /**
- * Carte réutilisable adaptée aux interfaces TV.
- * Encapsule [androidx.tv.material3.Card] avec les paramètres par défaut.
- *
- * @param onClick Action déclenchée lors de la sélection
- * @param modifier Modificateur Compose optionnel
- * @param content Contenu de la carte
+ * Contenedor oscuro para tarjetas de TV. Las tarjetas seleccionables muestran
+ * un contorno blanco grueso al recibir el foco del mando.
  */
-@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TvCard(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        modifier = modifier,
-        scale = CardDefaults.scale()
+    var isFocused by remember { mutableStateOf(false) }
+    val shape = RoundedCornerShape(12.dp)
+    val focusModifier = if (onClick != null) {
+        Modifier
+            .onFocusChanged { isFocused = it.isFocused }
+            .then(
+                if (isFocused) Modifier.border(
+                    BorderStroke(3.dp, Color.White),
+                    shape
+                ) else Modifier
+            )
+            .clickable(onClick = onClick)
+    } else {
+        Modifier
+    }
+
+    Surface(
+        modifier = modifier.then(focusModifier),
+        shape = shape,
+        color = SurfaceDark,
+        contentColor = Color.White,
+        tonalElevation = 0.dp,
+        shadowElevation = 2.dp
     ) {
         Column(content = content)
     }

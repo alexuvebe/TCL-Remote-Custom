@@ -1,7 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
+}
+
+val signingProperties = Properties().apply {
+    val signingFile = rootProject.file("key.properties")
+    if (signingFile.exists()) {
+        signingFile.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -12,16 +21,18 @@ android {
         applicationId = "dev.cavatz.keybindertv"
         minSdk = 30
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = providers.gradleProperty("APP_VERSION_CODE").orElse("1").get().toInt()
+        versionName = providers.gradleProperty("APP_VERSION_NAME").orElse("1.0.0").get()
     }
 
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("keybindertv.keystore")
-            storePassword = "keybindertv2024"
-            keyAlias = "keybindertv"
-            keyPassword = "keybindertv2024"
+            if (signingProperties.isNotEmpty()) {
+                storeFile = rootProject.file(signingProperties.getProperty("storeFile"))
+                storePassword = signingProperties.getProperty("storePassword")
+                keyAlias = signingProperties.getProperty("keyAlias")
+                keyPassword = signingProperties.getProperty("keyPassword")
+            }
         }
     }
 
@@ -48,6 +59,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -65,6 +77,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.core:core-ktx:1.12.0")
     // Compose BOM — aligne toutes les versions Compose
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)

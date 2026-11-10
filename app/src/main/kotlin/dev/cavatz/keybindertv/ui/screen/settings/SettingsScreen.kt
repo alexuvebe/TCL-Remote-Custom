@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -19,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,8 +30,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import dev.cavatz.keybindertv.R
+import dev.cavatz.keybindertv.ui.component.tvFocusOutline
 import dev.cavatz.keybindertv.data.repository.MappingRepository
+import dev.cavatz.keybindertv.KeyBinderTvApp
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
+import dev.cavatz.keybindertv.ui.theme.ActionPurple
 
 /** Espacement vertical entre les sections de paramètres */
 private val SectionSpacing = 24.dp
@@ -72,6 +79,7 @@ private fun SettingsContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(ScreenPadding),
         verticalArrangement = Arrangement.Top
     ) {
@@ -97,6 +105,8 @@ private fun SettingsContent(
         Spacer(modifier = Modifier.height(SectionSpacing))
 
         AccessibilityButton()
+        Spacer(modifier = Modifier.height(SectionSpacing))
+        UpdateSection()
     }
 }
 
@@ -141,7 +151,51 @@ private fun AccessibilityButton() {
     Button(onClick = {
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         context.startActivity(intent)
-    }) {
+    }, colors = ButtonDefaults.buttonColors(containerColor = ActionPurple, contentColor = Color.White)) {
         Text(text = stringResource(R.string.settings_accessibility))
+    }
+}
+
+
+/** Comprobación manual y descarga de nuevas versiones desde GitHub. */
+@Composable
+private fun UpdateSection() {
+    val context = LocalContext.current
+    val manager = (context.applicationContext as KeyBinderTvApp).updateManager
+    val updateState by manager.state.collectAsStateWithLifecycle()
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Actualizaciones", style = MaterialTheme.typography.titleLarge)
+        Text("Versión instalada: ${updateState.currentVersion}")
+        if (updateState.latestVersion.isNotBlank()) {
+            Text("Última versión: ${updateState.latestVersion}")
+        }
+        Text(updateState.message, style = MaterialTheme.typography.bodyMedium)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Button(
+                modifier = Modifier.tvFocusOutline(),
+                onClick = { manager.checkForUpdates() },
+                enabled = !updateState.isChecking && !updateState.isDownloading
+            ) {
+                Text(if (updateState.isChecking) "Comprobando…" else "Buscar actualizaciones")
+            }
+            if (updateState.updateAvailable) {
+                Button(
+                    modifier = Modifier.tvFocusOutline(),
+                    onClick = { manager.downloadAndInstall() },
+                    enabled = !updateState.isDownloading
+                ) {
+                    Text(if (updateState.isDownloading) "Descargando…" else "Descargar e instalar")
+                }
+            } else if (updateState.downloaded) {
+                Button(
+                    modifier = Modifier.tvFocusOutline(),
+                    onClick = { manager.installDownloadedApk() }
+                ) {
+                    Text("Instalar actualización")
+                }
+            }
+        }
     }
 }
