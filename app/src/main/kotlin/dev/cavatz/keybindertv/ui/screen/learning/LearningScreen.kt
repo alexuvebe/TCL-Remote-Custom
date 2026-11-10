@@ -166,6 +166,14 @@ private fun ButtonDetectedContent(
         text = "Botón detectado: $label",
         style = MaterialTheme.typography.titleMedium
     )
+    Text(
+        text = "Código: ${identifier.keyCode ?: "No disponible"}",
+        style = MaterialTheme.typography.bodyMedium
+    )
+    Text(
+        text = "Aplicación original: ${originalAppFor(identifier)}",
+        style = MaterialTheme.typography.bodyMedium
+    )
     Spacer(modifier = Modifier.height(VerticalSpacing))
     Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
         Button(onClick = onConfirm, colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)) {
@@ -215,5 +223,14 @@ private fun ServiceInactiveMessage(onCancel: () -> Unit) {
         Button(onClick = onCancel) {
             Text(text = stringResource(R.string.learning_cancel))
         }
+    }
+}
+
+
+/** Devuelve la aplicación de fábrica únicamente para códigos verificados del mando TCL. */
+private fun originalAppFor(identifier: ButtonIdentifier): String {
+    return when (identifier.keyCode) {
+        4062 -> "Netflix"
+        else -> "No identificada"
     }
 }
