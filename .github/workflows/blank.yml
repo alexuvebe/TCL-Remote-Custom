@@ -4,11 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches: [main, feature-spanish-high-contrast]
-  pull_request:
-    branches: [main]
-
 permissions:
   contents: read
+
+# Evita compilar varias veces la misma rama; conserva solo la última versión.
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
