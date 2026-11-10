@@ -36,7 +36,6 @@ import dev.cavatz.keybindertv.ui.theme.ActionBlue
 import dev.cavatz.keybindertv.ui.theme.ActionGray
 import dev.cavatz.keybindertv.ui.theme.ActionGreen
 import dev.cavatz.keybindertv.ui.theme.ActionRed
-import dev.cavatz.keybindertv.ui.theme.BackgroundDark
 import kotlinx.coroutines.launch
 
 private val CardPadding = 16.dp
@@ -58,6 +57,12 @@ fun MappingListScreen(
         uiState = uiState,
         onToggle = { id, enabled -> viewModel.toggleMapping(id, enabled) },
         onRemove = { id -> viewModel.removeMapping(id) },
+        onConfigureShort = { id ->
+            navController.navigate(Screen.AppChooser.createRoute(id, "short"))
+        },
+        onConfigureLong = { id ->
+            navController.navigate(Screen.AppChooser.createRoute(id, "long"))
+        },
         onAddMapping = {
             coroutineScope.launch {
                 val newMappingId: String = viewModel.createNewMapping()
@@ -72,6 +77,8 @@ private fun MappingListContent(
     uiState: MappingViewModel.MappingListUiState,
     onToggle: (String, Boolean) -> Unit,
     onRemove: (String) -> Unit,
+    onConfigureShort: (String) -> Unit,
+    onConfigureLong: (String) -> Unit,
     onAddMapping: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -86,7 +93,9 @@ private fun MappingListContent(
                 else -> MappingList(
                     mappings = uiState.mappings,
                     onToggle = onToggle,
-                    onRemove = onRemove
+                    onRemove = onRemove,
+                    onConfigureShort = onConfigureShort,
+                    onConfigureLong = onConfigureLong
                 )
             }
         }
@@ -142,7 +151,9 @@ private fun EmptyMappingList(onAddMapping: () -> Unit) {
 private fun MappingList(
     mappings: List<KeyMapping>,
     onToggle: (String, Boolean) -> Unit,
-    onRemove: (String) -> Unit
+    onRemove: (String) -> Unit,
+    onConfigureShort: (String) -> Unit,
+    onConfigureLong: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -154,7 +165,9 @@ private fun MappingList(
             MappingItem(
                 mapping = mapping,
                 onToggle = { enabled -> onToggle(mapping.id, enabled) },
-                onRemove = { onRemove(mapping.id) }
+                onRemove = { onRemove(mapping.id) },
+                onConfigureShort = { onConfigureShort(mapping.id) },
+                onConfigureLong = { onConfigureLong(mapping.id) }
             )
         }
     }
@@ -164,16 +177,43 @@ private fun MappingList(
 private fun MappingItem(
     mapping: KeyMapping,
     onToggle: (Boolean) -> Unit,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    onConfigureShort: () -> Unit,
+    onConfigureLong: () -> Unit
 ) {
     TvCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(CardPadding),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             MappingInfo(mapping = mapping)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    onClick = onConfigureShort,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ActionBlue,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Pulsación corta", maxLines = 1)
+                }
+                Button(
+                    onClick = onConfigureLong,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ActionGreen,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Pulsación larga", maxLines = 1)
+                }
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -186,9 +226,7 @@ private fun MappingItem(
                         contentColor = Color.White
                     )
                 ) {
-                    Text(
-                        text = if (mapping.isEnabled) "Desactivar" else "Activar"
-                    )
+                    Text(text = if (mapping.isEnabled) "Desactivar" else "Activar")
                 }
                 Button(
                     onClick = onRemove,
@@ -214,14 +252,14 @@ private fun MappingInfo(mapping: KeyMapping) {
         )
         mapping.shortPressAction?.let { action ->
             Text(
-                text = "${stringResource(R.string.mapping_short_press)}: ${action.appLabel}",
+                text = "Pulsación corta: ${action.appLabel}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         mapping.longPressAction?.let { action ->
             Text(
-                text = "${stringResource(R.string.mapping_long_press)}: ${action.appLabel}",
+                text = "Pulsación larga: ${action.appLabel}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
