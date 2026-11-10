@@ -1,7 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
+}
+
+val signingProperties = Properties().apply {
+    val signingFile = rootProject.file("key.properties")
+    if (signingFile.exists()) {
+        signingFile.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -18,10 +27,12 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("keybindertv.keystore")
-            storePassword = "keybindertv2024"
-            keyAlias = "keybindertv"
-            keyPassword = "keybindertv2024"
+            if (signingProperties.isNotEmpty()) {
+                storeFile = rootProject.file(signingProperties.getProperty("storeFile"))
+                storePassword = signingProperties.getProperty("storePassword")
+                keyAlias = signingProperties.getProperty("keyAlias")
+                keyPassword = signingProperties.getProperty("keyPassword")
+            }
         }
     }
 
