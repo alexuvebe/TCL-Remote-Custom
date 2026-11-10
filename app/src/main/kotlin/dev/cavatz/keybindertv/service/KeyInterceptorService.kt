@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import dev.cavatz.keybindertv.KeyBinderTvApp
+import dev.cavatz.keybindertv.data.model.ActionTarget
 import dev.cavatz.keybindertv.data.model.ButtonIdentifier
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.model.KeyMapping
@@ -89,6 +90,15 @@ class KeyInterceptorService : AccessibilityService() {
             m.isEnabled && m.button.keyCode == event.keyCode
         } ?: return false
 
+        // Si ambas pulsaciones son de fábrica, no interceptar: Android/TCL
+        // conserva íntegramente el comportamiento nativo del botón.
+        if (mapping.shortPressUseDefault && mapping.longPressUseDefault) return false
+
+        // Un mapping vacío no debe tragarse eventos del mando.
+        if (mapping.shortPressAction == null && mapping.longPressAction == null &&
+            !mapping.shortPressUseDefault && !mapping.longPressUseDefault
+        ) return false
+
         /*
          * No deduplicar ACTION_DOWN y ACTION_UP por separado: ambos forman una
          * única pulsación y LongPressDetector debe consumir los dos. La
@@ -127,13 +137,23 @@ class KeyInterceptorService : AccessibilityService() {
         return LongPressDetector(
             thresholdMs = config.longPressThresholdMs,
             onShortPress = {
-                val target = mapping.shortPressAction ?: return@LongPressDetector
-                remapExecutor.launch(target, config.showOverlayNotification)
+                if (mapping.shortPressUseDefault) {
+                    launchOriginalAction(mapping.button, config.showOverlayNotification)
+                } else {
+                    val target = mapping.shortPressAction ?: return@LongPressDetector
+                    remapExecutor.launch(target, config.showOverlayNotification)
+                }
             },
             onLongPress = {
-                val target = mapping.longPressAction ?: mapping.shortPressAction
-                    ?: return@LongPressDetector
-                remapExecutor.launch(target, config.showOverlayNotification)
+                if (mapping.longPressUseDefault) {
+                    launchOriginalAction(mapping.button, config.showOverlayNotification)
+                } else {
+                    // Mantener el comportamiento de las configuraciones antiguas:
+                    // si no había acción larga definida, se repetía la acción corta.
+                    val target = mapping.longPressAction ?: mapping.shortPressAction
+                        ?: return@LongPressDetector
+                    remapExecutor.launch(target, config.showOverlayNotification)
+                }
             }
         )
     }
@@ -162,8 +182,31 @@ class KeyInterceptorService : AccessibilityService() {
         val dedupKey: String = "package_$packageName"
         if (isDuplicate(dedupKey)) return
 
+        // En este flujo la app original ya se ha abierto: si la pulsación corta
+        // está configurada como "De fábrica", no hay nada que sustituir.
+        if (mapping.shortPressUseDefault) return
         val target = mapping.shortPressAction ?: return
         remapExecutor.launchAndKillSource(target, packageName, config.showOverlayNotification)
+    }
+
+    /**
+     * Reproduce una acción original solo cuando el botón está identificado.
+     * En el TCL probado, el código 4062 corresponde a Netflix.
+     */
+    private fun launchOriginalAction(button: ButtonIdentifier, showOverlay: Boolean) {
+        val target = when {
+            button.keyCode == 4062 ->
+                ActionTarget("com.netflix.ninja", "Netflix")
+            !button.sourcePackage.isNullOrBlank() ->
+                ActionTarget(button.sourcePackage, button.sourcePackage)
+            else -> null
+        }
+
+        if (target == null) {
+            Log.w(TAG, "No se puede reproducir la acción de fábrica: botón no identificado (${button.keyCode})")
+            return
+        }
+        remapExecutor.launch(target, showOverlay)
     }
 
     private fun isDuplicate(key: String): Boolean {
