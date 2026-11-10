@@ -41,6 +41,8 @@
     <string name="learning_service_inactive">El servicio está inactivo. Activa el servicio de accesibilidad.</string>
     <string name="appchooser_title">Elegir aplicación</string>
     <string name="appchooser_search">Buscar una aplicación…</string>
+    <string name="appchooser_factory">De fábrica</string>
+    <string name="appchooser_factory_description">Usar la acción original del botón cuando se pueda identificar.</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_overlay">Mostrar aviso al reasignar</string>
     <string name="settings_longpress_threshold">Duración de pulsación larga: %1$d ms</string>
