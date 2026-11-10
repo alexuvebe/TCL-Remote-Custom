@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
+import dev.cavatz.keybindertv.backup.GitHubBackupManager
 import dev.cavatz.keybindertv.data.repository.KeyBinderConfigSerializer
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.data.repository.MappingRepositoryImpl
@@ -36,10 +37,18 @@ class KeyBinderTvApp : Application() {
     lateinit var mappingRepository: MappingRepository
         private set
 
+    lateinit var githubBackupManager: GitHubBackupManager
+        private set
+
     override fun onCreate() {
         super.onCreate()
         mappingRepository = MappingRepositoryImpl(
             dataStore = configDataStore,
+            scope = applicationScope
+        )
+        githubBackupManager = GitHubBackupManager(
+            context = this,
+            repository = mappingRepository,
             scope = applicationScope
         )
     }
