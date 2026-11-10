@@ -4,8 +4,11 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Lettre K stylisée pour KeyBinderTv -->
+    <!-- Logotipo tipográfico TCL en rojo -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M38,26 L38,82 L50,82 L50,58 L70,82 L85,82 L62,54 L84,26 L69,26 L50,50 L50,26 Z" />
+        android:fillColor="#E60012"
+        android:pathData="M16,29 H92 V43 H62 V80 H46 V43 H16 Z M89,50 H103 V80 H89 Z M77,50 H91 V80 H77 Z M72,50 H86 V64 H72 Z" />
+    <path
+        android:fillColor="#E60012"
+        android:pathData="M73,50 H87 V64 H73 Z M73,64 H87 V80 H73 Z M68,50 H82 V64 H68 Z" />
 </vector>
