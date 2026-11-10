@@ -30,7 +30,9 @@ class KeyInterceptorService : AccessibilityService() {
     private lateinit var repository: MappingRepository
     private lateinit var remapExecutor: RemapExecutor
 
-    private data class DetectorEntry(val mapping: KeyMapping, val thresholdMs: Long, val detector: LongPressDetector)\n\n    private val longPressDetectors: MutableMap<Int, DetectorEntry> = mutableMapOf()
+    private data class DetectorEntry(val mapping: KeyMapping, val thresholdMs: Long, val detector: LongPressDetector)
+
+    private val longPressDetectors: MutableMap<Int, DetectorEntry> = mutableMapOf()
     private val recentlyHandledKeys: MutableMap<String, Long> = mutableMapOf()
 
     override fun onServiceConnected() {
