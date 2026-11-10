@@ -84,7 +84,7 @@ class LongPressDetector(
 
     private fun handleActionDown(event: KeyEvent): Boolean {
         // Ignorer les répétitions auto (touche maintenue)
-        if (event.repeatCount > 0) return isPending
+        if (event.repeatCount > 0) return isPending || consumeNextActionUp
 
         if (!isPending) {
             consumeNextActionUp = false
