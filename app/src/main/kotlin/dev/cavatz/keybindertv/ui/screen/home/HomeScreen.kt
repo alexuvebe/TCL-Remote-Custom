@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import dev.cavatz.keybindertv.R
+import dev.cavatz.keybindertv.ui.component.tvFocusOutline
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 import dev.cavatz.keybindertv.ui.navigation.Screen
@@ -102,6 +103,7 @@ private fun AppTitle() {
 private fun EnableServiceButton() {
     val context = LocalContext.current
     Button(
+        modifier = Modifier.tvFocusOutline(),
         onClick = {
             val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             context.startActivity(intent)
@@ -134,6 +136,7 @@ private fun NavigationButtons(
         verticalArrangement = Arrangement.spacedBy(VerticalSpacing)
     ) {
         Button(
+            modifier = Modifier.tvFocusOutline(),
             onClick = onNavigateMappings,
             colors = ButtonDefaults.buttonColors(
                 containerColor = ActionBlue,
@@ -143,6 +146,7 @@ private fun NavigationButtons(
             Text(text = stringResource(R.string.home_manage_mappings))
         }
         Button(
+            modifier = Modifier.tvFocusOutline(),
             onClick = onNavigateSettings,
             colors = ButtonDefaults.buttonColors(
                 containerColor = ActionPurple,
@@ -152,6 +156,7 @@ private fun NavigationButtons(
             Text(text = stringResource(R.string.home_settings))
         }
         Button(
+            modifier = Modifier.tvFocusOutline(),
             onClick = onNavigateBackup,
             colors = ButtonDefaults.buttonColors(
                 containerColor = ActionYellow,
