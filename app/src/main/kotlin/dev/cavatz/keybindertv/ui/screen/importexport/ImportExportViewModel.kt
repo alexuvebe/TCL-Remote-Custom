@@ -96,6 +96,12 @@ class ImportExportViewModel(
      * @param context Contexte Android requis pour le ContentResolver
      * @param uri     URI de destination fourni par ACTION_CREATE_DOCUMENT
      */
+    fun exportToJson(): String = exporter.exportToJson(_uiState.value.currentConfig)
+
+    fun setStatusMessage(message: String) {
+        _uiState.update { it.copy(statusMessage = message) }
+    }
+
     fun exportToFile(context: Context, uri: Uri) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, statusMessage = "") }
