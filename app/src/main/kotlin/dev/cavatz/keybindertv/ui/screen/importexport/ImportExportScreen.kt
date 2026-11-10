@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.cavatz.keybindertv.R
+import dev.cavatz.keybindertv.ui.component.tvFocusOutline
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.QrCodeDisplay
@@ -115,6 +116,7 @@ private fun ExportSection(
         )
         Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
             Button(
+                modifier = Modifier.tvFocusOutline(),
                 onClick = onExportFile,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ActionGreen,
@@ -124,6 +126,7 @@ private fun ExportSection(
                 Text(text = stringResource(R.string.importexport_export_file))
             }
             Button(
+                modifier = Modifier.tvFocusOutline(),
                 onClick = onGenerateQr,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ActionYellow,
