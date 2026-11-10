@@ -29,6 +29,9 @@ interface MappingRepository {
     /** Met à jour les paramètres globaux de la configuration. */
     suspend fun updateSettings(showOverlay: Boolean, longPressThresholdMs: Long)
 
+    /** Reemplaza la configuración completa al restaurar una copia validada. */
+    suspend fun replaceConfig(config: KeyBinderConfig)
+
     /**
      * Retourne la configuration courante de manière synchrone.
      * Utilise un cache AtomicReference mis à jour en background.
