@@ -36,6 +36,9 @@
     <string name="learning_instructions">Pulsa el botón del mando que quieres reasignar…</string>
     <string name="learning_timeout">No se ha detectado ningún botón. Inténtalo de nuevo.</string>
     <string name="learning_confirm">Confirmar</string>
+    <string name="learning_choose_press_type">¿Qué tipo de pulsación quieres configurar?</string>
+    <string name="learning_short_press">Un toque</string>
+    <string name="learning_long_press">Toque largo</string>
     <string name="learning_retry">Volver a intentar</string>
     <string name="learning_cancel">Cancelar</string>
     <string name="learning_service_inactive">El servicio está inactivo. Activa el servicio de accesibilidad.</string>
