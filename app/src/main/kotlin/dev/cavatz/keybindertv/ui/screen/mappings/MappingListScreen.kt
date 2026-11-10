@@ -39,9 +39,9 @@ import dev.cavatz.keybindertv.ui.theme.ActionGreen
 import dev.cavatz.keybindertv.ui.theme.ActionRed
 import kotlinx.coroutines.launch
 
-private val CardPadding = 16.dp
-private val ItemSpacing = 12.dp
-private val ScreenPadding = 16.dp
+private val CardPadding = 10.dp
+private val ItemSpacing = 8.dp
+private val ScreenPadding = 8.dp
 
 @Composable
 fun MappingListScreen(
@@ -86,7 +86,7 @@ private fun MappingListContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 88.dp)
+                .padding(bottom = 64.dp)
         ) {
             when {
                 uiState.isLoading -> LoadingIndicator()
@@ -110,7 +110,7 @@ private fun MappingListContent(
                 ),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(ScreenPadding)
+                    .padding(8.dp)
                     .tvFocusOutline()
             ) {
                 Text(text = stringResource(R.string.mappings_add))
@@ -188,12 +188,12 @@ private fun MappingItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(CardPadding),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             MappingInfo(mapping = mapping)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Button(
                     onClick = onConfigureShort,
@@ -203,7 +203,7 @@ private fun MappingItem(
                         contentColor = Color.White
                     )
                 ) {
-                    Text("Pulsación corta", maxLines = 1)
+                    Text("Pulsación corta", maxLines = 1, style = MaterialTheme.typography.labelSmall)
                 }
                 Button(
                     onClick = onConfigureLong,
@@ -213,12 +213,12 @@ private fun MappingItem(
                         contentColor = Color.White
                     )
                 ) {
-                    Text("Pulsación larga", maxLines = 1)
+                    Text("Pulsación larga", maxLines = 1, style = MaterialTheme.typography.labelSmall)
                 }
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
