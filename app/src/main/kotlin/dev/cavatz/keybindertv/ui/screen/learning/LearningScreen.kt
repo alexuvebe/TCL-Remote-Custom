@@ -285,7 +285,7 @@ private fun RemoteDiagram(identifier: ButtonIdentifier) {
 /** Coordenadas normalizadas de teclas cuya posición se puede representar con seguridad. */
 private fun remoteButtonPosition(identifier: ButtonIdentifier): Pair<Float, Float>? {
     return when (identifier.keyCode) {
-        4062, 4099, 4065 -> 0.5f to 0.842f // Acceso directo de aplicaciones
+        4062, 4099, 4140, 4057, 4065, 4020 -> 0.5f to 0.842f // Accesos directos de aplicaciones
         KeyEvent.KEYCODE_DPAD_UP -> 0.5f to 0.22f
         KeyEvent.KEYCODE_DPAD_DOWN -> 0.5f to 0.46f
         KeyEvent.KEYCODE_DPAD_LEFT -> 0.38f to 0.34f
@@ -301,8 +301,11 @@ private fun remoteButtonPosition(identifier: ButtonIdentifier): Pair<Float, Floa
 private fun originalAppFor(identifier: ButtonIdentifier): String {
     return when (identifier.keyCode) {
         4062 -> "Netflix"
+        4099 -> "Prime Video"
+        4140 -> "Guard"
+        4057 -> "Media"
         4065 -> "YouTube"
-        4099 -> "Amazon Prime Video"
+        4020 -> "TCL Channel"
         else -> "No identificada"
     }
 }
