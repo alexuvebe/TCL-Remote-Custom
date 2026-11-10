@@ -24,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +50,7 @@ fun ImportExportScreen(repository: MappingRepository) {
     )
     val uiState: ImportExportViewModel.ImportExportUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
 
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -61,6 +64,18 @@ fun ImportExportScreen(repository: MappingRepository) {
         uiState = uiState,
         onExportFile = { exportLauncher.launch("keybinder_config.json") },
         onImportFile = { importLauncher.launch(arrayOf("application/json")) },
+        onCopyBackup = {
+            clipboardManager.setText(AnnotatedString(viewModel.exportToJson()))
+            viewModel.setStatusMessage("Copia de seguridad copiada. No desinstales hasta restaurarla.")
+        },
+        onRestoreClipboard = {
+            val backup = clipboardManager.getText()?.text
+            if (backup.isNullOrBlank()) {
+                viewModel.setStatusMessage("No hay ninguna copia JSON en el portapapeles.")
+            } else {
+                viewModel.importFromJson(backup)
+            }
+        },
         onGenerateQr = { viewModel.generateQrCode() }
     )
 }
@@ -70,6 +85,8 @@ private fun BackupContent(
     uiState: ImportExportViewModel.ImportExportUiState,
     onExportFile: () -> Unit,
     onImportFile: () -> Unit,
+    onCopyBackup: () -> Unit,
+    onRestoreClipboard: () -> Unit,
     onGenerateQr: () -> Unit
 ) {
     Column(
@@ -99,6 +116,8 @@ private fun BackupContent(
             isQrTooLarge = uiState.isQrTooLarge,
             onExportFile = onExportFile,
             onImportFile = onImportFile,
+            onCopyBackup = onCopyBackup,
+            onRestoreClipboard = onRestoreClipboard,
             onGenerateQr = onGenerateQr
         )
     }
@@ -111,6 +130,8 @@ private fun ExportSection(
     isQrTooLarge: Boolean,
     onExportFile: () -> Unit,
     onImportFile: () -> Unit,
+    onCopyBackup: () -> Unit,
+    onRestoreClipboard: () -> Unit,
     onGenerateQr: () -> Unit
 ) {
     Column(
@@ -123,16 +144,23 @@ private fun ExportSection(
             style = MaterialTheme.typography.titleMedium
         )
         if (config.mappings.isEmpty()) {
-            Text("¿Vienes de una instalación anterior? Puedes restaurar tu copia de seguridad.")
+            Text("¿Vienes de una instalación anterior? Restaura la copia desde el portapapeles.")
             Button(
                 modifier = Modifier.tvFocusOutline(),
-                onClick = onImportFile,
+                onClick = onRestoreClipboard,
                 colors = ButtonDefaults.buttonColors(containerColor = ActionYellow, contentColor = Color(0xFF202020))
             ) {
-                Text("Restaurar copia de seguridad")
+                Text("Restaurar desde portapapeles")
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
+            Button(
+                modifier = Modifier.tvFocusOutline(),
+                onClick = onCopyBackup,
+                colors = ButtonDefaults.buttonColors(containerColor = ActionGreen, contentColor = Color.White)
+            ) {
+                Text("Copiar copia")
+            }
             Button(
                 modifier = Modifier.tvFocusOutline(),
                 onClick = onExportFile,
