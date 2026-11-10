@@ -27,11 +27,18 @@ class InstalledAppsProvider(private val context: Context) {
      * être dédupliquées car la grille Compose utilise packageName comme clé stable.
      */
     fun getInstalledApps(): List<AppInfo> {
+        // Google TV/Android TV apps often expose only LEANBACK_LAUNCHER
+        // (Prime Video is one common example), while mobile-style apps use LAUNCHER.
         val launcherIntent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
-        val resolvedApps: List<ResolveInfo> = context.packageManager
-            .queryIntentActivities(launcherIntent, PackageManager.MATCH_ALL)
+        val leanbackIntent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+        }
+        val packageManager = context.packageManager
+        val resolvedApps: List<ResolveInfo> =
+            packageManager.queryIntentActivities(launcherIntent, PackageManager.MATCH_ALL) +
+            packageManager.queryIntentActivities(leanbackIntent, PackageManager.MATCH_ALL)
 
         return resolvedApps
             .mapNotNull { resolveInfo -> buildAppInfo(resolveInfo) }
