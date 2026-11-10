@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Guarda únicamente las asignaciones y preferencias de MANDO TCL. -->
+    <include
+        domain="file"
+        path="datastore/keybinder_config.json" />
+</full-backup-content>
