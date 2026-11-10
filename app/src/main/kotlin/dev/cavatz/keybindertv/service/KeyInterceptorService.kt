@@ -207,13 +207,15 @@ class KeyInterceptorService : AccessibilityService() {
         }
 
         val target = factoryApp?.let { app ->
-            val installed = packageManager.getInstalledApplications(android.content.pm.PackageManager.MATCH_ALL)
-                .firstOrNull { info ->
-                    val packageName = info.packageName.lowercase()
-                    val label = runCatching { info.loadLabel(packageManager).toString().lowercase() }.getOrDefault("")
-                    label in app.labelAliases ||
-                        app.packageHints.any { hint -> packageName.contains(hint) }
-                }
+            val installedApps = packageManager.getInstalledApplications(android.content.pm.PackageManager.MATCH_ALL)
+            val exactLabelMatch = installedApps.firstOrNull { info ->
+                val label = runCatching { info.loadLabel(packageManager).toString().trim().lowercase() }.getOrDefault("")
+                label in app.labelAliases
+            }
+            val installed = exactLabelMatch ?: installedApps.firstOrNull { info ->
+                val packageName = info.packageName.lowercase()
+                app.packageHints.any { hint -> packageName.contains(hint) }
+            }
             installed?.let {
                 ActionTarget(it.packageName, app.label)
             }
