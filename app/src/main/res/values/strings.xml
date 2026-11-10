@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KeyBinder TV</string>
+    <string name="app_name">MANDO TCL</string>
     <string name="screen_home">Inicio</string>
     <string name="screen_mappings">Asignaciones</string>
     <string name="screen_learning">Detección</string>
     <string name="screen_settings">Ajustes</string>
-    <string name="screen_import_export">Importar / Exportar</string>
+    <string name="screen_import_export">Copia de seguridad</string>
     <string name="action_add">Añadir</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
@@ -20,16 +20,16 @@
     <string name="mapping_no_action">Sin acción asignada</string>
     <string name="settings_show_overlay">Mostrar aviso al reasignar un botón</string>
     <string name="settings_long_press_threshold">Duración de la pulsación larga (ms)</string>
-    <string name="accessibility_service_label">KeyBinder TV — Reasignador de botones</string>
+    <string name="accessibility_service_label">MANDO TCL — Reasignador de botones</string>
     <string name="accessibility_service_description">Intercepta los botones del mando a distancia para asignarlos a otras aplicaciones.</string>
-    <string name="home_title">KeyBinder TV</string>
+    <string name="home_title">MANDO TCL</string>
     <string name="home_service_active">Servicio activo</string>
     <string name="home_service_inactive">Servicio inactivo</string>
     <string name="home_enable_service">Activar servicio</string>
     <string name="home_mappings_count">%1$d asignaciones activas de %2$d</string>
     <string name="home_manage_mappings">Gestionar asignaciones</string>
     <string name="home_settings">Ajustes</string>
-    <string name="home_import_export">Importar / Exportar</string>
+    <string name="home_import_export">Copia de seguridad</string>
     <string name="mappings_empty">No hay asignaciones configuradas</string>
     <string name="mappings_add">Añadir asignación</string>
     <string name="learning_title">Detectar botón</string>
@@ -45,7 +45,7 @@
     <string name="settings_overlay">Mostrar aviso al reasignar</string>
     <string name="settings_longpress_threshold">Duración de pulsación larga: %1$d ms</string>
     <string name="settings_accessibility">Ajustes de accesibilidad</string>
-    <string name="importexport_title">Importar / Exportar</string>
+    <string name="importexport_title">Copia de seguridad</string>
     <string name="importexport_export_file">Exportar a archivo JSON</string>
     <string name="importexport_generate_qr">Generar código QR</string>
     <string name="importexport_import_file">Importar desde archivo JSON</string>
