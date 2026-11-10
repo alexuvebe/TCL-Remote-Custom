@@ -190,27 +190,51 @@ class KeyInterceptorService : AccessibilityService() {
     }
 
     /**
-     * Reproduce una acción original solo cuando el botón está identificado.
-     * En el TCL probado, el código 4062 corresponde a Netflix.
+     * Reproduce la aplicación original asociada al acceso directo.
+     * Los códigos proceden de la detección realizada en el TCL 65P638.
+     * El paquete se resuelve entre las aplicaciones instaladas para no
+     * depender de identificadores de paquete supuestos.
      */
     private fun launchOriginalAction(button: ButtonIdentifier, showOverlay: Boolean) {
-        val target = when (button.keyCode) {
-            4062 -> ActionTarget("com.netflix.ninja", "Netflix")
-            4065 -> ActionTarget("com.google.android.youtube.tv", "YouTube")
-            4099 -> ActionTarget("com.amazon.amazonvideo.livingroom", "Prime Video")
-            else -> if (!button.sourcePackage.isNullOrBlank()) {
-                ActionTarget(button.sourcePackage, button.sourcePackage)
-            } else {
-                null
+        val factoryApp = when (button.keyCode) {
+            4062 -> FactoryApp("Netflix", setOf("netflix"), setOf("netflix"))
+            4099 -> FactoryApp("Prime Video", setOf("prime video", "amazon prime video"), setOf("amazonvideo", "primevideo"))
+            4140 -> FactoryApp("Guard", setOf("guard", "guardia de seguridad", "security guard"), setOf("guard"))
+            4057 -> FactoryApp("Media", setOf("media", "reproductor multimedia", "media player"), setOf("media"))
+            4065 -> FactoryApp("YouTube", setOf("youtube"), setOf("youtube"))
+            4020 -> FactoryApp("TCL Channel", setOf("tcl channel"), setOf("tclchannel", "tcl_channel"))
+            else -> null
+        }
+
+        val target = factoryApp?.let { app ->
+            val installed = packageManager.getInstalledApplications(android.content.pm.PackageManager.MATCH_ALL)
+                .firstOrNull { info ->
+                    val packageName = info.packageName.lowercase()
+                    val label = runCatching { info.loadLabel(packageManager).toString().lowercase() }.getOrDefault("")
+                    label in app.labelAliases ||
+                        app.packageHints.any { hint -> packageName.contains(hint) }
+                }
+            installed?.let {
+                ActionTarget(it.packageName, app.label)
             }
+        } ?: if (factoryApp == null && !button.sourcePackage.isNullOrBlank()) {
+            ActionTarget(button.sourcePackage, button.sourcePackage)
+        } else {
+            null
         }
 
         if (target == null) {
-            Log.w(TAG, "No se puede reproducir la acción de fábrica: botón no identificado (${button.keyCode})")
+            Log.w(TAG, "No se encuentra instalada la aplicación original para el código ${button.keyCode}")
             return
         }
         remapExecutor.launch(target, showOverlay)
     }
+
+    private data class FactoryApp(
+        val label: String,
+        val labelAliases: Set<String>,
+        val packageHints: Set<String>
+    )
 
     private fun isDuplicate(key: String): Boolean {
         val now: Long = System.currentTimeMillis()
