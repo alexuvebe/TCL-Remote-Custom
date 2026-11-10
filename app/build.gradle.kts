@@ -16,12 +16,19 @@ android {
         versionName = "1.0.0"
     }
 
+    val signingPropertiesFile = rootProject.file("key.properties")
+    val signingProperties = java.util.Properties().apply {
+        if (signingPropertiesFile.exists()) {
+            signingPropertiesFile.inputStream().use { load(it) }
+        }
+    }
+
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("keybindertv.keystore")
-            storePassword = "keybindertv2024"
-            keyAlias = "keybindertv"
-            keyPassword = "keybindertv2024"
+            storeFile = rootProject.file(signingProperties.getProperty("storeFile", "keybindertv.keystore"))
+            storePassword = signingProperties.getProperty("storePassword")
+            keyAlias = signingProperties.getProperty("keyAlias")
+            keyPassword = signingProperties.getProperty("keyPassword")
         }
     }
 
