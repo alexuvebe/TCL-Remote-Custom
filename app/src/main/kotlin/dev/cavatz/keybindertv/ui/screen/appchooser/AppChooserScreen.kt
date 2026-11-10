@@ -38,16 +38,16 @@ import kotlinx.coroutines.launch
 private const val GRID_COLUMNS: Int = 5
 
 /** Taille de l'icône d'application dans la grille */
-private val AppIconSize = 48.dp
+private val AppIconSize = 40.dp
 
 /** Espacement entre les éléments de la grille */
-private val GridSpacing = 8.dp
+private val GridSpacing = 5.dp
 
 /** Padding interne des cartes d'application */
-private val AppCardPadding = 8.dp
+private val AppCardPadding = 5.dp
 
 /** Padding global de l'écran */
-private val ScreenPadding = 16.dp
+private val ScreenPadding = 8.dp
 
 /**
  * Écran de sélection d'application pour un mapping.
@@ -104,13 +104,13 @@ private fun AppChooserContent(
     ) {
         Text(
             text = stringResource(R.string.appchooser_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.titleLarge
         )
         TvCard(onClick = onFactorySelected) {
             Column(modifier = Modifier.padding(AppCardPadding)) {
                 Text(
                     text = stringResource(R.string.appchooser_factory),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleSmall
                 )
                 Text(
                     text = stringResource(R.string.appchooser_factory_description),
