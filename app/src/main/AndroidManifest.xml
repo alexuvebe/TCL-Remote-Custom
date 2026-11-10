@@ -5,7 +5,7 @@
     <!-- Nécessaire pour lister les applications installées (sélecteur d'app cible) -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
-    <!-- Internet : optionnel, prévu pour une future synchronisation cloud -->
+    <!-- Internet : opcional, previsto para futuras funciones -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Démarrage automatique au boot (Phase 4) -->
@@ -35,6 +35,8 @@
     <application
         android:name=".KeyBinderTvApp"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -74,7 +76,7 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- Receiver de démarrage automatique — vérifie le service d'accessibilité au boot -->
+        <!-- Receiver de démarrage automático -->
         <receiver
             android:name=".receiver.BootReceiver"
             android:exported="false">
