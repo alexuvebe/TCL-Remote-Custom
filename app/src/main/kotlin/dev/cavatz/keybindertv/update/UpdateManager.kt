@@ -168,7 +168,7 @@ class UpdateManager(private val context: Context) {
     companion object {
         private const val RELEASE_API =
             "https://api.github.com/repos/alexuvebe/TCL-Remote-Custom/releases/latest"
-        private const val APK_NAME = "app-debug.apk"
+        private const val APK_NAME = "mando-tcl.apk"
         private const val MIN_APK_SIZE = 1_000_000L
     }
 }
