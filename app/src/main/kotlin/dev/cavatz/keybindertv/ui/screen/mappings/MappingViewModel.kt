@@ -12,6 +12,7 @@ import dev.cavatz.keybindertv.data.repository.MappingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -60,6 +61,31 @@ class MappingViewModel(
     fun toggleMapping(id: String, enabled: Boolean) {
         viewModelScope.launch {
             repository.toggleMapping(id, enabled)
+        }
+    }
+
+    /** Activa/desactiva de forma independiente cada tipo de pulsación. */
+    fun toggleShortPress(id: String, enabled: Boolean) = updatePress(id) {
+        copy(shortPressEnabled = enabled)
+    }
+
+    fun toggleLongPress(id: String, enabled: Boolean) = updatePress(id) {
+        copy(longPressEnabled = enabled)
+    }
+
+    /** La X borra solo la asignación elegida y devuelve esa pulsación a fábrica. */
+    fun clearShortPress(id: String) = updatePress(id) {
+        copy(shortPressAction = null, shortPressUseDefault = true)
+    }
+
+    fun clearLongPress(id: String) = updatePress(id) {
+        copy(longPressAction = null, longPressUseDefault = true)
+    }
+
+    private fun updatePress(id: String, change: KeyMapping.() -> KeyMapping) {
+        viewModelScope.launch {
+            val current = repository.configFlow.first().mappings.firstOrNull { it.id == id } ?: return@launch
+            repository.updateMapping(current.change())
         }
     }
 
