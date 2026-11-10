@@ -1,4 +1,5 @@
 name: TCL Remote Custom - Android APK
+# Build trigger after permanent signing secret setup
 
 on:
   workflow_dispatch:
