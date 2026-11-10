@@ -104,7 +104,6 @@ private fun MappingListContent(
         if (!uiState.isLoading) {
             Button(
                 onClick = onAddMapping,
-                modifier = Modifier.tvFocusOutline(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ActionBlue,
                     contentColor = Color.White
