@@ -185,6 +185,42 @@ class MappingRepositoryTest {
     }
 
     @Test
+    fun `should store factory short press independently from custom long press`() = testScope.runTest {
+        val mapping = mappingYoutube.copy(
+            shortPressAction = null,
+            shortPressUseDefault = true,
+            longPressAction = actionNetflix,
+            longPressUseDefault = false
+        )
+
+        repository.addMapping(mapping)
+        val stored = repository.configFlow.first().mappings.single()
+
+        assertTrue(stored.shortPressUseDefault)
+        assertFalse(stored.longPressUseDefault)
+        assertEquals(null, stored.shortPressAction)
+        assertEquals(actionNetflix, stored.longPressAction)
+    }
+
+    @Test
+    fun `should store custom short press independently from factory long press`() = testScope.runTest {
+        val mapping = mappingYoutube.copy(
+            shortPressAction = actionYoutube,
+            shortPressUseDefault = false,
+            longPressAction = null,
+            longPressUseDefault = true
+        )
+
+        repository.addMapping(mapping)
+        val stored = repository.configFlow.first().mappings.single()
+
+        assertFalse(stored.shortPressUseDefault)
+        assertTrue(stored.longPressUseDefault)
+        assertEquals(actionYoutube, stored.shortPressAction)
+        assertEquals(null, stored.longPressAction)
+    }
+
+    @Test
     fun `should update settings — showOverlayNotification and longPressThresholdMs`() = testScope.runTest {
         // Acte
         repository.updateSettings(showOverlay = false, longPressThresholdMs = 800L)
