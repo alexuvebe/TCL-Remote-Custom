@@ -103,7 +103,23 @@ class LearningViewModel(
         val currentState = _state.value as? LearningState.ButtonDetected ?: return
         val config = repository.configFlow.first()
         val existingMapping = config.mappings.firstOrNull { it.id == mappingId } ?: return
-        val updatedMapping = existingMapping.copy(button = currentState.identifier)
+        // A newly learned key must explicitly start with its native/factory
+        // behavior for both press types. This avoids an empty "Un toque" state.
+        // Preserve any existing custom action/default selection when editing.
+        val hasAnyConfiguredAction =
+            existingMapping.shortPressAction != null ||
+            existingMapping.longPressAction != null ||
+            existingMapping.shortPressUseDefault ||
+            existingMapping.longPressUseDefault
+        val updatedMapping = if (hasAnyConfiguredAction) {
+            existingMapping.copy(button = currentState.identifier)
+        } else {
+            existingMapping.copy(
+                button = currentState.identifier,
+                shortPressUseDefault = true,
+                longPressUseDefault = true
+            )
+        }
         repository.updateMapping(updatedMapping)
     }
 
