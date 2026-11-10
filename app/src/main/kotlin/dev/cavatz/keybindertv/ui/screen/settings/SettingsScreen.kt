@@ -1,6 +1,7 @@
 package dev.cavatz.keybindertv.ui.screen.settings
 
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,82 +26,87 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import dev.cavatz.keybindertv.KeyBinderTvApp
 import dev.cavatz.keybindertv.R
+import dev.cavatz.keybindertv.backup.GitHubBackupManager
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 
-/** Espacement vertical entre les sections de paramètres */
 private val SectionSpacing = 24.dp
-
-/** Padding global de l'écran */
 private val ScreenPadding = 32.dp
-
-/** Nombre de pas sur le slider de long press */
 private val SLIDER_STEPS: Int = ((LONG_PRESS_MAX_MS - LONG_PRESS_MIN_MS) / LONG_PRESS_STEP_MS - 1).toInt()
 
-/**
- * Écran de paramètres globaux de l'application.
- * Permet de configurer l'overlay et le seuil de long press.
- *
- * @param navController Contrôleur de navigation
- * @param repository Repository des mappings
- */
 @Composable
 fun SettingsScreen(
     navController: NavHostController,
     repository: MappingRepository
 ) {
-    val viewModel: SettingsViewModel = viewModel(
-        factory = SettingsViewModel.factory(repository)
-    )
+    val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(repository))
     val uiState: SettingsViewModel.SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val backupManager = (context.applicationContext as KeyBinderTvApp).githubBackupManager
+    val backupState by backupManager.state.collectAsStateWithLifecycle()
 
     SettingsContent(
         uiState = uiState,
+        backupState = backupState,
+        backupManager = backupManager,
         onSetShowOverlay = { enabled -> viewModel.setShowOverlay(enabled) },
         onSetLongPressThreshold = { threshold -> viewModel.setLongPressThreshold(threshold) }
     )
 }
 
-/** Contenu stateless de l'écran des paramètres */
 @Composable
 private fun SettingsContent(
     uiState: SettingsViewModel.SettingsUiState,
+    backupState: GitHubBackupManager.UiState,
+    backupManager: GitHubBackupManager,
     onSetShowOverlay: (Boolean) -> Unit,
     onSetLongPressThreshold: (Long) -> Unit
 ) {
+    val context = LocalContext.current
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(ScreenPadding),
+        modifier = Modifier.fillMaxSize().padding(ScreenPadding),
         verticalArrangement = Arrangement.Top
     ) {
-        Text(
-            text = stringResource(R.string.settings_title),
-            style = MaterialTheme.typography.headlineMedium
-        )
+        Text(text = stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(SectionSpacing))
-
         StatusIndicator(isActive = uiState.isServiceActive)
         Spacer(modifier = Modifier.height(SectionSpacing))
-
-        OverlayToggle(
-            enabled = uiState.showOverlayNotification,
-            onToggle = onSetShowOverlay
-        )
+        OverlayToggle(enabled = uiState.showOverlayNotification, onToggle = onSetShowOverlay)
         Spacer(modifier = Modifier.height(SectionSpacing))
-
-        LongPressSlider(
-            thresholdMs = uiState.longPressThresholdMs,
-            onThresholdChanged = onSetLongPressThreshold
-        )
+        LongPressSlider(thresholdMs = uiState.longPressThresholdMs, onThresholdChanged = onSetLongPressThreshold)
         Spacer(modifier = Modifier.height(SectionSpacing))
-
         AccessibilityButton()
+        Spacer(modifier = Modifier.height(SectionSpacing))
+        Text("Copia de seguridad en GitHub", style = MaterialTheme.typography.titleLarge)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(backupState.status, style = MaterialTheme.typography.bodyMedium)
+        if (backupState.userCode != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Código de autorización", style = MaterialTheme.typography.bodyMedium)
+            Text(backupState.userCode, style = MaterialTheme.typography.headlineLarge)
+            Button(onClick = {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(backupState.verificationUrl ?: "https://github.com/login/device")))
+            }) { Text("Abrir GitHub para autorizar") }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        if (!backupState.connected) {
+            Button(onClick = { backupManager.connect() }, enabled = !backupState.busy) {
+                Text(if (backupState.userCode == null) "Conectar con GitHub" else "Solicitar otro código")
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Button(onClick = { backupManager.backupNow() }, enabled = !backupState.busy) { Text("Guardar copia") }
+                Button(onClick = { backupManager.restoreNow() }, enabled = !backupState.busy) { Text("Restaurar copia") }
+            }
+            Button(onClick = { backupManager.disconnect() }, enabled = !backupState.busy) {
+                Text("Desconectar GitHub")
+            }
+        }
     }
 }
 
-/** Toggle pour la notification overlay */
 @Composable
 private fun OverlayToggle(enabled: Boolean, onToggle: (Boolean) -> Unit) {
     Row(
@@ -108,22 +114,15 @@ private fun OverlayToggle(enabled: Boolean, onToggle: (Boolean) -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = stringResource(R.string.settings_overlay),
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Text(text = stringResource(R.string.settings_overlay), style = MaterialTheme.typography.bodyLarge)
         Switch(checked = enabled, onCheckedChange = onToggle)
     }
 }
 
-/** Slider pour configurer le seuil de long press */
 @Composable
 private fun LongPressSlider(thresholdMs: Long, onThresholdChanged: (Long) -> Unit) {
     Column {
-        Text(
-            text = stringResource(R.string.settings_longpress_threshold, thresholdMs),
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Text(text = stringResource(R.string.settings_longpress_threshold, thresholdMs), style = MaterialTheme.typography.bodyLarge)
         Slider(
             value = thresholdMs.toFloat(),
             onValueChange = { value -> onThresholdChanged(value.toLong()) },
@@ -134,13 +133,11 @@ private fun LongPressSlider(thresholdMs: Long, onThresholdChanged: (Long) -> Uni
     }
 }
 
-/** Bouton d'accès aux paramètres d'accessibilité Android */
 @Composable
 private fun AccessibilityButton() {
     val context = LocalContext.current
     Button(onClick = {
-        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-        context.startActivity(intent)
+        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
     }) {
         Text(text = stringResource(R.string.settings_accessibility))
     }
