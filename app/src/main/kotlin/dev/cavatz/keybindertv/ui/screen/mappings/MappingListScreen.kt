@@ -26,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -212,7 +213,7 @@ private fun MappingItem(
                         vertical = 8.dp
                     )
                 ) {
-                    Text("Pulsación corta", maxLines = 1, style = MaterialTheme.typography.labelSmall)
+                    Text(text = "Corta · ${shortPressLabel(mapping)}", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall)
                 }
                 Button(
                     onClick = onConfigureLong,
@@ -226,7 +227,7 @@ private fun MappingItem(
                         vertical = 8.dp
                     )
                 ) {
-                    Text("Pulsación larga", maxLines = 1, style = MaterialTheme.typography.labelSmall)
+                    Text(text = "Larga · ${longPressLabel(mapping)}", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall)
                 }
                 Switch(
                     checked = mapping.isEnabled,
@@ -256,51 +257,48 @@ private fun MappingItem(
 
 @Composable
 private fun MappingInfo(mapping: KeyMapping) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
         Text(
             text = mapping.button.userLabel.ifEmpty { "Botón #${mapping.id.take(8)}" },
             style = MaterialTheme.typography.titleMedium,
             color = Color.White
         )
-        val factoryAppLabel = factoryAppForKeyCode(mapping.button.keyCode)
-        Text(
-            text = "Código: ${mapping.button.keyCode ?: "—"} · De fábrica: $factoryAppLabel",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        val shortLabel = when {
-            mapping.shortPressUseDefault -> "De fábrica"
-            mapping.shortPressAction != null -> mapping.shortPressAction.appLabel
-            else -> "Sin acción"
-        }
-        val longLabel = when {
-            mapping.longPressUseDefault -> "De fábrica"
-            mapping.longPressAction != null -> mapping.longPressAction.appLabel
-            mapping.shortPressAction != null && !mapping.shortPressUseDefault -> "${mapping.shortPressAction.appLabel} (igual que corta)"
-            else -> "Sin acción"
-        }
-        Text(
-            text = "Pulsación corta: $shortLabel",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = "Pulsación larga: $longLabel",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        if (mapping.shortPressAction == null && mapping.longPressAction == null &&
-            !mapping.shortPressUseDefault && !mapping.longPressUseDefault
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.mapping_no_action),
+                text = "Código: ${mapping.button.keyCode ?: "—"} · ${factoryAppForKeyCode(mapping.button.keyCode)}",
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = if (mapping.isEnabled) "Activado" else "Desactivado",
+                maxLines = 1,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (mapping.isEnabled) ActionGreen else ActionRed
             )
         }
     }
 }
 
+private fun shortPressLabel(mapping: KeyMapping): String = when {
+    mapping.shortPressUseDefault -> "De fábrica"
+    mapping.shortPressAction != null -> mapping.shortPressAction.appLabel
+    else -> "Sin acción"
+}
+
+private fun longPressLabel(mapping: KeyMapping): String = when {
+    mapping.longPressUseDefault -> "De fábrica"
+    mapping.longPressAction != null -> mapping.longPressAction.appLabel
+    mapping.shortPressAction != null && !mapping.shortPressUseDefault ->
+        "${mapping.shortPressAction.appLabel} (igual que corta)"
+    else -> "Sin acción"
+}
 private fun factoryAppForKeyCode(keyCode: Int?): String {
     return when (keyCode) {
         4062 -> "Netflix"
