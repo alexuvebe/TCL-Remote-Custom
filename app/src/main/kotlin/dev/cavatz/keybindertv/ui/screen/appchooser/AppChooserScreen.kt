@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -14,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,7 +51,7 @@ private val ScreenPadding = 16.dp
 
 /**
  * Écran de sélection d'application pour un mapping.
- * Affiche une grille d'apps installées avec une barre de recherche.
+ * Affiche directement les applications installées sous forme de grille d'icônes.
  *
  * @param navController Contrôleur de navigation
  * @param repository Repository des mappings
@@ -77,7 +75,6 @@ fun AppChooserScreen(
 
     AppChooserContent(
         uiState = uiState,
-        onSearchQueryChanged = { query -> viewModel.onSearchQueryChanged(query) },
         onFactorySelected = {
             coroutineScope.launch {
                 viewModel.selectFactory()
@@ -97,7 +94,6 @@ fun AppChooserScreen(
 @Composable
 private fun AppChooserContent(
     uiState: AppChooserViewModel.AppChooserUiState,
-    onSearchQueryChanged: (String) -> Unit,
     onFactorySelected: () -> Unit,
     onAppSelected: (InstalledAppsProvider.AppInfo) -> Unit
 ) {
@@ -109,10 +105,6 @@ private fun AppChooserContent(
         Text(
             text = stringResource(R.string.appchooser_title),
             style = MaterialTheme.typography.headlineMedium
-        )
-        SearchBar(
-            query = uiState.searchQuery,
-            onQueryChanged = onSearchQueryChanged
         )
         TvCard(onClick = onFactorySelected) {
             Column(modifier = Modifier.padding(AppCardPadding)) {
@@ -132,25 +124,11 @@ private fun AppChooserContent(
             uiState.isLoading -> LoadingGrid()
             else -> AppGrid(
                 apps = uiState.apps,
-                onAppSelected = onAppSelected
+                onAppSelected = onAppSelected,
+                modifier = Modifier.weight(1f).fillMaxWidth()
             )
         }
     }
-}
-
-/** Barre de recherche pour filtrer les applications */
-@Composable
-private fun SearchBar(query: String, onQueryChanged: (String) -> Unit) {
-    TextField(
-        value = query,
-        onValueChange = onQueryChanged,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = GridSpacing)
-            .tvFocusOutline(),
-        placeholder = { Text(text = stringResource(R.string.appchooser_search)) },
-        singleLine = true
-    )
 }
 
 /** Indicateur de chargement centré */
@@ -168,11 +146,12 @@ private fun LoadingGrid() {
 @Composable
 private fun AppGrid(
     apps: List<InstalledAppsProvider.AppInfo>,
-    onAppSelected: (InstalledAppsProvider.AppInfo) -> Unit
+    onAppSelected: (InstalledAppsProvider.AppInfo) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(GRID_COLUMNS),
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         contentPadding = PaddingValues(GridSpacing),
         verticalArrangement = Arrangement.spacedBy(GridSpacing),
         horizontalArrangement = Arrangement.spacedBy(GridSpacing)
