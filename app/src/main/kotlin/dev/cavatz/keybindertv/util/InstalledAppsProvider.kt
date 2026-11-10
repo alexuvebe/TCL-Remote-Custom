@@ -22,9 +22,9 @@ class InstalledAppsProvider(private val context: Context) {
     )
 
     /**
-     * Retourne la liste de toutes les apps installées ayant une activité principale.
-     * Trié alphabétiquement par appLabel.
-     * Exclut les apps système sans launcher et notre propre application.
+     * Retourne une seule entrée par application, triée alphabétiquement.
+     * Certaines applications exposent plusieurs activités launcher : elles doivent
+     * être dédupliquées car la grille Compose utilise packageName comme clé stable.
      */
     fun getInstalledApps(): List<AppInfo> {
         val launcherIntent = Intent(Intent.ACTION_MAIN).apply {
@@ -36,7 +36,8 @@ class InstalledAppsProvider(private val context: Context) {
         return resolvedApps
             .mapNotNull { resolveInfo -> buildAppInfo(resolveInfo) }
             .filter { app -> app.packageName != context.packageName }
-            .sortedBy { app -> app.appLabel.lowercase() }
+            .distinctBy { app -> app.packageName }
+            .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { app -> app.appLabel })
     }
 
     /** Construit un [AppInfo] depuis un [ResolveInfo], retourne null en cas d'erreur */
