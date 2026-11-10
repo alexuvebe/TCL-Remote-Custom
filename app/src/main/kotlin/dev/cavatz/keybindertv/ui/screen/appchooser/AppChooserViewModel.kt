@@ -27,7 +27,6 @@ class AppChooserViewModel(
 
     data class AppChooserUiState(
         val apps: List<InstalledAppsProvider.AppInfo> = emptyList(),
-        val searchQuery: String = "",
         val isLoading: Boolean = true
     )
 
@@ -45,14 +44,6 @@ class AppChooserViewModel(
             allApps = apps
             _uiState.update { it.copy(apps = apps, isLoading = false) }
         }
-    }
-
-    fun onSearchQueryChanged(query: String) {
-        val filtered = if (query.isBlank()) allApps else allApps.filter { app ->
-            app.appLabel.contains(query, ignoreCase = true) ||
-                app.packageName.contains(query, ignoreCase = true)
-        }
-        _uiState.update { it.copy(searchQuery = query, apps = filtered) }
     }
 
     suspend fun selectApp(app: InstalledAppsProvider.AppInfo) {
