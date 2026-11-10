@@ -41,10 +41,10 @@ import dev.cavatz.keybindertv.ui.theme.ActionGreen
 import kotlinx.coroutines.launch
 
 /** Espacement vertical entre les éléments */
-private val VerticalSpacing = 16.dp
+private val VerticalSpacing = 10.dp
 
 /** Padding global de l'écran */
-private val ScreenPadding = 32.dp
+private val ScreenPadding = 12.dp
 
 /**
  * Écran de détection du bouton de télécommande.
@@ -113,7 +113,7 @@ private fun LearningContent(
     ) {
         Text(
             text = stringResource(R.string.learning_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.titleLarge
         )
         Spacer(modifier = Modifier.height(VerticalSpacing))
 
@@ -264,7 +264,7 @@ private fun ServiceInactiveMessage(onCancel: () -> Unit) {
 @Composable
 private fun RemoteDiagram(identifier: ButtonIdentifier) {
     val position = remoteButtonPosition(identifier)
-    Canvas(modifier = Modifier.size(width = 104.dp, height = 230.dp)) {
+    Canvas(modifier = Modifier.size(width = 78.dp, height = 172.dp)) {
         val w = size.width
         val h = size.height
         drawRoundRect(
