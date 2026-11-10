@@ -158,12 +158,23 @@ class GitHubBackupManager(
     }
 
     private fun initializeGist() {
-        val existingId = prefs.getString(KEY_GIST_ID, null)
+        var existingId = prefs.getString(KEY_GIST_ID, null)
+        val token = readToken() ?: error("No se ha guardado la autorización de GitHub")
+        if (existingId == null) {
+            // Tras reinstalar se pierde el identificador local; localizamos la copia privada por su descripción.
+            val gists = requestJson("https://api.github.com/gists?per_page=100", "GET", null, token)
+            val match = gists.jsonArray.firstOrNull { gist ->
+                gist.jsonObject["description"]?.jsonPrimitive?.content == "Copia privada de MANDO TCL" &&
+                    gist.jsonObject["files"]?.jsonObject?.containsKey(BACKUP_FILE) == true
+            }
+            existingId = match?.jsonObject?.get("id")?.jsonPrimitive?.content
+            if (existingId != null) prefs.edit().putString(KEY_GIST_ID, existingId).apply()
+        }
         if (existingId != null) {
             val local = repository.configFlow.first()
             if (local.mappings.isEmpty()) {
-                runCatching { repository.replaceConfig(downloadConfig()) }
-                    .onSuccess { return }
+                repository.replaceConfig(downloadConfig())
+                return
             }
             uploadCurrentConfig()
             return
