@@ -198,26 +198,32 @@ class KeyInterceptorService : AccessibilityService() {
     private fun launchOriginalAction(button: ButtonIdentifier, showOverlay: Boolean) {
         val factoryApp = when (button.keyCode) {
             4062 -> FactoryApp("Netflix", setOf("netflix"), setOf("netflix"))
-            4099 -> FactoryApp("Prime Video", setOf("prime video", "amazon prime video"), setOf("amazonvideo", "primevideo"))
+            // Paquetes verificados para los accesos directos del TCL 65P638.
+            4099 -> FactoryApp("Prime Video", setOf("prime video", "amazon prime video"), setOf("amazonvideo", "primevideo"), "com.amazon.amazonvideo.livingroom")
             4140 -> FactoryApp("Guard", setOf("guard", "guardia de seguridad", "security guard"), setOf("guard"))
             4057 -> FactoryApp("Media", setOf("media", "reproductor multimedia", "media player"), setOf("media"))
             4065 -> FactoryApp("YouTube", setOf("youtube"), setOf("youtube"))
-            4020 -> FactoryApp("TCL Channel", setOf("tcl channel"), setOf("tclchannel", "tcl_channel"))
+            4020 -> FactoryApp("TCL Channel", setOf("tcl channel", "live tv", "tv"), setOf("tclchannel", "tcl_channel"), "com.tcl.tv")
             else -> null
         }
 
         val target = factoryApp?.let { app ->
             val installedApps = packageManager.getInstalledApplications(android.content.pm.PackageManager.MATCH_ALL)
+            val exactPackageMatch = app.preferredPackageName?.let { preferred ->
+                installedApps.firstOrNull { it.packageName == preferred }
+            }
             val exactLabelMatch = installedApps.firstOrNull { info ->
                 val label = runCatching { info.loadLabel(packageManager).toString().trim().lowercase() }.getOrDefault("")
                 label in app.labelAliases
             }
-            val installed = exactLabelMatch ?: installedApps.firstOrNull { info ->
+            val installed = exactPackageMatch ?: exactLabelMatch ?: installedApps.firstOrNull { info ->
                 val packageName = info.packageName.lowercase()
                 app.packageHints.any { hint -> packageName.contains(hint) }
             }
             installed?.let {
                 ActionTarget(it.packageName, app.label)
+            } ?: app.preferredPackageName?.let { preferred ->
+                ActionTarget(preferred, app.label)
             }
         } ?: if (factoryApp == null && !button.sourcePackage.isNullOrBlank()) {
             ActionTarget(button.sourcePackage, button.sourcePackage)
@@ -235,7 +241,8 @@ class KeyInterceptorService : AccessibilityService() {
     private data class FactoryApp(
         val label: String,
         val labelAliases: Set<String>,
-        val packageHints: Set<String>
+        val packageHints: Set<String>,
+        val preferredPackageName: String? = null
     )
 
     private fun isDuplicate(key: String): Boolean {
