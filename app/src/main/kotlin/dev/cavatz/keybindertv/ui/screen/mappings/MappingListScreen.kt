@@ -225,7 +225,7 @@ private fun MappingItem(
                     onClick = { onToggle(!mapping.isEnabled) },
                     modifier = Modifier.tvFocusOutline(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (mapping.isEnabled) ActionGray else ActionGreen,
+                        containerColor = if (mapping.isEnabled) ActionGray else ActionRed,
                         contentColor = Color.White
                     )
                 ) {
