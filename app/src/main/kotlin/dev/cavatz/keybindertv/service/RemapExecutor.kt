@@ -68,11 +68,23 @@ class RemapExecutor(private val context: Context) {
      * Retourne false si le package manager ne trouve pas l'application.
      */
     private fun startTargetApp(target: ActionTarget): Boolean {
-        val launchIntent: Intent? = context.packageManager
-            .getLaunchIntentForPackage(target.packageName)
+        val packageManager = context.packageManager
+        // getLaunchIntentForPackage no siempre encuentra la actividad principal
+        // de apps que solo publican LEANBACK_LAUNCHER (Android TV/Google TV).
+        val launchIntent: Intent? = packageManager.getLaunchIntentForPackage(target.packageName)
+            ?: sequenceOf(
+                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER),
+                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+            ).mapNotNull { baseIntent ->
+                baseIntent.setPackage(target.packageName)
+                packageManager.queryIntentActivities(baseIntent, 0)
+                    .firstOrNull()?.activityInfo?.let { activity ->
+                        Intent(baseIntent).setClassName(activity.packageName, activity.name)
+                    }
+            }.firstOrNull()
 
         if (launchIntent == null) {
-            Log.w(TAG, "Package introuvable : ${target.packageName}")
+            Log.w(TAG, "No se encuentra actividad de inicio para : ${target.packageName}")
             return false
         }
 
