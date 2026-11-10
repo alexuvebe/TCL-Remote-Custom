@@ -77,6 +77,12 @@ fun AppChooserScreen(
     AppChooserContent(
         uiState = uiState,
         onSearchQueryChanged = { query -> viewModel.onSearchQueryChanged(query) },
+        onFactorySelected = {
+            coroutineScope.launch {
+                viewModel.selectFactory()
+                navController.popBackStack()
+            }
+        },
         onAppSelected = { app ->
             coroutineScope.launch {
                 viewModel.selectApp(app)
@@ -91,6 +97,7 @@ fun AppChooserScreen(
 private fun AppChooserContent(
     uiState: AppChooserViewModel.AppChooserUiState,
     onSearchQueryChanged: (String) -> Unit,
+    onFactorySelected: () -> Unit,
     onAppSelected: (InstalledAppsProvider.AppInfo) -> Unit
 ) {
     Column(
@@ -106,6 +113,19 @@ private fun AppChooserContent(
             query = uiState.searchQuery,
             onQueryChanged = onSearchQueryChanged
         )
+        TvCard(onClick = onFactorySelected) {
+            Column(modifier = Modifier.padding(AppCardPadding)) {
+                Text(
+                    text = stringResource(R.string.appchooser_factory),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = stringResource(R.string.appchooser_factory_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
 
         when {
             uiState.isLoading -> LoadingGrid()
