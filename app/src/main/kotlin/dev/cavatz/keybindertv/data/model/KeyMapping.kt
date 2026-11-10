@@ -3,14 +3,9 @@ package dev.cavatz.keybindertv.data.model
 import kotlinx.serialization.Serializable
 
 /**
- * Association entre un bouton physique et une ou deux actions cibles.
- * Un seul mapping peut couvrir l'appui court ET l'appui long.
- *
- * @param id               Identifiant UUID unique du mapping
- * @param button           Bouton source identifié
- * @param shortPressAction Application lancée sur appui court (null = pas de remapping)
- * @param longPressAction  Application lancée sur appui long (null = pas de remapping)
- * @param isEnabled        Permet de désactiver temporairement sans supprimer
+ * Asociación entre un botón físico y sus acciones para pulsación corta y larga.
+ * Los indicadores "UseDefault" distinguen la acción de fábrica de una acción
+ * sin configurar. Sus valores por defecto mantienen compatibilidad con copias antiguas.
  */
 @Serializable
 data class KeyMapping(
@@ -18,5 +13,7 @@ data class KeyMapping(
     val button: ButtonIdentifier,
     val shortPressAction: ActionTarget? = null,
     val longPressAction: ActionTarget? = null,
-    val isEnabled: Boolean = true
+    val isEnabled: Boolean = true,
+    val shortPressUseDefault: Boolean = false,
+    val longPressUseDefault: Boolean = false
 )
