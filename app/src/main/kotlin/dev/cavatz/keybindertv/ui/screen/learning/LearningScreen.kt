@@ -176,11 +176,7 @@ private fun ButtonDetectedContent(
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = "Código: ${identifier.keyCode ?: "No disponible"}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Aplicación original: ${originalAppFor(identifier)}",
+                text = "Código: ${identifier.keyCode ?: "No disponible"} · De fábrica: ${originalAppFor(identifier)}",
                 style = MaterialTheme.typography.bodyMedium
             )
             if (remoteButtonPosition(identifier) == null) {
