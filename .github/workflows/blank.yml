@@ -45,8 +45,8 @@ jobs:
       - name: Publicar APK para descarga directa
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2026.11.10-2
+          tag_name: v2026.11.10-3
           name: MANDO TCL - 10 noviembre 2026 (actualización)
-          body: APK compilado automáticamente. Incluye selector de aplicaciones sin buscador y nombre MANDO TCL corregido.
+          body: APK compilado automáticamente. Incluye acciones de fábrica iniciales y detección de aplicaciones Android TV/Leanback en el selector.
           files: app/build/outputs/apk/debug/*.apk
           fail_on_unmatched_files: true
