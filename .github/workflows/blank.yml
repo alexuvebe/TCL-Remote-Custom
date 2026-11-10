@@ -33,7 +33,7 @@ jobs:
           validate-wrappers: false
 
       - name: Compilar APK
-        run: gradle --no-daemon assembleDebug
+        run: gradle --no-daemon assembleDebug -PAPP_VERSION_CODE=${{ github.run_number }} -PAPP_VERSION_NAME=2026.11.10.${{ github.run_number }}
 
       - name: Guardar APK
         uses: actions/upload-artifact@v4
@@ -45,8 +45,8 @@ jobs:
       - name: Publicar APK para descarga directa
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2026.11.10-7
-          name: MANDO TCL - 10 noviembre 2026 (actualización 7)
-          body: APK compilado automáticamente. Corrige la apertura de fábrica de Prime Video y TCL TV, añade compatibilidad con actividades Android TV y muestra el código junto a la aplicación original y muestra las aplicaciones asignadas junto a cada tipo de pulsación y compacta los controles en dos líneas.
+          tag_name: v2026.11.10-${{ github.run_number }}
+          name: MANDO TCL - actualización ${{ github.run_number }}
+          body: Nueva versión de MANDO TCL. Incluye comprobación automática de actualizaciones y descarga e instalación del APK desde la propia aplicación. Conserva la configuración de botones.
           files: app/build/outputs/apk/debug/*.apk
           fail_on_unmatched_files: true
