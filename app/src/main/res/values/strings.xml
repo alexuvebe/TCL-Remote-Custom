@@ -48,15 +48,9 @@
     <string name="importexport_title">Copia de seguridad</string>
     <string name="importexport_export_file">Exportar a archivo JSON</string>
     <string name="importexport_generate_qr">Generar código QR</string>
-    <string name="importexport_import_file">Importar desde archivo JSON</string>
-    <string name="importexport_import_paste_hint">O pega aquí el contenido JSON</string>
-    <string name="importexport_import_button">Importar</string>
     <string name="importexport_qr_too_large">La configuración es demasiado grande para un QR. Usa la exportación a archivo.</string>
     <string name="importexport_qr_prompt">Pulsa «Generar código QR» para mostrarlo</string>
     <string name="importexport_section_export">Exportar</string>
-    <string name="importexport_section_import">Importar</string>
     <string name="press_type_short">Corta</string>
     <string name="press_type_long">Larga</string>
-    <string name="support_button">☕ Apoyar al desarrollador</string>
-    <string name="support_url" translatable="false">https://buymeacoffee.com/anthoctz</string>
 </resources>
