@@ -49,6 +49,10 @@ fun ImportExportScreen(repository: MappingRepository) {
     val uiState: ImportExportViewModel.ImportExportUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri -> uri?.let { viewModel.importFromFile(context, it) } }
+
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri -> uri?.let { viewModel.exportToFile(context, it) } }
@@ -56,6 +60,7 @@ fun ImportExportScreen(repository: MappingRepository) {
     BackupContent(
         uiState = uiState,
         onExportFile = { exportLauncher.launch("keybinder_config.json") },
+        onImportFile = { importLauncher.launch(arrayOf("application/json")) },
         onGenerateQr = { viewModel.generateQrCode() }
     )
 }
@@ -64,6 +69,7 @@ fun ImportExportScreen(repository: MappingRepository) {
 private fun BackupContent(
     uiState: ImportExportViewModel.ImportExportUiState,
     onExportFile: () -> Unit,
+    onImportFile: () -> Unit,
     onGenerateQr: () -> Unit
 ) {
     Column(
@@ -92,6 +98,7 @@ private fun BackupContent(
             qrBitmap = uiState.qrBitmap,
             isQrTooLarge = uiState.isQrTooLarge,
             onExportFile = onExportFile,
+            onImportFile = onImportFile,
             onGenerateQr = onGenerateQr
         )
     }
@@ -103,6 +110,7 @@ private fun ExportSection(
     qrBitmap: Bitmap?,
     isQrTooLarge: Boolean,
     onExportFile: () -> Unit,
+    onImportFile: () -> Unit,
     onGenerateQr: () -> Unit
 ) {
     Column(
@@ -114,6 +122,16 @@ private fun ExportSection(
             text = stringResource(R.string.importexport_section_export),
             style = MaterialTheme.typography.titleMedium
         )
+        if (config.mappings.isEmpty()) {
+            Text("¿Vienes de una instalación anterior? Puedes restaurar tu copia de seguridad.")
+            Button(
+                modifier = Modifier.tvFocusOutline(),
+                onClick = onImportFile,
+                colors = ButtonDefaults.buttonColors(containerColor = ActionYellow, contentColor = Color(0xFF202020))
+            ) {
+                Text("Restaurar copia de seguridad")
+            }
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
             Button(
                 modifier = Modifier.tvFocusOutline(),
