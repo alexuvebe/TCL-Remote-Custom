@@ -81,7 +81,9 @@ class MappingViewModel(
             button = ButtonIdentifier(userLabel = ""),
             shortPressAction = null,
             longPressAction = null,
-            isEnabled = true
+            isEnabled = true,
+            shortPressUseDefault = true,
+            longPressUseDefault = true
         )
         repository.addMapping(emptyMapping)
         return newId
