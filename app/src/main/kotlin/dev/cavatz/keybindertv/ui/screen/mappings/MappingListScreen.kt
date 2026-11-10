@@ -31,6 +31,7 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.model.KeyMapping
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.TvCard
+import dev.cavatz.keybindertv.ui.component.tvFocusOutline
 import dev.cavatz.keybindertv.ui.navigation.Screen
 import dev.cavatz.keybindertv.ui.theme.ActionBlue
 import dev.cavatz.keybindertv.ui.theme.ActionGray
@@ -103,6 +104,7 @@ private fun MappingListContent(
         if (!uiState.isLoading) {
             Button(
                 onClick = onAddMapping,
+                modifier = Modifier.tvFocusOutline(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ActionBlue,
                     contentColor = Color.White
@@ -110,6 +112,7 @@ private fun MappingListContent(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(ScreenPadding)
+                    .tvFocusOutline()
             ) {
                 Text(text = stringResource(R.string.mappings_add))
             }
@@ -195,7 +198,7 @@ private fun MappingItem(
             ) {
                 Button(
                     onClick = onConfigureShort,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).tvFocusOutline(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ActionBlue,
                         contentColor = Color.White
@@ -221,6 +224,7 @@ private fun MappingItem(
             ) {
                 Button(
                     onClick = { onToggle(!mapping.isEnabled) },
+                    modifier = Modifier.tvFocusOutline(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (mapping.isEnabled) ActionGray else ActionGreen,
                         contentColor = Color.White
@@ -230,6 +234,7 @@ private fun MappingItem(
                 }
                 Button(
                     onClick = onRemove,
+                    modifier = Modifier.tvFocusOutline(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ActionRed,
                         contentColor = Color.White
