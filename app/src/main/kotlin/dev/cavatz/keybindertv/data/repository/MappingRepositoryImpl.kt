@@ -7,8 +7,6 @@ import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.model.KeyMapping
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -72,7 +70,6 @@ class MappingRepositoryImpl(
             delay((1000L * (attempt + 1)).coerceAtMost(10000L))
             true
         }
-        .shareIn(scope, SharingStarted.Eagerly, replay = 1)
 
     init {
         // Lance le collecteur de cache en background dès la création du repository
