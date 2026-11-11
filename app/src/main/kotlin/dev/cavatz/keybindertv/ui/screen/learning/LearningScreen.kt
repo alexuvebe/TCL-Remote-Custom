@@ -63,6 +63,7 @@ fun LearningScreen(
     val state: LearningViewModel.LearningState by viewModel.state.collectAsStateWithLifecycle()
     val remainingSeconds: Int by viewModel.remainingSeconds.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
+    var showPressTypeChoice by remember { mutableStateOf(false) }
 
     // Si le service est inactif, afficher un message d'erreur
     if (KeyInterceptorService.instance == null) {
