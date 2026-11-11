@@ -1,5 +1,8 @@
 package dev.cavatz.keybindertv.ui.screen.mappings
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,41 +12,40 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.tv.material3.Button
 import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.model.KeyMapping
 import dev.cavatz.keybindertv.data.repository.MappingRepository
-import dev.cavatz.keybindertv.ui.component.TvCard
 import dev.cavatz.keybindertv.ui.navigation.Screen
-import dev.cavatz.keybindertv.ui.theme.ErrorRed
-import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
-import dev.cavatz.keybindertv.ui.theme.OnSurfaceVariantDark
+import dev.cavatz.keybindertv.ui.theme.BackgroundDark
+import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
+import dev.cavatz.keybindertv.ui.theme.OutlineDark
+import dev.cavatz.keybindertv.ui.theme.SurfaceDark
+import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
 import kotlinx.coroutines.launch
 
+private val ScreenPadding = 14.dp
 private val CardPadding = 10.dp
-private val ItemSpacing = 6.dp
-private val ScreenPadding = 12.dp
+private val CardSpacing = 8.dp
+private val CardShape = RoundedCornerShape(10.dp)
 
 @Composable
 fun MappingListScreen(
@@ -82,13 +84,19 @@ private fun MappingListContent(
     onEditLong: (String) -> Unit,
     onAddMapping: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize().background(BackgroundDark).padding(ScreenPadding)
+    ) {
         when {
-            uiState.isLoading -> LoadingIndicator()
-            uiState.mappings.isEmpty() -> EmptyMappingList()
+            uiState.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+            uiState.mappings.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(stringResource(R.string.mappings_empty), color = OnSurfaceDark)
+            }
             else -> LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(ScreenPadding),
-                verticalArrangement = Arrangement.spacedBy(ItemSpacing)
+                modifier = Modifier.fillMaxSize().padding(bottom = 62.dp),
+                verticalArrangement = Arrangement.spacedBy(CardSpacing)
             ) {
                 items(items = uiState.mappings, key = { it.id }) { mapping ->
                     MappingItem(
@@ -104,30 +112,11 @@ private fun MappingListContent(
             }
         }
 
-        if (!uiState.isLoading) {
-            Button(
-                onClick = onAddMapping,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(ScreenPadding),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)
-            ) {
-                Text(stringResource(R.string.mappings_add))
-            }
-        }
-    }
-}
-
-@Composable
-private fun LoadingIndicator() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun EmptyMappingList() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(stringResource(R.string.mappings_empty), style = MaterialTheme.typography.bodyLarge)
+        Button(
+            onClick = onAddMapping,
+            modifier = Modifier.align(Alignment.BottomEnd)
+        ) {
+            Text(stringResource(R.string.mappings_add))
         }
     }
 }
@@ -142,89 +131,98 @@ private fun MappingItem(
     onEditShort: () -> Unit,
     onEditLong: () -> Unit
 ) {
-    TvCard(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.fillMaxWidth().padding(CardPadding)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        mapping.button.userLabel.ifEmpty { "Botón configurado" },
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        "Código: ${mapping.button.keyCode ?: "—"} · De fábrica: ${factoryLabel(mapping.button.keyCode)}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        if (mapping.isEnabled) "Activado" else "Desactivado",
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                    Switch(checked = mapping.isEnabled, onCheckedChange = onToggle, colors = actionSwitchColors())
-                }
-                IconButton(onClick = onRemove) {
-                    Text(
-                        "×",
-                        color = OnSurfaceVariantDark,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(SurfaceDark, CardShape)
+            .border(BorderStroke(1.dp, OutlineDark), CardShape)
+            .padding(CardPadding)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    mapping.button.userLabel.ifEmpty { "Botón configurado" },
+                    color = OnSurfaceDark,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    "Código: ${mapping.button.keyCode ?: "—"} · De fábrica: ${factoryLabel(mapping.button.keyCode)}",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1
+                )
             }
+            Button(onClick = { onToggle(!mapping.isEnabled) }) {
+                Text(if (mapping.isEnabled) "ACTIVO" else "INACTIVO")
+            }
+            Spacer(Modifier.width(6.dp))
+            Button(onClick = onRemove) {
+                Text("×")
+            }
+        }
 
-            Divider(color = MaterialTheme.colorScheme.outlineVariant)
-            ActionRow(
-                title = "Pulsación corta",
-                destination = mapping.shortPressAction?.appLabel ?: "Sin asignar",
+        Spacer(Modifier.height(7.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ActionControl(
+                title = "CORTA",
+                destination = mapping.shortPressAction?.appLabel ?: "Elegir aplicación",
                 enabled = mapping.shortPressEnabled,
-                onToggle = onToggleShort,
-                onEdit = onEditShort
+                onToggle = { onToggleShort(!mapping.shortPressEnabled) },
+                onEdit = onEditShort,
+                modifier = Modifier.weight(1f)
             )
-            ActionRow(
-                title = "Pulsación larga",
+            ActionControl(
+                title = "LARGA",
                 destination = when {
                     mapping.longPressAction != null -> mapping.longPressAction.appLabel
-                    mapping.shortPressAction != null && mapping.shortPressEnabled ->
-                        "Usar acción corta: ${mapping.shortPressAction.appLabel}"
-                    mapping.shortPressAction != null -> "Acción corta desactivada"
-                    else -> "Sin asignar"
+                    mapping.shortPressAction != null -> "Usar acción corta"
+                    else -> "Elegir aplicación"
                 },
                 enabled = mapping.longPressEnabled,
-                onToggle = onToggleLong,
-                onEdit = onEditLong
+                onToggle = { onToggleLong(!mapping.longPressEnabled) },
+                onEdit = onEditLong,
+                modifier = Modifier.weight(1f)
             )
         }
     }
 }
 
 @Composable
-private fun ActionRow(
+private fun ActionControl(
     title: String,
     destination: String,
     enabled: Boolean,
-    onToggle: (Boolean) -> Unit,
-    onEdit: () -> Unit
+    onToggle: () -> Unit,
+    onEdit: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp),
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.labelLarge)
-            Text(destination, style = MaterialTheme.typography.bodySmall, maxLines = 1)
+        Button(onClick = onEdit, modifier = Modifier.weight(1f)) {
+            Column {
+                Text(title, style = MaterialTheme.typography.labelSmall)
+                Text(
+                    destination,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                if (enabled) "Activado" else "Desactivado",
-                style = MaterialTheme.typography.labelSmall
-            )
-            Switch(checked = enabled, onCheckedChange = onToggle, colors = actionSwitchColors())
-        }
-        TextButton(onClick = onEdit) {
-            Text("Elegir")
+        Button(onClick = onToggle) {
+            Text(if (enabled) "✓" else "OFF")
         }
     }
 }
@@ -238,9 +236,3 @@ private fun factoryLabel(keyCode: Int?): String = when (keyCode) {
     4020 -> "TCL"
     else -> "Sin etiqueta"
 }
-
-@Composable
-private fun actionSwitchColors() = SwitchDefaults.colors(
-    checkedThumbColor = ErrorRed,
-    checkedTrackColor = ErrorRed.copy(alpha = 0.45f)
-)
