@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,8 +45,8 @@ import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
 import kotlinx.coroutines.launch
 
 private val ScreenPadding = 14.dp
-private val CardPadding = 10.dp
-private val CardSpacing = 8.dp
+private val CardPadding = 7.dp
+private val CardSpacing = 5.dp
 private val CardShape = RoundedCornerShape(10.dp)
 
 @Composable
@@ -158,19 +159,19 @@ private fun MappingItem(
                     maxLines = 1
                 )
             }
-            Button(onClick = { onToggle(!mapping.isEnabled) }, modifier = Modifier.tvFocusBorder()) {
+            Button(onClick = { onToggle(!mapping.isEnabled) }, modifier = Modifier.tvFocusBorder(), contentPadding = PaddingValues(horizontal = 7.dp, vertical = 1.dp)) {
                 Text(if (mapping.isEnabled) "ACTIVO" else "INACTIVO")
             }
             Spacer(Modifier.width(6.dp))
-            Button(onClick = onRemove, modifier = Modifier.tvFocusBorder()) {
+            Button(onClick = onRemove, modifier = Modifier.tvFocusBorder(), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
                 Text("×")
             }
         }
 
-        Spacer(Modifier.height(7.dp))
+        Spacer(Modifier.height(4.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ActionControl(
@@ -211,7 +212,7 @@ private fun ActionControl(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(onClick = onEdit, modifier = Modifier.weight(1f).tvFocusBorder()) {
+        Button(onClick = onEdit, modifier = Modifier.weight(1f).tvFocusBorder().height(46.dp), contentPadding = PaddingValues(horizontal = 6.dp, vertical = 1.dp)) {
             Column {
                 Text(title, style = MaterialTheme.typography.labelSmall)
                 Text(
@@ -222,7 +223,7 @@ private fun ActionControl(
                 )
             }
         }
-        Button(onClick = onToggle, modifier = Modifier.tvFocusBorder()) {
+        Button(onClick = onToggle, modifier = Modifier.tvFocusBorder().height(46.dp), contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp)) {
             Text(if (enabled) "✓" else "OFF")
         }
     }

@@ -8,6 +8,7 @@ on:
       - feature-spanish-high-contrast
       - audit-fixes
       - fix-tv-ui-startup-update
+      - ui-assignment-flow-compact
 
 permissions:
   contents: read

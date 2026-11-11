@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,12 +76,7 @@ fun LearningScreen(
         onConfirm = {
             coroutineScope.launch {
                 viewModel.confirmButton()
-                // Navigation vers AppChooser pour configurer les actions du bouton détecté
-                navController.navigate(
-                    Screen.AppChooser.createRoute(mappingId, DEFAULT_PRESS_TYPE)
-                ) {
-                    popUpTo(Screen.MappingList.route) { inclusive = false }
-                }
+                showPressTypeChoice = true
             }
         },
         onRetry = { viewModel.retry() },
@@ -86,9 +85,41 @@ fun LearningScreen(
             navController.popBackStack()
         }
     )
+
+    if (showPressTypeChoice) {
+        AlertDialog(
+            onDismissRequest = { showPressTypeChoice = false },
+            title = { Text("¿Qué tipo de pulsación quieres configurar?") },
+            text = {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Button(
+                        onClick = {
+                            showPressTypeChoice = false
+                            navController.navigate(Screen.AppChooser.createRoute(mappingId, "short")) {
+                                popUpTo(Screen.MappingList.route) { inclusive = false }
+                            }
+                        },
+                        modifier = Modifier.weight(1f).tvFocusBorder(),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    ) { Text("Pulsación corta") }
+                    Button(
+                        onClick = {
+                            showPressTypeChoice = false
+                            navController.navigate(Screen.AppChooser.createRoute(mappingId, "long")) {
+                                popUpTo(Screen.MappingList.route) { inclusive = false }
+                            }
+                        },
+                        modifier = Modifier.weight(1f).tvFocusBorder(),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    ) { Text("Pulsación larga") }
+                }
+            },
+            confirmButton = {}
+        )
+    }
 }
 
-/** Contenu stateless de l'écran d'apprentissage */
+/** Contenido stateless de l'écran d'apprentissage */
 @Composable
 private fun LearningContent(
     state: LearningViewModel.LearningState,

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -80,29 +81,6 @@ private fun HomeContent(
         Spacer(modifier = Modifier.height(VerticalSpacing))
         StatusIndicator(isActive = uiState.isServiceActive)
 
-        Spacer(modifier = Modifier.height(VerticalSpacing))
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Remapeo global", style = MaterialTheme.typography.titleMedium)
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    if (uiState.globalEnabled) "Activado" else "Desactivado",
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Switch(
-                    checked = uiState.globalEnabled,
-                    onCheckedChange = onGlobalToggle,
-                    modifier = Modifier.tvFocusBorder(),
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = ErrorRed,
-                        checkedTrackColor = ErrorRed.copy(alpha = 0.45f)
-                    )
-                )
-            }
-        }
 
         Spacer(modifier = Modifier.height(VerticalSpacing))
         Text(
@@ -116,13 +94,14 @@ private fun HomeContent(
 
         Spacer(modifier = Modifier.height(VerticalSpacing * 2))
         Row(
-            modifier = Modifier.widthIn(max = 620.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.widthIn(max = 720.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
                 onClick = onNavigateMappings,
                 modifier = Modifier.weight(1f).tvFocusBorder(),
+                contentPadding = PaddingValues(horizontal = 7.dp, vertical = 4.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)
             ) {
                 Text(stringResource(R.string.home_manage_mappings), maxLines = 1)
@@ -131,17 +110,32 @@ private fun HomeContent(
                 isServiceActive = uiState.isServiceActive,
                 modifier = Modifier.weight(1f)
             )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.tvFocusBorder()
+            ) {
+                Text("Remapeo", style = MaterialTheme.typography.labelSmall, maxLines = 1)
+                Switch(
+                    checked = uiState.globalEnabled,
+                    onCheckedChange = onGlobalToggle,
+                    modifier = Modifier.tvFocusBorder(),
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = ErrorRed,
+                        checkedTrackColor = ErrorRed.copy(alpha = 0.45f)
+                    )
+                )
+            }
             Button(
                 onClick = onNavigateSettings,
-                modifier = Modifier.size(52.dp).tvFocusBorder(CircleShape),
+                modifier = Modifier.size(48.dp).tvFocusBorder(CircleShape),
                 shape = CircleShape,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+                contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SecondaryPurpleDark,
                     contentColor = OnSurfaceDark
                 )
             ) {
-                Text("⚙", fontSize = 27.sp, fontWeight = FontWeight.Bold)
+                Text("⚙", fontSize = 25.sp, fontWeight = FontWeight.Bold)
             }
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -164,6 +158,7 @@ private fun ServiceAccessButton(
             context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         },
         modifier = modifier.tvFocusBorder(),
+        contentPadding = PaddingValues(horizontal = 7.dp, vertical = 4.dp),
         colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
     ) {
         Text(
