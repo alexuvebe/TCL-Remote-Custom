@@ -83,11 +83,30 @@ class ConfigImporter(
      */
     private fun validateConfig(config: KeyBinderConfig): ImportResult {
         if (config.version < 1) {
-            return ImportResult.Error("Version de configuration invalide : ${config.version}")
+            return ImportResult.Error("Version de configuración no válida: ${config.version}")
         }
-        val invalidMapping = config.mappings.firstOrNull { it.id.isBlank() }
+        if (config.longPressThresholdMs !in 200L..2000L) {
+            return ImportResult.Error("El umbral de pulsación larga debe estar entre 200 y 2000 ms")
+        }
+        if (config.backupRecoveryPending) {
+            return ImportResult.Error("La copia contiene un estado de recuperación local no válido")
+        }
+        if (config.mappings.any { it.id.isBlank() }) {
+            return ImportResult.Error("La copia contiene una asignación sin identificador")
+        }
+        if (config.mappings.map { it.id }.distinct().size != config.mappings.size) {
+            return ImportResult.Error("La copia contiene identificadores repetidos")
+        }
+        val invalidMapping = config.mappings.firstOrNull { mapping ->
+            (mapping.button.keyCode == null && mapping.button.sourcePackage.isNullOrBlank()) ||
+                listOfNotNull(mapping.shortPressAction, mapping.longPressAction)
+                    .any { it.packageName.isBlank() } ||
+                (mapping.button.sourcePackage != null &&
+                    listOfNotNull(mapping.shortPressAction, mapping.longPressAction)
+                        .any { it.packageName == mapping.button.sourcePackage })
+        }
         if (invalidMapping != null) {
-            return ImportResult.Error("Mapping avec id vide détecté")
+            return ImportResult.Error("La copia contiene una asignación o aplicación de destino no válida")
         }
         return ImportResult.Success(config)
     }

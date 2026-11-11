@@ -9,17 +9,22 @@ import dev.cavatz.keybindertv.data.repository.MappingRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 import java.net.HttpURLConnection
 import java.net.URL
@@ -50,19 +55,34 @@ class GitHubBackupManager(
 
     private val appContext = context.applicationContext
     private val prefs = appContext.getSharedPreferences("github_backup", Context.MODE_PRIVATE)
-    private val _state = MutableStateFlow(
-        UiState(connected = readToken() != null, status = if (readToken() != null) "GitHub conectado" else "Copia de seguridad no conectada")
-    )
+    private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+    private val uploadMutex = Mutex()
 
     init {
-        scope.launch {
-            repository.configFlow.collect {
+        scope.launch(Dispatchers.IO) {
+            val connected = readToken() != null
+            _state.value = UiState(
+                connected = connected,
+                status = if (connected) "GitHub conectado" else "Copia de seguridad no conectada"
+            )
+            var firstEmission = true
+            repository.configFlow.collectLatest { config ->
+                if (firstEmission) {
+                    firstEmission = false
+                    return@collectLatest
+                }
                 delay(1800)
+                // Nunca sustituir una copia remota por valores de fábrica tras una lectura dañada.
+                if (config.backupRecoveryPending) return@collectLatest
                 if (readToken() != null && prefs.getString(KEY_GIST_ID, null) != null) {
-                    runCatching { uploadCurrentConfig() }
-                        .onFailure { _state.value = _state.value.copy(status = "No se pudo actualizar la copia: ${it.message}") }
+                    runCatching { uploadConfig(config) }
+                        .onFailure {
+                            _state.value = _state.value.copy(
+                                status = "No se pudo actualizar la copia: ${it.message}"
+                            )
+                        }
                 }
             }
         }
@@ -83,9 +103,9 @@ class GitHubBackupManager(
                 )
                 val token = pollForToken(device)
                 withContext(Dispatchers.IO) { saveToken(token) }
-                _state.value = UiState(status = "Autorizado. Preparando copia privada…", busy = true, connected = true)
-                withContext(Dispatchers.IO) { initializeGist() }
-                _state.value = UiState(status = "GitHub conectado. Copia privada preparada.", connected = true)
+                _state.value = UiState(status = "Autorizado. Preparando copia de seguridad…", busy = true, connected = true)
+                val connectionStatus = withContext(Dispatchers.IO) { initializeGist() }
+                _state.value = UiState(status = connectionStatus, connected = true)
             } catch (e: Exception) {
                 _state.value = UiState(status = "No se pudo conectar: ${e.message ?: "error desconocido"}", connected = readToken() != null)
             }
@@ -94,7 +114,7 @@ class GitHubBackupManager(
 
     fun backupNow() {
         scope.launch {
-            _state.value = _state.value.copy(busy = true, status = "Guardando copia privada…")
+            _state.value = _state.value.copy(busy = true, status = "Guardando copia de seguridad…")
             try {
                 withContext(Dispatchers.IO) { uploadCurrentConfig() }
                 _state.value = _state.value.copy(busy = false, status = "Copia de seguridad actualizada", connected = true)
@@ -106,7 +126,7 @@ class GitHubBackupManager(
 
     fun restoreNow() {
         scope.launch {
-            _state.value = _state.value.copy(busy = true, status = "Buscando copia privada…")
+            _state.value = _state.value.copy(busy = true, status = "Buscando copia de seguridad…")
             try {
                 val config = withContext(Dispatchers.IO) { downloadConfig() }
                 repository.replaceConfig(config)
@@ -119,7 +139,9 @@ class GitHubBackupManager(
 
     fun disconnect() {
         prefs.edit().remove(KEY_TOKEN).remove(KEY_GIST_ID).apply()
-        _state.value = UiState(status = "GitHub desconectado")
+        _state.value = UiState(
+            status = "Desconectado en MANDO TCL. Para revocar el permiso concedido, elimina la autorización de la aplicación en GitHub > Settings > Applications."
+        )
     }
 
     private data class DeviceCode(val deviceCode: String, val userCode: String, val verificationUri: String, val expiresIn: Int, val interval: Int)
@@ -158,14 +180,15 @@ class GitHubBackupManager(
         error("El código ha caducado. Vuelve a intentarlo.")
     }
 
-    private suspend fun initializeGist() {
+    private suspend fun initializeGist(): String {
         var existingId = prefs.getString(KEY_GIST_ID, null)
         val token = readToken() ?: error("No se ha guardado la autorización de GitHub")
         if (existingId == null) {
             // Tras reinstalar se pierde el identificador local; localizamos la copia privada por su descripción.
             val gists = requestJson("https://api.github.com/gists?per_page=100", "GET", null, token)
             val match = gists.jsonArray.firstOrNull { gist ->
-                gist.jsonObject["description"]?.jsonPrimitive?.content == "Copia privada de MANDO TCL" &&
+                gist.jsonObject["description"]?.jsonPrimitive?.content in
+                    setOf(GIST_DESCRIPTION, "Copia privada de MANDO TCL") &&
                     gist.jsonObject["files"]?.jsonObject?.containsKey(BACKUP_FILE) == true
             }
             existingId = match?.jsonObject?.get("id")?.jsonPrimitive?.content
@@ -173,18 +196,22 @@ class GitHubBackupManager(
         }
         if (existingId != null) {
             val local = repository.configFlow.first()
-            if (local == KeyBinderConfig()) {
+            if (local == KeyBinderConfig() || local.backupRecoveryPending) {
                 repository.replaceConfig(downloadConfig())
-                return
+                return "GitHub conectado. Se ha recuperado la copia existente."
             }
-            uploadCurrentConfig()
-            return
+            // No asumimos que la configuración local sea más reciente que la remota.
+            return "GitHub conectado. Se ha detectado una copia existente y no se ha sobrescrito. Usa Restaurar si quieres recuperarla."
         }
 
         val local = repository.configFlow.first()
+        if (local.backupRecoveryPending) {
+            error("La configuración local se recuperó con valores de fábrica y no se ha encontrado una copia previa. No se creará una copia vacía para proteger tus datos.")
+        }
+        validateBackupConfig(local)
         val payload = backupPayload(local)
         val body = buildJsonObject {
-            put("description", "Copia privada de MANDO TCL")
+            put("description", GIST_DESCRIPTION)
             put("public", false)
             put("files", buildJsonObject {
                 put(BACKUP_FILE, buildJsonObject { put("content", payload) })
@@ -193,35 +220,83 @@ class GitHubBackupManager(
         val response = requestJson("https://api.github.com/gists", "POST", body, readToken()).jsonObject
         val id = response["id"]?.jsonPrimitive?.content ?: error("GitHub no devolvió el identificador de la copia")
         prefs.edit().putString(KEY_GIST_ID, id).apply()
+        return "GitHub conectado. Copia de seguridad no pública creada."
     }
 
     private suspend fun uploadCurrentConfig() {
+        val current = repository.configFlow.first()
+        if (current.backupRecoveryPending) {
+            error("La configuración local está marcada como recuperada tras un posible daño. Restaura primero la copia de GitHub para evitar sobrescribirla.")
+        }
+        uploadConfig(current)
+    }
+
+    private suspend fun uploadConfig(config: KeyBinderConfig) {
+        validateBackupConfig(config)
         val token = readToken() ?: error("Conecta primero con GitHub")
-        val id = prefs.getString(KEY_GIST_ID, null) ?: error("No existe una copia privada; vuelve a conectar")
-        val config = repository.configFlow.first()
+        val id = prefs.getString(KEY_GIST_ID, null) ?: error("No existe una copia; vuelve a conectar")
         val body = buildJsonObject {
             put("files", buildJsonObject {
                 put(BACKUP_FILE, buildJsonObject { put("content", backupPayload(config)) })
             })
         }.toString()
-        requestJson("https://api.github.com/gists/$id", "PATCH", body, token)
+        uploadMutex.withLock {
+            requestJson("https://api.github.com/gists/$id", "PATCH", body, token)
+        }
     }
 
     private suspend fun downloadConfig(): KeyBinderConfig {
         val token = readToken() ?: error("Conecta primero con GitHub")
-        val id = prefs.getString(KEY_GIST_ID, null) ?: error("No hay copia privada asociada")
+        val id = prefs.getString(KEY_GIST_ID, null) ?: error("No hay copia asociada")
         val gist = requestJson("https://api.github.com/gists/$id", "GET", null, token).jsonObject
         val content = gist.getValue("files").jsonObject.getValue(BACKUP_FILE).jsonObject.getValue("content").jsonPrimitive.content
         val root = json.parseToJsonElement(content).jsonObject
+        require(root["schemaVersion"]?.jsonPrimitive?.intOrNull == 1) {
+            "La versión del formato de copia no es compatible"
+        }
+        require(root["app"]?.jsonPrimitive?.content == "MANDO TCL") {
+            "El archivo no corresponde a una copia de MANDO TCL"
+        }
+        require((root["updatedAt"]?.jsonPrimitive?.longOrNull ?: 0L) > 0L) {
+            "La copia no contiene una fecha válida"
+        }
         val raw = root.getValue("config").toString()
-        return json.decodeFromString(KeyBinderConfig.serializer(), raw)
+        val config = json.decodeFromString(KeyBinderConfig.serializer(), raw)
+        validateBackupConfig(config)
+        return config
+    }
+
+    private fun validateBackupConfig(config: KeyBinderConfig) {
+        require(config.version >= 1) { "La versión de la copia no es válida" }
+        require(config.longPressThresholdMs in 200L..2000L) {
+            "El umbral de pulsación de la copia no está entre 200 y 2000 ms"
+        }
+        require(!config.backupRecoveryPending) { "La copia no puede contener una recuperación local pendiente" }
+        require(config.mappings.all { it.id.isNotBlank() }) {
+            "La copia contiene una asignación sin identificador"
+        }
+        require(config.mappings.map { it.id }.distinct().size == config.mappings.size) {
+            "La copia contiene identificadores repetidos"
+        }
+        config.mappings.forEach { mapping ->
+            require(mapping.button.keyCode != null || !mapping.button.sourcePackage.isNullOrBlank()) {
+                "La copia contiene un botón sin identificar"
+            }
+            val targets = listOfNotNull(mapping.shortPressAction, mapping.longPressAction)
+            require(targets.all { it.packageName.isNotBlank() }) {
+                "La copia contiene una aplicación de destino no válida"
+            }
+            require(mapping.button.sourcePackage == null || targets.none {
+                it.packageName == mapping.button.sourcePackage
+            }) { "La copia contiene una reasignación que se apunta a sí misma" }
+        }
     }
 
     private fun backupPayload(config: KeyBinderConfig): String = buildJsonObject {
         put("schemaVersion", 1)
         put("updatedAt", System.currentTimeMillis())
         put("app", "MANDO TCL")
-        put("config", json.parseToJsonElement(json.encodeToString(KeyBinderConfig.serializer(), config)))
+        put("config", json.parseToJsonElement(json.encodeToString(KeyBinderConfig.serializer(), config.copy(backupRecoveryPending = false))))
     }.toString()
 
     private fun requestJson(url: String, method: String, body: String?, token: String?): kotlinx.serialization.json.JsonElement {
@@ -294,6 +369,7 @@ class GitHubBackupManager(
     companion object {
         private const val CLIENT_ID = "Ov23liFBLQq9S8Hk2Ggc"
         private const val BACKUP_FILE = "mando-tcl-backup.json"
+        private const val GIST_DESCRIPTION = "Copia de seguridad no pública de MANDO TCL"
         private const val KEY_TOKEN = "encrypted_token"
         private const val KEY_GIST_ID = "gist_id"
         private const val KEY_ALIAS = "mando_tcl_github_backup_key"

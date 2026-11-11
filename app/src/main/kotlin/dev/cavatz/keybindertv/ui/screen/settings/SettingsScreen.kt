@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -41,13 +42,18 @@ import dev.cavatz.keybindertv.backup.GitHubBackupManager
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 import dev.cavatz.keybindertv.update.AppUpdateManager
+import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
+import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
+import dev.cavatz.keybindertv.ui.theme.SuccessGreen
+import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
+import dev.cavatz.keybindertv.ui.theme.WarningAmber
 import kotlinx.coroutines.launch
 
 /** Espacement vertical entre las secciones, conservando la distribución de la versión 155. */
-private val SectionSpacing = 24.dp
+private val SectionSpacing = 12.dp
 
 /** Padding global de la pantalla, igual que en la versión 155. */
-private val ScreenPadding = 32.dp
+private val ScreenPadding = 16.dp
 
 /** Número de pasos del control de pulsación larga. */
 private val SLIDER_STEPS: Int = ((LONG_PRESS_MAX_MS - LONG_PRESS_MIN_MS) / LONG_PRESS_STEP_MS - 1).toInt()
@@ -119,7 +125,7 @@ private fun SettingsContent(
     ) {
         Text(
             text = stringResource(R.string.settings_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineSmall
         )
         Spacer(modifier = Modifier.height(SectionSpacing))
 
@@ -144,12 +150,12 @@ private fun SettingsContent(
         // Actualizador incorporado en la versión 202, sin alterar los controles originales.
         Text(
             text = stringResource(R.string.update_section_title),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(updateStatus, style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = onCheckUpdate, enabled = !checkingUpdate) {
+        Button(onClick = onCheckUpdate, enabled = !checkingUpdate, colors = ButtonDefaults.buttonColors(containerColor = WarningAmber)) {
             Text(
                 if (checkingUpdate) stringResource(R.string.update_checking)
                 else stringResource(R.string.update_check_button)
@@ -157,10 +163,15 @@ private fun SettingsContent(
         }
         Spacer(modifier = Modifier.height(SectionSpacing))
 
-        // Copia privada de GitHub añadida sin introducir tarjetas ni estilos distintos.
-        Text("Copia de seguridad en GitHub", style = MaterialTheme.typography.titleLarge)
+        // Copia de seguridad no pública en GitHub, integrada con el estilo existente.
+        Text("Copia de seguridad no pública en GitHub", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Text(backupState.status, style = MaterialTheme.typography.bodyMedium)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            "El Gist no aparece en listados públicos, pero cualquiera que tenga su enlace puede acceder.",
+            style = MaterialTheme.typography.bodySmall
+        )
 
         if (backupState.userCode != null) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -187,16 +198,20 @@ private fun SettingsContent(
                 Text(if (backupState.userCode == null) "Conectar con GitHub" else "Solicitar otro código")
             }
         } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = { backupManager.backupNow() },
-                    enabled = !backupState.busy
+                    enabled = !backupState.busy,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
                 ) {
                     Text("Guardar copia")
                 }
                 Button(
                     onClick = { backupManager.restoreNow() },
-                    enabled = !backupState.busy
+                    enabled = !backupState.busy,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)
                 ) {
                     Text("Restaurar copia")
                 }
@@ -204,7 +219,8 @@ private fun SettingsContent(
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = { backupManager.disconnect() },
-                enabled = !backupState.busy
+                enabled = !backupState.busy,
+                colors = ButtonDefaults.buttonColors(containerColor = SurfaceVariantDark, contentColor = OnSurfaceDark)
             ) {
                 Text("Desconectar GitHub")
             }

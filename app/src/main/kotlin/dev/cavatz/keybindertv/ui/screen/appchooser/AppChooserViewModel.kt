@@ -95,9 +95,9 @@ class AppChooserViewModel(
         )
 
         val updatedMapping: KeyMapping = when (pressType) {
-            "short" -> existingMapping.copy(shortPressAction = actionTarget)
-            "long" -> existingMapping.copy(longPressAction = actionTarget)
-            else -> existingMapping.copy(shortPressAction = actionTarget)
+            "short" -> existingMapping.copy(shortPressAction = actionTarget, shortPressEnabled = true)
+            "long" -> existingMapping.copy(longPressAction = actionTarget, longPressEnabled = true)
+            else -> existingMapping.copy(shortPressAction = actionTarget, shortPressEnabled = true)
         }
 
         repository.updateMapping(updatedMapping)

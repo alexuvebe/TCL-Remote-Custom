@@ -1,13 +1,15 @@
 package dev.cavatz.keybindertv.data.repository
 
 import androidx.datastore.core.DataStore
+import android.util.Log
 import androidx.datastore.core.Serializer
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.model.KeyMapping
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.io.InputStream
@@ -20,19 +22,23 @@ import java.util.concurrent.atomic.AtomicReference
  */
 object KeyBinderConfigSerializer : Serializer<KeyBinderConfig> {
 
-    private val json: Json = Json { ignoreUnknownKeys = true }
+    private val json: Json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
     override val defaultValue: KeyBinderConfig = KeyBinderConfig()
 
     override suspend fun readFrom(input: InputStream): KeyBinderConfig {
         return try {
-            json.decodeFromString(
+            val config = json.decodeFromString(
                 deserializer = KeyBinderConfig.serializer(),
                 string = input.readBytes().decodeToString()
             )
+            config
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (exception: Exception) {
-            // En cas de corruption, on repart avec la config par défaut
-            defaultValue
+            // Keep the remote backup safe if DataStore had to fall back to defaults.
+            Log.e("MappingRepository", "Configuración local dañada; se bloquea la copia automática hasta restaurar", exception)
+            defaultValue.copy(backupRecoveryPending = true)
         }
     }
 
@@ -62,7 +68,11 @@ class MappingRepositoryImpl(
         AtomicReference(KeyBinderConfig())
 
     override val configFlow: Flow<KeyBinderConfig> = dataStore.data
-        .shareIn(scope, SharingStarted.Eagerly, replay = 1)
+        .retryWhen { cause, attempt ->
+            Log.e("MappingRepository", "Error leyendo configuración; se reintentará", cause)
+            delay((1000L * (attempt + 1)).coerceAtMost(10000L))
+            true
+        }
 
     init {
         // Lance le collecteur de cache en background dès la création du repository
@@ -110,9 +120,13 @@ class MappingRepositoryImpl(
         dataStore.updateData { current ->
             current.copy(
                 showOverlayNotification = showOverlay,
-                longPressThresholdMs = longPressThresholdMs
+                longPressThresholdMs = longPressThresholdMs.coerceIn(200L, 2000L)
             )
         }
+    }
+
+    override suspend fun setGlobalEnabled(enabled: Boolean) {
+        dataStore.updateData { current -> current.copy(globalEnabled = enabled) }
     }
 
     override suspend fun replaceConfig(config: KeyBinderConfig) {

@@ -126,6 +126,32 @@ class KeyBinderConfigSerializationTest {
     }
 
     @Test
+    fun `should preserve global and independent press switches`() {
+        val original = KeyBinderConfig(
+            globalEnabled = false,
+            mappings = listOf(
+                KeyMapping(
+                    id = "independent-actions",
+                    button = ButtonIdentifier(keyCode = 4099, userLabel = "Prime Video"),
+                    shortPressAction = ActionTarget("com.example.short", "Corta"),
+                    longPressAction = ActionTarget("com.example.long", "Larga"),
+                    shortPressEnabled = false,
+                    longPressEnabled = true,
+                    isEnabled = true
+                )
+            )
+        )
+
+        val encoded = json.encodeToString(KeyBinderConfig.serializer(), original)
+        val decoded = json.decodeFromString(KeyBinderConfig.serializer(), encoded)
+
+        assertEquals(original, decoded)
+        assertEquals(false, decoded.globalEnabled)
+        assertEquals(false, decoded.mappings.single().shortPressEnabled)
+        assertEquals(true, decoded.mappings.single().longPressEnabled)
+    }
+
+    @Test
     fun `should serialize custom longPressThresholdMs correctly`() {
         // Donnée : seuil personnalisé
         val original = KeyBinderConfig(longPressThresholdMs = 1200L)

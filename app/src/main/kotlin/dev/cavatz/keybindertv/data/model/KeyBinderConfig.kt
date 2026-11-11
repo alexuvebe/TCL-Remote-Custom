@@ -15,5 +15,8 @@ data class KeyBinderConfig(
     val version: Int = 1,
     val mappings: List<KeyMapping> = emptyList(),
     val showOverlayNotification: Boolean = true,
-    val longPressThresholdMs: Long = 500L
+    val longPressThresholdMs: Long = 500L,
+    val globalEnabled: Boolean = true,
+    /** True when local storage was recovered from a damaged file; blocks automatic cloud overwrite. */
+    val backupRecoveryPending: Boolean = false
 )

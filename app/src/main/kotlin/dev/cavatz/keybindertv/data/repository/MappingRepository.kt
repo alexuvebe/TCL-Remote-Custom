@@ -29,6 +29,9 @@ interface MappingRepository {
     /** Met à jour les paramètres globaux de la configuration. */
     suspend fun updateSettings(showOverlay: Boolean, longPressThresholdMs: Long)
 
+    /** Activa o desactiva globalmente todos los remapeos sin borrar sus asignaciones. */
+    suspend fun setGlobalEnabled(enabled: Boolean)
+
     /** Reemplaza la configuración completa al restaurar una copia validada. */
     suspend fun replaceConfig(config: KeyBinderConfig)
 

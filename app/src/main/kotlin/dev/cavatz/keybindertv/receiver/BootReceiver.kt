@@ -1,9 +1,11 @@
 package dev.cavatz.keybindertv.receiver
 
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import dev.cavatz.keybindertv.service.KeyInterceptorService
 import android.util.Log
 
 /**
@@ -42,6 +44,9 @@ class BootReceiver : BroadcastReceiver() {
             context.contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         ) ?: return false
-        return enabledServices.contains(context.packageName)
+        val expected = ComponentName(context, KeyInterceptorService::class.java)
+        return enabledServices.split(':').any { flattened ->
+            ComponentName.unflattenFromString(flattened) == expected
+        }
     }
 }

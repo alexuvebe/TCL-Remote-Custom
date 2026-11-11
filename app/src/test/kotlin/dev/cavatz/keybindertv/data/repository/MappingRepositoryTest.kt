@@ -5,10 +5,13 @@ import dev.cavatz.keybindertv.data.model.ActionTarget
 import dev.cavatz.keybindertv.data.model.ButtonIdentifier
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.model.KeyMapping
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -47,6 +50,7 @@ class MappingRepositoryTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
+    private val repositoryScope = CoroutineScope(SupervisorJob() + testDispatcher)
 
     private lateinit var dataStore: InMemoryDataStore
     private lateinit var repository: MappingRepositoryImpl
@@ -70,10 +74,16 @@ class MappingRepositoryTest {
         isEnabled = true
     )
 
+    @org.junit.After
+    fun tearDown() {
+        repositoryScope.cancel()
+        testScope.cancel()
+    }
+
     @Before
     fun setUp() {
         dataStore = InMemoryDataStore()
-        repository = MappingRepositoryImpl(dataStore = dataStore, scope = testScope)
+        repository = MappingRepositoryImpl(dataStore = dataStore, scope = repositoryScope)
     }
 
     @Test
@@ -193,6 +203,17 @@ class MappingRepositoryTest {
         val config: KeyBinderConfig = repository.configFlow.first()
         assertFalse(config.showOverlayNotification)
         assertEquals(800L, config.longPressThresholdMs)
+    }
+
+    @Test
+    fun `should toggle global remapping without changing assignments`() = testScope.runTest {
+        repository.addMapping(mappingYoutube)
+        repository.setGlobalEnabled(false)
+        val disabled = repository.configFlow.first()
+        assertFalse(disabled.globalEnabled)
+        assertEquals(1, disabled.mappings.size)
+        repository.setGlobalEnabled(true)
+        assertTrue(repository.configFlow.first().globalEnabled)
     }
 
     @Test

@@ -38,7 +38,8 @@ class HomeViewModel(
     data class HomeUiState(
         val isServiceActive: Boolean = false,
         val activeMappingsCount: Int = 0,
-        val totalMappingsCount: Int = 0
+        val totalMappingsCount: Int = 0,
+        val globalEnabled: Boolean = true
     )
 
     private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState())
@@ -55,12 +56,26 @@ class HomeViewModel(
             .onEach { config: KeyBinderConfig ->
                 _uiState.update { current ->
                     current.copy(
-                        activeMappingsCount = config.mappings.count { it.isEnabled },
-                        totalMappingsCount = config.mappings.size
+                        activeMappingsCount = if (config.globalEnabled) config.mappings.count { mapping ->
+                            mapping.isEnabled && (
+                                (mapping.shortPressEnabled && mapping.shortPressAction != null) ||
+                                    (mapping.longPressEnabled && (
+                                        mapping.longPressAction != null ||
+                                            (mapping.shortPressEnabled && mapping.shortPressAction != null)
+                                        ))
+                                )
+                        } else 0,
+                        totalMappingsCount = config.mappings.size,
+                        globalEnabled = config.globalEnabled
                     )
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    /** Activa o desactiva el remapeo global sin borrar ninguna asignación. */
+    fun setGlobalEnabled(enabled: Boolean) {
+        viewModelScope.launch { repository.setGlobalEnabled(enabled) }
     }
 
     /** Vérifie périodiquement si le service d'accessibilité est actif */

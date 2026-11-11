@@ -30,10 +30,10 @@ import dev.cavatz.keybindertv.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
 /** Espacement vertical entre les éléments */
-private val VerticalSpacing = 16.dp
+private val VerticalSpacing = 12.dp
 
 /** Padding global de l'écran */
-private val ScreenPadding = 32.dp
+private val ScreenPadding = 16.dp
 
 /** Type d'appui par défaut après la détection du bouton */
 private const val DEFAULT_PRESS_TYPE: String = "short"
@@ -105,7 +105,7 @@ private fun LearningContent(
     ) {
         Text(
             text = stringResource(R.string.learning_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineSmall
         )
         Spacer(modifier = Modifier.height(VerticalSpacing))
 
