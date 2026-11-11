@@ -31,6 +31,7 @@ class MappingViewModel(
     /** État UI de la liste des mappings */
     data class MappingListUiState(
         val mappings: List<KeyMapping> = emptyList(),
+        val isGloballyEnabled: Boolean = true,
         val isLoading: Boolean = false
     )
 
@@ -49,6 +50,7 @@ class MappingViewModel(
                 _uiState.update { current ->
                     current.copy(
                         mappings = config.mappings,
+                        isGloballyEnabled = config.isGloballyEnabled,
                         isLoading = false
                     )
                 }
@@ -60,6 +62,21 @@ class MappingViewModel(
     fun toggleMapping(id: String, enabled: Boolean) {
         viewModelScope.launch {
             repository.toggleMapping(id, enabled)
+        }
+    }
+
+    fun toggleGlobal(enabled: Boolean) {
+        viewModelScope.launch { repository.toggleGlobal(enabled) }
+    }
+
+    fun toggleAction(mapping: KeyMapping, isLongPress: Boolean, enabled: Boolean) {
+        viewModelScope.launch {
+            val updated = if (isLongPress) {
+                mapping.copy(longPressAction = mapping.longPressAction?.copy(isEnabled = enabled))
+            } else {
+                mapping.copy(shortPressAction = mapping.shortPressAction?.copy(isEnabled = enabled))
+            }
+            repository.updateMapping(updated)
         }
     }
 
