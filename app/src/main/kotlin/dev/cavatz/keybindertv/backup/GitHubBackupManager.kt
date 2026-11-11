@@ -71,6 +71,15 @@ class GitHubBackupManager(
             repository.configFlow.collectLatest { config ->
                 if (firstEmission) {
                     firstEmission = false
+                    if (config.backupRecoveryPending) {
+                        _state.value = _state.value.copy(
+                            status = if (connected) {
+                                "La configuración local parece dañada. Tu copia de GitHub está protegida; pulsa «Restaurar copia» para recuperar tus asignaciones."
+                            } else {
+                                "La configuración local parece dañada. Conecta GitHub y restaura tu copia antes de guardar nada."
+                            }
+                        )
+                    }
                     return@collectLatest
                 }
                 delay(1800)
