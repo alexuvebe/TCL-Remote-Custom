@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.datastore.core.Serializer
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.model.KeyMapping
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.retryWhen
@@ -32,6 +33,8 @@ object KeyBinderConfigSerializer : Serializer<KeyBinderConfig> {
                 string = input.readBytes().decodeToString()
             )
             config
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (exception: Exception) {
             // Keep the remote backup safe if DataStore had to fall back to defaults.
             Log.e("MappingRepository", "Configuración local dañada; se bloquea la copia automática hasta restaurar", exception)
