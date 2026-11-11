@@ -94,6 +94,7 @@ class KeyInterceptorService : AccessibilityService() {
         }
 
         val config = repository.getConfigSync()
+        if (!config.globalEnabled) return false
         val mapping = config.mappings.firstOrNull { it.isEnabled && it.button.keyCode == event.keyCode }
 
         if (mapping == null) {
@@ -135,10 +136,18 @@ class KeyInterceptorService : AccessibilityService() {
         return LongPressDetector(
             thresholdMs = config.longPressThresholdMs,
             onShortPress = {
-                mapping.shortPressAction?.let { launchAndRemember(it, config.showOverlayNotification) }
+                if (mapping.shortPressEnabled) {
+                    mapping.shortPressAction?.let { launchAndRemember(it, config.showOverlayNotification) }
+                }
             },
             onLongPress = {
-                val target = mapping.longPressAction ?: mapping.shortPressAction
+                val target = when {
+                    mapping.longPressAction != null ->
+                        mapping.longPressAction.takeIf { mapping.longPressEnabled }
+                    mapping.longPressEnabled && mapping.shortPressEnabled ->
+                        mapping.shortPressAction
+                    else -> null
+                }
                 target?.let { launchAndRemember(it, config.showOverlayNotification) }
             }
         )
@@ -168,6 +177,7 @@ class KeyInterceptorService : AccessibilityService() {
         }
 
         val config = repository.getConfigSync()
+        if (!config.globalEnabled) return
         val mapping = config.mappings.firstOrNull {
             it.isEnabled && it.button.sourcePackage == packageName
         } ?: return
