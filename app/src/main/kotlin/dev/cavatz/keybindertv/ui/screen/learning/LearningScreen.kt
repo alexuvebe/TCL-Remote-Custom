@@ -105,7 +105,7 @@ private fun LearningContent(
     ) {
         Text(
             text = stringResource(R.string.learning_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineSmall
         )
         Spacer(modifier = Modifier.height(VerticalSpacing))
 
