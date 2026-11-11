@@ -156,8 +156,9 @@ class KeyInterceptorService : AccessibilityService() {
                 remapExecutor.launch(target, config.showOverlayNotification)
             },
             onLongPress = {
-                val target = mapping.longPressAction?.takeIf { it.isEnabled }
-                    ?: mapping.shortPressAction?.takeIf { it.isEnabled }
+                val target = mapping.longPressAction?.let { action ->
+                    if (action.isEnabled) action else return@LongPressDetector
+                } ?: mapping.shortPressAction?.takeIf { it.isEnabled }
                     ?: return@LongPressDetector
                 remapExecutor.launch(target, config.showOverlayNotification)
             }
