@@ -121,6 +121,7 @@ class KeyInterceptorService : AccessibilityService() {
         }
 
         val config: KeyBinderConfig = repository.getConfigSync()
+        if (!config.isGloballyEnabled) return false
         val mapping: KeyMapping = config.mappings.firstOrNull { m ->
             m.isEnabled && m.button.keyCode == event.keyCode
         } ?: return false
@@ -151,11 +152,12 @@ class KeyInterceptorService : AccessibilityService() {
         return LongPressDetector(
             thresholdMs = config.longPressThresholdMs,
             onShortPress = {
-                val target = mapping.shortPressAction ?: return@LongPressDetector
+                val target = mapping.shortPressAction?.takeIf { it.isEnabled } ?: return@LongPressDetector
                 remapExecutor.launch(target, config.showOverlayNotification)
             },
             onLongPress = {
-                val target = mapping.longPressAction ?: mapping.shortPressAction
+                val target = mapping.longPressAction?.takeIf { it.isEnabled }
+                    ?: mapping.shortPressAction?.takeIf { it.isEnabled }
                     ?: return@LongPressDetector
                 remapExecutor.launch(target, config.showOverlayNotification)
             }
@@ -186,6 +188,7 @@ class KeyInterceptorService : AccessibilityService() {
         }
 
         val config: KeyBinderConfig = repository.getConfigSync()
+        if (!config.isGloballyEnabled) return
         val mapping: KeyMapping = config.mappings.firstOrNull { m ->
             m.isEnabled && m.button.sourcePackage == packageName
         } ?: return
@@ -194,7 +197,7 @@ class KeyInterceptorService : AccessibilityService() {
         if (isDuplicate(dedupKey)) return
 
         // Flux B : toujours short press — l'app source s'est déjà ouverte, on la remplace
-        val target = mapping.shortPressAction ?: return
+        val target = mapping.shortPressAction?.takeIf { it.isEnabled } ?: return
         remapExecutor.launchAndKillSource(target, packageName, config.showOverlayNotification)
     }
 
