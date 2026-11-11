@@ -34,6 +34,7 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.QrCodeDisplay
+import dev.cavatz.keybindertv.ui.component.tvFocusBorder
 
 /** Espacement vertical standard entre les éléments */
 private val VerticalSpacing = 12.dp
@@ -168,10 +169,10 @@ private fun ExportSection(
             style = MaterialTheme.typography.titleMedium
         )
         Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
-            Button(onClick = onExportFile) {
+            Button(onClick = onExportFile, modifier = Modifier.tvFocusBorder()) {
                 Text(text = "Exporter en fichier JSON")
             }
-            Button(onClick = onGenerateQr) {
+            Button(onClick = onGenerateQr, modifier = Modifier.tvFocusBorder()) {
                 Text(text = "Générer QR code")
             }
         }
@@ -241,7 +242,7 @@ private fun ImportSection(
             text = "Import",
             style = MaterialTheme.typography.titleMedium
         )
-        Button(onClick = onImportFile) {
+        Button(onClick = onImportFile, modifier = Modifier.tvFocusBorder()) {
             Text(text = "Importer depuis un fichier JSON")
         }
         OutlinedTextField(
@@ -249,13 +250,15 @@ private fun ImportSection(
             onValueChange = { pastedJson = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp),
+                .height(120.dp)
+                .tvFocusBorder(),
             label = { Text(text = "Ou collez votre JSON ici") },
             maxLines = 8
         )
         Button(
             onClick = { onImportJson(pastedJson) },
-            enabled = pastedJson.isNotBlank()
+            enabled = pastedJson.isNotBlank(),
+            modifier = Modifier.tvFocusBorder()
         ) {
             Text(text = "Importer")
         }
