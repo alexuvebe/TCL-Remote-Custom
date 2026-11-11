@@ -32,6 +32,7 @@ import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 import dev.cavatz.keybindertv.ui.navigation.Screen
 import dev.cavatz.keybindertv.ui.theme.ErrorRed
+import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
 import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
 import dev.cavatz.keybindertv.ui.theme.SecondaryPurpleDark
 
@@ -68,7 +69,7 @@ private fun HomeContent(
     ) {
         Text(
             text = stringResource(R.string.home_title),
-            style = MaterialTheme.typography.headlineLarge
+            style = MaterialTheme.typography.headlineMedium
         )
         Spacer(modifier = Modifier.height(VerticalSpacing))
         StatusIndicator(isActive = uiState.isServiceActive)
@@ -111,7 +112,7 @@ private fun HomeContent(
             Button(onClick = onNavigateMappings, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)) {
                 Text(stringResource(R.string.home_manage_mappings))
             }
-            Button(onClick = onNavigateSettings, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = SecondaryPurpleDark)) {
+            Button(onClick = onNavigateSettings, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = SecondaryPurpleDark, contentColor = OnSurfaceDark)) {
                 Text(stringResource(R.string.home_settings))
             }
         }
