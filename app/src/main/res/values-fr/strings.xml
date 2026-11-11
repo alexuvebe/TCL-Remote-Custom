@@ -1,72 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KeyBinder TV</string>
-
-    <!-- Navigation -->
-    <string name="screen_home">Accueil</string>
-    <string name="screen_mappings">Mappings</string>
-    <string name="screen_learning">Apprentissage</string>
-    <string name="screen_settings">Paramètres</string>
-    <string name="screen_import_export">Import / Export</string>
-
-    <!-- Actions génériques -->
-    <string name="action_add">Ajouter</string>
-    <string name="action_edit">Modifier</string>
-    <string name="action_delete">Supprimer</string>
-    <string name="action_save">Enregistrer</string>
-    <string name="action_cancel">Annuler</string>
-    <string name="action_enable">Activer</string>
-    <string name="action_disable">Désactiver</string>
-
-    <!-- Mappings -->
-    <string name="mapping_short_press">Appui court</string>
-    <string name="mapping_long_press">Appui long</string>
-    <string name="mapping_enabled">Activé</string>
-    <string name="mapping_disabled">Désactivé</string>
-    <string name="mapping_no_action">Aucune action assignée</string>
-
-    <!-- Paramètres -->
-    <string name="settings_show_overlay">Afficher une notification lors du remapping</string>
-    <string name="settings_long_press_threshold">Durée appui long (ms)</string>
-
-    <!-- Accessibilité -->
-    <string name="accessibility_service_label">KeyBinder TV — Remappeur de boutons</string>
-    <string name="accessibility_service_description">Intercepte les boutons de la télécommande pour les rediriger vers d\'autres applications.</string>
-
-    <!-- Écrans Phase 3 -->
-    <string name="home_title">KeyBinderTv</string>
-    <string name="home_service_active">Service actif</string>
-    <string name="home_service_inactive">Service inactif</string>
-    <string name="home_enable_service">Activer le service</string>
-    <string name="home_mappings_count">%1$d mappings actifs sur %2$d</string>
-    <string name="home_manage_mappings">Gérer les mappings</string>
-    <string name="home_settings">Paramètres</string>
-    <string name="home_import_export">Import / Export</string>
-    <string name="mappings_empty">Aucun mapping configuré</string>
-    <string name="mappings_add">Ajouter un mapping</string>
-    <string name="learning_title">Détecter le bouton</string>
-    <string name="learning_instructions">Appuyez sur le bouton à remapper...</string>
-    <string name="learning_timeout">Aucun bouton détecté — réessayez</string>
-    <string name="learning_confirm">Confirmer</string>
-    <string name="learning_retry">Réessayer</string>
-    <string name="learning_cancel">Annuler</string>
-    <string name="learning_service_inactive">Service inactif — activez le service d\'accessibilité</string>
-    <string name="appchooser_title">Choisir l\'application</string>
-    <string name="appchooser_search">Rechercher une application...</string>
-    <string name="settings_title">Paramètres</string>
-    <string name="settings_overlay">Notification lors du remapping</string>
-    <string name="settings_longpress_threshold">Délai long press : %1$d ms</string>
-    <string name="settings_accessibility">Paramètres d\'accessibilité</string>
-    <string name="importexport_title">Import / Export</string>
-    <string name="importexport_export_file">Exporter en fichier JSON</string>
-    <string name="importexport_generate_qr">Générer QR code</string>
-    <string name="importexport_import_file">Importer depuis un fichier JSON</string>
-    <string name="importexport_import_paste_hint">Ou collez votre JSON ici</string>
-    <string name="importexport_import_button">Importer</string>
-    <string name="importexport_qr_too_large">Configuration trop grande pour un QR — utilisez l\'export fichier</string>
-    <string name="importexport_qr_prompt">Appuyez sur « Générer QR code » pour afficher</string>
-    <string name="importexport_section_export">Export</string>
-    <string name="importexport_section_import">Import</string>
-    <string name="press_type_short">Court</string>
-    <string name="press_type_long">Long</string>
+    <string name="app_name">MANDO TCL</string>
+    <string name="update_section_title">Actualizaciones</string>
+    <string name="update_check_button">Buscar actualizaciones</string>
+    <string name="update_checking">Comprobando nueva versión…</string>
+    <string name="update_initial_status">Comprueba si hay una nueva versión de MANDO TCL.</string>
+    <string name="screen_home">Inicio</string>
+    <string name="screen_mappings">Asignaciones</string>
+    <string name="screen_learning">Detectar botón</string>
+    <string name="screen_settings">Ajustes</string>
+    <string name="screen_import_export">Importar / Exportar</string>
+    <string name="action_add">Añadir</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_enable">Activar</string>
+    <string name="action_disable">Desactivar</string>
+    <string name="mapping_short_press">Pulsación corta</string>
+    <string name="mapping_long_press">Pulsación larga</string>
+    <string name="mapping_enabled">Activado</string>
+    <string name="mapping_disabled">Desactivado</string>
+    <string name="mapping_no_action">Sin acción asignada</string>
+    <string name="settings_show_overlay">Mostrar aviso al reasignar un botón</string>
+    <string name="settings_long_press_threshold">Duración de la pulsación larga (ms)</string>
+    <string name="accessibility_service_label">MANDO TCL — Control de botones</string>
+    <string name="accessibility_service_description">Detecta los botones del mando para asignarles otras aplicaciones.</string>
+    <string name="home_title">MANDO TCL</string>
+    <string name="home_service_active">Servicio activado</string>
+    <string name="home_service_inactive">Servicio desactivado</string>
+    <string name="home_enable_service">Activar servicio</string>
+    <string name="home_mappings_count">%1$d asignaciones activas de %2$d</string>
+    <string name="home_manage_mappings">Gestionar asignaciones</string>
+    <string name="home_settings">Ajustes</string>
+    <string name="home_import_export">Importar / Exportar</string>
+    <string name="mappings_empty">No hay botones configurados</string>
+    <string name="mappings_add">Añadir asignación</string>
+    <string name="learning_title">Detectar botón</string>
+    <string name="learning_instructions">Pulsa el botón del mando que quieres configurar…</string>
+    <string name="learning_timeout">No se ha detectado ningún botón. Inténtalo de nuevo.</string>
+    <string name="learning_confirm">Confirmar</string>
+    <string name="learning_retry">Reintentar</string>
+    <string name="learning_cancel">Cancelar</string>
+    <string name="learning_service_inactive">Servicio desactivado. Activa el servicio de accesibilidad.</string>
+    <string name="appchooser_title">Elegir aplicación</string>
+    <string name="appchooser_search">Buscar aplicación…</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_overlay">Aviso al reasignar un botón</string>
+    <string name="settings_longpress_threshold">Tiempo de pulsación larga: %1$d ms</string>
+    <string name="settings_accessibility">Ajustes de accesibilidad</string>
+    <string name="importexport_title">Importar / Exportar</string>
+    <string name="importexport_export_file">Exportar archivo JSON</string>
+    <string name="importexport_generate_qr">Generar código QR</string>
+    <string name="importexport_import_file">Importar archivo JSON</string>
+    <string name="importexport_import_paste_hint">O pega aquí el contenido JSON</string>
+    <string name="importexport_import_button">Importar</string>
+    <string name="importexport_qr_too_large">La configuración es demasiado grande para un QR. Usa la exportación a archivo.</string>
+    <string name="importexport_qr_prompt">Pulsa «Generar código QR» para mostrarlo</string>
+    <string name="importexport_section_export">Exportar</string>
+    <string name="importexport_section_import">Importar</string>
+    <string name="press_type_short">Corta</string>
+    <string name="press_type_long">Larga</string>
+    <string name="support_button">☕ Apoyar al desarrollador</string>
+    <string name="support_url" translatable="false">https://buymeacoffee.com/anthoctz</string>
 </resources>
