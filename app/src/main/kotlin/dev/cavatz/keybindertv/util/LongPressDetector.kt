@@ -11,7 +11,7 @@ import android.view.KeyEvent
  * - ACTION_DOWN (repeatCount=0) → démarre un timer de [thresholdMs] ms
  * - Timer expire → déclenche LONG press
  * - ACTION_UP avant timer → annule le timer, déclenche SHORT press
- * - Timeout de sécurité [safetyTimeoutMs] = 1000ms : au cas où ACTION_UP
+ * - Timeout de sécurité [safetyTimeoutMs] = seuil + 1000ms par défaut : au cas où ACTION_UP
  *   n'arrive jamais (télécommandes IR sans signal de relâchement fiable)
  *
  * @param thresholdMs     Délai avant déclenchement long press (par défaut 500ms)
@@ -21,13 +21,14 @@ import android.view.KeyEvent
  */
 class LongPressDetector(
     private val thresholdMs: Long = DEFAULT_THRESHOLD_MS,
-    private val safetyTimeoutMs: Long = SAFETY_TIMEOUT_MS,
+    private val safetyTimeoutMs: Long = thresholdMs + SAFETY_TIMEOUT_MS,
     private val onShortPress: () -> Unit,
     private val onLongPress: () -> Unit
 ) {
 
     companion object {
         const val DEFAULT_THRESHOLD_MS: Long = 500L
+        /** Grace period added after the configured long-press threshold. */
         const val SAFETY_TIMEOUT_MS: Long = 1000L
     }
 
