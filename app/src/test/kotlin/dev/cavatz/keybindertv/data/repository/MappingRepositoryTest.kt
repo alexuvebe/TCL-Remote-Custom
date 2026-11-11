@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -69,6 +70,11 @@ class MappingRepositoryTest {
         shortPressAction = ActionTarget("com.tcl.tclchannels", "TCL Channel"),
         isEnabled = true
     )
+
+    @org.junit.After
+    fun tearDown() {
+        testScope.cancel()
+    }
 
     @Before
     fun setUp() {
