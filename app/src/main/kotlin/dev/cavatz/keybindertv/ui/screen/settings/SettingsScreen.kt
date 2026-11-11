@@ -33,8 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dev.cavatz.keybindertv.update.AppUpdateManager
-import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import dev.cavatz.keybindertv.KeyBinderTvApp
@@ -42,9 +40,16 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.backup.GitHubBackupManager
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
+import dev.cavatz.keybindertv.update.AppUpdateManager
+import kotlinx.coroutines.launch
 
+/** Espacement vertical entre las secciones, conservando la distribución de la versión 155. */
 private val SectionSpacing = 24.dp
+
+/** Padding global de la pantalla, igual que en la versión 155. */
 private val ScreenPadding = 32.dp
+
+/** Número de pasos del control de pulsación larga. */
 private val SLIDER_STEPS: Int = ((LONG_PRESS_MAX_MS - LONG_PRESS_MIN_MS) / LONG_PRESS_STEP_MS - 1).toInt()
 
 @Composable
@@ -102,50 +107,105 @@ private fun SettingsContent(
     onSetLongPressThreshold: (Long) -> Unit
 ) {
     val context = LocalContext.current
+
+    // Se conserva el orden visual de la versión 155: estado, preferencias y accesibilidad.
+    // Las funciones nuevas quedan después, integradas con la misma tipografía y espaciado.
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(ScreenPadding),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(ScreenPadding),
         verticalArrangement = Arrangement.Top
     ) {
-        Text(text = stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineMedium)
+        Text(
+            text = stringResource(R.string.settings_title),
+            style = MaterialTheme.typography.headlineMedium
+        )
         Spacer(modifier = Modifier.height(SectionSpacing))
+
         StatusIndicator(isActive = uiState.isServiceActive)
         Spacer(modifier = Modifier.height(SectionSpacing))
-        Text(stringResource(R.string.update_section_title), style = MaterialTheme.typography.titleLarge)
+
+        OverlayToggle(
+            enabled = uiState.showOverlayNotification,
+            onToggle = onSetShowOverlay
+        )
+        Spacer(modifier = Modifier.height(SectionSpacing))
+
+        LongPressSlider(
+            thresholdMs = uiState.longPressThresholdMs,
+            onThresholdChanged = onSetLongPressThreshold
+        )
+        Spacer(modifier = Modifier.height(SectionSpacing))
+
+        AccessibilityButton()
+        Spacer(modifier = Modifier.height(SectionSpacing))
+
+        // Actualizador incorporado en la versión 202, sin alterar los controles originales.
+        Text(
+            text = stringResource(R.string.update_section_title),
+            style = MaterialTheme.typography.titleLarge
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Text(updateStatus, style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onCheckUpdate, enabled = !checkingUpdate) {
-            Text(if (checkingUpdate) stringResource(R.string.update_checking) else stringResource(R.string.update_check_button))
+            Text(
+                if (checkingUpdate) stringResource(R.string.update_checking)
+                else stringResource(R.string.update_check_button)
+            )
         }
         Spacer(modifier = Modifier.height(SectionSpacing))
-        OverlayToggle(enabled = uiState.showOverlayNotification, onToggle = onSetShowOverlay)
-        Spacer(modifier = Modifier.height(SectionSpacing))
-        LongPressSlider(thresholdMs = uiState.longPressThresholdMs, onThresholdChanged = onSetLongPressThreshold)
-        Spacer(modifier = Modifier.height(SectionSpacing))
-        AccessibilityButton()
-        Spacer(modifier = Modifier.height(SectionSpacing))
+
+        // Copia privada de GitHub añadida sin introducir tarjetas ni estilos distintos.
         Text("Copia de seguridad en GitHub", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
         Text(backupState.status, style = MaterialTheme.typography.bodyMedium)
+
         if (backupState.userCode != null) {
             Spacer(modifier = Modifier.height(8.dp))
             Text("Código de autorización", style = MaterialTheme.typography.bodyMedium)
             Text(backupState.userCode, style = MaterialTheme.typography.headlineLarge)
             Button(onClick = {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(backupState.verificationUrl ?: "https://github.com/login/device")))
-            }) { Text("Abrir GitHub para autorizar") }
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(backupState.verificationUrl ?: "https://github.com/login/device")
+                    )
+                )
+            }) {
+                Text("Abrir GitHub para autorizar")
+            }
         }
+
         Spacer(modifier = Modifier.height(8.dp))
         if (!backupState.connected) {
-            Button(onClick = { backupManager.connect() }, enabled = !backupState.busy) {
+            Button(
+                onClick = { backupManager.connect() },
+                enabled = !backupState.busy
+            ) {
                 Text(if (backupState.userCode == null) "Conectar con GitHub" else "Solicitar otro código")
             }
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = { backupManager.backupNow() }, enabled = !backupState.busy) { Text("Guardar copia") }
-                Button(onClick = { backupManager.restoreNow() }, enabled = !backupState.busy) { Text("Restaurar copia") }
+                Button(
+                    onClick = { backupManager.backupNow() },
+                    enabled = !backupState.busy
+                ) {
+                    Text("Guardar copia")
+                }
+                Button(
+                    onClick = { backupManager.restoreNow() },
+                    enabled = !backupState.busy
+                ) {
+                    Text("Restaurar copia")
+                }
             }
-            Button(onClick = { backupManager.disconnect() }, enabled = !backupState.busy) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = { backupManager.disconnect() },
+                enabled = !backupState.busy
+            ) {
                 Text("Desconectar GitHub")
             }
         }
@@ -159,7 +219,10 @@ private fun OverlayToggle(enabled: Boolean, onToggle: (Boolean) -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = stringResource(R.string.settings_overlay), style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = stringResource(R.string.settings_overlay),
+            style = MaterialTheme.typography.bodyLarge
+        )
         Switch(checked = enabled, onCheckedChange = onToggle)
     }
 }
@@ -167,7 +230,10 @@ private fun OverlayToggle(enabled: Boolean, onToggle: (Boolean) -> Unit) {
 @Composable
 private fun LongPressSlider(thresholdMs: Long, onThresholdChanged: (Long) -> Unit) {
     Column {
-        Text(text = stringResource(R.string.settings_longpress_threshold, thresholdMs), style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = stringResource(R.string.settings_longpress_threshold, thresholdMs),
+            style = MaterialTheme.typography.bodyLarge
+        )
         Slider(
             value = thresholdMs.toFloat(),
             onValueChange = { value -> onThresholdChanged(value.toLong()) },
@@ -187,7 +253,6 @@ private fun AccessibilityButton() {
         Text(text = stringResource(R.string.settings_accessibility))
     }
 }
-
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
