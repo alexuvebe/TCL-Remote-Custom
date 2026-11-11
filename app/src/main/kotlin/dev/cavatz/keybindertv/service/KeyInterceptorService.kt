@@ -182,7 +182,7 @@ class KeyInterceptorService : AccessibilityService() {
             it.isEnabled && it.button.sourcePackage == packageName
         } ?: return
 
-        val target = mapping.shortPressAction ?: return
+        val target = mapping.shortPressAction?.takeIf { mapping.shortPressEnabled } ?: return
 
         // Never relaunch an app onto itself or create a source/target loop.
         if (target.packageName == packageName) return
