@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -42,6 +43,10 @@ import dev.cavatz.keybindertv.backup.GitHubBackupManager
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 import dev.cavatz.keybindertv.update.AppUpdateManager
+import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
+import dev.cavatz.keybindertv.ui.theme.SuccessGreen
+import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
+import dev.cavatz.keybindertv.ui.theme.WarningAmber
 import kotlinx.coroutines.launch
 
 /** Espacement vertical entre las secciones, conservando la distribución de la versión 155. */
@@ -150,7 +155,7 @@ private fun SettingsContent(
         Spacer(modifier = Modifier.height(8.dp))
         Text(updateStatus, style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = onCheckUpdate, enabled = !checkingUpdate) {
+        Button(onClick = onCheckUpdate, enabled = !checkingUpdate, colors = ButtonDefaults.buttonColors(containerColor = WarningAmber)) {
             Text(
                 if (checkingUpdate) stringResource(R.string.update_checking)
                 else stringResource(R.string.update_check_button)
@@ -197,14 +202,16 @@ private fun SettingsContent(
                 Button(
                     onClick = { backupManager.backupNow() },
                     enabled = !backupState.busy,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
                 ) {
                     Text("Guardar copia")
                 }
                 Button(
                     onClick = { backupManager.restoreNow() },
                     enabled = !backupState.busy,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)
                 ) {
                     Text("Restaurar copia")
                 }
@@ -212,7 +219,8 @@ private fun SettingsContent(
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = { backupManager.disconnect() },
-                enabled = !backupState.busy
+                enabled = !backupState.busy,
+                colors = ButtonDefaults.buttonColors(containerColor = SurfaceVariantDark)
             ) {
                 Text("Desconectar GitHub")
             }
