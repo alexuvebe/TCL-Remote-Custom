@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -80,7 +81,7 @@ private fun MappingListContent(
     Box(modifier = Modifier.fillMaxSize()) {
         when {
             uiState.isLoading -> LoadingIndicator()
-            uiState.mappings.isEmpty() -> EmptyMappingList(onAddMapping)
+            uiState.mappings.isEmpty() -> EmptyMappingList()
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(ScreenPadding),
                 verticalArrangement = Arrangement.spacedBy(ItemSpacing)
@@ -118,12 +119,10 @@ private fun LoadingIndicator() {
 }
 
 @Composable
-private fun EmptyMappingList(onAddMapping: () -> Unit) {
+private fun EmptyMappingList() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(stringResource(R.string.mappings_empty), style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(ItemSpacing))
-            Button(onClick = onAddMapping) { Text(stringResource(R.string.mappings_add)) }
         }
     }
 }
