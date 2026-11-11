@@ -94,7 +94,11 @@ class KeyInterceptorService : AccessibilityService() {
         }
 
         val config = repository.getConfigSync()
-        if (!config.globalEnabled) return false
+        if (!config.globalEnabled) {
+            longPressDetectors.values.forEach { it.detector.cancel() }
+            longPressDetectors.clear()
+            return false
+        }
         val mapping = config.mappings.firstOrNull { it.isEnabled && it.button.keyCode == event.keyCode }
 
         if (mapping == null) {
