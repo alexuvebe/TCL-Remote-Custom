@@ -27,11 +27,15 @@ class InstalledAppsProvider(private val context: Context) {
      * Exclut les apps système sans launcher et notre propre application.
      */
     fun getInstalledApps(): List<AppInfo> {
-        val launcherIntent = Intent(Intent.ACTION_MAIN).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
-        }
-        val resolvedApps: List<ResolveInfo> = context.packageManager
-            .queryIntentActivities(launcherIntent, PackageManager.MATCH_ALL)
+        val launcherIntents = listOf(
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+        )
+        val resolvedApps = launcherIntents
+            .flatMap { intent ->
+                context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+            }
+            .distinctBy { it.activityInfo?.packageName }
 
         return resolvedApps
             .mapNotNull { resolveInfo -> buildAppInfo(resolveInfo) }
