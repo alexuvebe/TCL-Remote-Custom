@@ -124,7 +124,11 @@ class KeyInterceptorService : AccessibilityService() {
             )
             longPressDetectors[event.keyCode] = entry
         }
-        return entry.detector.onKeyEvent(event)
+        return when (event.action) {
+            KeyEvent.ACTION_DOWN -> entry.detector.onKeyDown(event.repeatCount)
+            KeyEvent.ACTION_UP -> entry.detector.onKeyUp()
+            else -> false
+        }
     }
 
     private fun buildDetector(mapping: KeyMapping, config: KeyBinderConfig): LongPressDetector {
