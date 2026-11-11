@@ -23,14 +23,6 @@ import java.util.concurrent.atomic.AtomicReference
  */
 object KeyBinderConfigSerializer : Serializer<KeyBinderConfig> {
 
-    @Volatile
-    var corruptionDetected: Boolean = false
-        private set
-
-    fun markRecovered() {
-        corruptionDetected = false
-    }
-
     private val json: Json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
     override val defaultValue: KeyBinderConfig = KeyBinderConfig()
@@ -41,13 +33,11 @@ object KeyBinderConfigSerializer : Serializer<KeyBinderConfig> {
                 deserializer = KeyBinderConfig.serializer(),
                 string = input.readBytes().decodeToString()
             )
-            corruptionDetected = false
             config
         } catch (exception: Exception) {
             // Keep the remote backup safe if DataStore had to fall back to defaults.
-            corruptionDetected = true
-            Log.e("MappingRepository", "Configuración local dañada; se usan valores de fábrica", exception)
-            defaultValue
+            Log.e("MappingRepository", "Configuración local dañada; se bloquea la copia automática hasta restaurar", exception)
+            defaultValue.copy(backupRecoveryPending = true)
         }
     }
 
