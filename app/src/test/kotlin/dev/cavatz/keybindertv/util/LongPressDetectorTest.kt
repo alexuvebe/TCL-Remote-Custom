@@ -29,7 +29,7 @@ class LongPressDetectorTest {
 
     private fun buildDetector(
         thresholdMs: Long = 200L,
-        safetyTimeoutMs: Long = 1000L
+        safetyTimeoutMs: Long = thresholdMs + LongPressDetector.SAFETY_TIMEOUT_MS
     ) = LongPressDetector(
         thresholdMs = thresholdMs,
         safetyTimeoutMs = safetyTimeoutMs,
@@ -65,6 +65,17 @@ class LongPressDetectorTest {
         val detector = buildDetector(thresholdMs = 100L, safetyTimeoutMs = 500L)
         detector.onKeyEvent(keyDown())
         advanceTime(150L)
+
+        assertEquals(0, shortPressCount)
+        assertEquals(1, longPressCount)
+        detector.onKeyEvent(keyUp())
+    }
+
+    @Test
+    fun test_long_press_at_maximum_configured_threshold() {
+        val detector = buildDetector(thresholdMs = 2000L)
+        detector.onKeyEvent(keyDown())
+        advanceTime(2100L)
 
         assertEquals(0, shortPressCount)
         assertEquals(1, longPressCount)
