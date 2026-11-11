@@ -39,7 +39,6 @@ import dev.cavatz.keybindertv.ui.navigation.Screen
 import dev.cavatz.keybindertv.ui.theme.ErrorRed
 import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
 import dev.cavatz.keybindertv.ui.theme.OnSurfaceVariantDark
-import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
 import kotlinx.coroutines.launch
 
 private val CardPadding = 10.dp
