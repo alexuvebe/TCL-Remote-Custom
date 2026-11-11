@@ -35,6 +35,7 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.model.KeyMapping
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.navigation.Screen
+import dev.cavatz.keybindertv.ui.component.tvFocusBorder
 import dev.cavatz.keybindertv.ui.theme.BackgroundDark
 import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
 import dev.cavatz.keybindertv.ui.theme.OutlineDark
@@ -114,7 +115,7 @@ private fun MappingListContent(
 
         Button(
             onClick = onAddMapping,
-            modifier = Modifier.align(Alignment.BottomEnd)
+            modifier = Modifier.align(Alignment.BottomEnd).tvFocusBorder()
         ) {
             Text(stringResource(R.string.mappings_add))
         }
@@ -157,11 +158,11 @@ private fun MappingItem(
                     maxLines = 1
                 )
             }
-            Button(onClick = { onToggle(!mapping.isEnabled) }) {
+            Button(onClick = { onToggle(!mapping.isEnabled) }, modifier = Modifier.tvFocusBorder()) {
                 Text(if (mapping.isEnabled) "ACTIVO" else "INACTIVO")
             }
             Spacer(Modifier.width(6.dp))
-            Button(onClick = onRemove) {
+            Button(onClick = onRemove, modifier = Modifier.tvFocusBorder()) {
                 Text("×")
             }
         }
@@ -210,7 +211,7 @@ private fun ActionControl(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(onClick = onEdit, modifier = Modifier.weight(1f)) {
+        Button(onClick = onEdit, modifier = Modifier.weight(1f).tvFocusBorder()) {
             Column {
                 Text(title, style = MaterialTheme.typography.labelSmall)
                 Text(
@@ -221,7 +222,7 @@ private fun ActionControl(
                 )
             }
         }
-        Button(onClick = onToggle) {
+        Button(onClick = onToggle, modifier = Modifier.tvFocusBorder()) {
             Text(if (enabled) "✓" else "OFF")
         }
     }
