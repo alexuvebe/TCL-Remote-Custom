@@ -85,6 +85,9 @@ class ConfigImporter(
         if (config.version < 1) {
             return ImportResult.Error("Version de configuración no válida: ${config.version}")
         }
+        if (config.longPressThresholdMs !in 200L..2000L) {
+            return ImportResult.Error("El umbral de pulsación larga debe estar entre 200 y 2000 ms")
+        }
         if (config.backupRecoveryPending) {
             return ImportResult.Error("La copia contiene un estado de recuperación local no válido")
         }
