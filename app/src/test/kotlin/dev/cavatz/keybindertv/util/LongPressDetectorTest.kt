@@ -5,6 +5,8 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit
  * Solution : [TestableLongPressDetector] remplace Handler par un [ScheduledExecutorService]
  * injectable, permettant de contrôler le temps dans les tests.
  */
+@RunWith(RobolectricTestRunner::class)
 class LongPressDetectorTest {
 
     /** Implémentation testable qui remplace Handler par un executor injectable. */
