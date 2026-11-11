@@ -15,12 +15,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 import java.net.HttpURLConnection
 import java.net.URL
@@ -54,6 +58,7 @@ class GitHubBackupManager(
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+    private val uploadMutex = Mutex()
 
     init {
         scope.launch(Dispatchers.IO) {
@@ -70,7 +75,7 @@ class GitHubBackupManager(
                 }
                 delay(1800)
                 // Nunca sustituir una copia remota por valores de fábrica tras una lectura dañada.
-                if (config.backupRecoveryPending || config == KeyBinderConfig()) return@collectLatest
+                if (config.backupRecoveryPending) return@collectLatest
                 if (readToken() != null && prefs.getString(KEY_GIST_ID, null) != null) {
                     runCatching { uploadConfig(config) }
                         .onFailure {
@@ -219,10 +224,10 @@ class GitHubBackupManager(
 
     private suspend fun uploadCurrentConfig() {
         val current = repository.configFlow.first()
-        uploadConfig(current.copy(backupRecoveryPending = false))
         if (current.backupRecoveryPending) {
-            repository.replaceConfig(current.copy(backupRecoveryPending = false))
+            error("La configuración local está marcada como recuperada tras un posible daño. Restaura primero la copia de GitHub para evitar sobrescribirla.")
         }
+        uploadConfig(current)
     }
 
     private suspend fun uploadConfig(config: KeyBinderConfig) {
@@ -233,7 +238,9 @@ class GitHubBackupManager(
                 put(BACKUP_FILE, buildJsonObject { put("content", backupPayload(config)) })
             })
         }.toString()
-        requestJson("https://api.github.com/gists/$id", "PATCH", body, token)
+        uploadMutex.withLock {
+            requestJson("https://api.github.com/gists/$id", "PATCH", body, token)
+        }
     }
 
     private suspend fun downloadConfig(): KeyBinderConfig {
@@ -242,6 +249,15 @@ class GitHubBackupManager(
         val gist = requestJson("https://api.github.com/gists/$id", "GET", null, token).jsonObject
         val content = gist.getValue("files").jsonObject.getValue(BACKUP_FILE).jsonObject.getValue("content").jsonPrimitive.content
         val root = json.parseToJsonElement(content).jsonObject
+        require(root["schemaVersion"]?.jsonPrimitive?.intOrNull == 1) {
+            "La versión del formato de copia no es compatible"
+        }
+        require(root["app"]?.jsonPrimitive?.content == "MANDO TCL") {
+            "El archivo no corresponde a una copia de MANDO TCL"
+        }
+        require((root["updatedAt"]?.jsonPrimitive?.longOrNull ?: 0L) > 0L) {
+            "La copia no contiene una fecha válida"
+        }
         val raw = root.getValue("config").toString()
         val config = json.decodeFromString(KeyBinderConfig.serializer(), raw)
         validateBackupConfig(config)
