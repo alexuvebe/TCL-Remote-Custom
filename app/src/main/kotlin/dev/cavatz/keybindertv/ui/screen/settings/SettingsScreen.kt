@@ -1,5 +1,8 @@
 package dev.cavatz.keybindertv.ui.screen.settings
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -20,12 +23,19 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.cavatz.keybindertv.update.AppUpdateManager
+import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import dev.cavatz.keybindertv.KeyBinderTvApp
@@ -46,6 +56,9 @@ fun SettingsScreen(
     val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(repository))
     val uiState: SettingsViewModel.SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val updateScope = rememberCoroutineScope()
+    var updateStatus by remember { mutableStateOf(context.getString(R.string.update_initial_status)) }
+    var checkingUpdate by remember { mutableStateOf(false) }
     val backupManager = (context.applicationContext as KeyBinderTvApp).githubBackupManager
     val backupState by backupManager.state.collectAsStateWithLifecycle()
 
@@ -53,6 +66,26 @@ fun SettingsScreen(
         uiState = uiState,
         backupState = backupState,
         backupManager = backupManager,
+        updateStatus = updateStatus,
+        checkingUpdate = checkingUpdate,
+        onCheckUpdate = {
+            val activity = context.findActivity()
+            if (activity == null) {
+                updateStatus = "No se pudo abrir el instalador desde esta pantalla."
+            } else {
+                updateScope.launch {
+                    checkingUpdate = true
+                    updateStatus = context.getString(R.string.update_checking)
+                    try {
+                        updateStatus = AppUpdateManager.checkAndInstall(activity)
+                    } catch (error: Exception) {
+                        updateStatus = "Error al buscar la actualización: " + (error.message ?: "desconocido")
+                    } finally {
+                        checkingUpdate = false
+                    }
+                }
+            }
+        },
         onSetShowOverlay = { enabled -> viewModel.setShowOverlay(enabled) },
         onSetLongPressThreshold = { threshold -> viewModel.setLongPressThreshold(threshold) }
     )
@@ -63,6 +96,9 @@ private fun SettingsContent(
     uiState: SettingsViewModel.SettingsUiState,
     backupState: GitHubBackupManager.UiState,
     backupManager: GitHubBackupManager,
+    updateStatus: String,
+    checkingUpdate: Boolean,
+    onCheckUpdate: () -> Unit,
     onSetShowOverlay: (Boolean) -> Unit,
     onSetLongPressThreshold: (Long) -> Unit
 ) {
@@ -74,6 +110,14 @@ private fun SettingsContent(
         Text(text = stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(SectionSpacing))
         StatusIndicator(isActive = uiState.isServiceActive)
+        Spacer(modifier = Modifier.height(SectionSpacing))
+        Text(stringResource(R.string.update_section_title), style = MaterialTheme.typography.titleLarge)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(updateStatus, style = MaterialTheme.typography.bodyMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onCheckUpdate, enabled = !checkingUpdate) {
+            Text(if (checkingUpdate) stringResource(R.string.update_checking) else stringResource(R.string.update_check_button))
+        }
         Spacer(modifier = Modifier.height(SectionSpacing))
         OverlayToggle(enabled = uiState.showOverlayNotification, onToggle = onSetShowOverlay)
         Spacer(modifier = Modifier.height(SectionSpacing))
@@ -143,4 +187,11 @@ private fun AccessibilityButton() {
     }) {
         Text(text = stringResource(R.string.settings_accessibility))
     }
+}
+
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
