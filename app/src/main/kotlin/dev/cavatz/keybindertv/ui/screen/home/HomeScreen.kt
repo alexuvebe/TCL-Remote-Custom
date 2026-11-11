@@ -86,11 +86,17 @@ private fun HomeContent(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Remapeo global", style = MaterialTheme.typography.titleMedium)
-            Switch(
-                checked = uiState.globalEnabled,
-                onCheckedChange = onGlobalToggle,
-                colors = SwitchDefaults.colors(checkedThumbColor = ErrorRed, checkedTrackColor = ErrorRed.copy(alpha = 0.45f))
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    if (uiState.globalEnabled) "Activado" else "Desactivado",
+                    style = MaterialTheme.typography.labelSmall
+                )
+                Switch(
+                    checked = uiState.globalEnabled,
+                    onCheckedChange = onGlobalToggle,
+                    colors = SwitchDefaults.colors(checkedThumbColor = ErrorRed, checkedTrackColor = ErrorRed.copy(alpha = 0.45f))
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(VerticalSpacing))
