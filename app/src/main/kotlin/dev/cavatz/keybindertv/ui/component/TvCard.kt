@@ -25,7 +25,7 @@ fun TvCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.tvFocusBorder(),
         scale = CardDefaults.scale()
     ) {
         Column(content = content)

@@ -41,6 +41,7 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.backup.GitHubBackupManager
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
+import dev.cavatz.keybindertv.ui.component.tvFocusBorder
 import dev.cavatz.keybindertv.update.AppUpdateManager
 import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
 import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
@@ -155,7 +156,7 @@ private fun SettingsContent(
         Spacer(modifier = Modifier.height(8.dp))
         Text(updateStatus, style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = onCheckUpdate, enabled = !checkingUpdate, colors = ButtonDefaults.buttonColors(containerColor = WarningAmber)) {
+        Button(onClick = onCheckUpdate, enabled = !checkingUpdate, modifier = Modifier.tvFocusBorder(), colors = ButtonDefaults.buttonColors(containerColor = WarningAmber)) {
             Text(
                 if (checkingUpdate) stringResource(R.string.update_checking)
                 else stringResource(R.string.update_check_button)
@@ -184,7 +185,7 @@ private fun SettingsContent(
                         Uri.parse(backupState.verificationUrl ?: "https://github.com/login/device")
                     )
                 )
-            }) {
+            }, modifier = Modifier.tvFocusBorder()) {
                 Text("Abrir GitHub para autorizar")
             }
         }
@@ -193,7 +194,8 @@ private fun SettingsContent(
         if (!backupState.connected) {
             Button(
                 onClick = { backupManager.connect() },
-                enabled = !backupState.busy
+                enabled = !backupState.busy,
+                modifier = Modifier.tvFocusBorder()
             ) {
                 Text(if (backupState.userCode == null) "Conectar con GitHub" else "Solicitar otro código")
             }
@@ -202,7 +204,7 @@ private fun SettingsContent(
                 Button(
                     onClick = { backupManager.backupNow() },
                     enabled = !backupState.busy,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).tvFocusBorder(),
                     colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
                 ) {
                     Text("Guardar copia")
@@ -210,7 +212,7 @@ private fun SettingsContent(
                 Button(
                     onClick = { backupManager.restoreNow() },
                     enabled = !backupState.busy,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).tvFocusBorder(),
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)
                 ) {
                     Text("Restaurar copia")
@@ -220,6 +222,7 @@ private fun SettingsContent(
             Button(
                 onClick = { backupManager.disconnect() },
                 enabled = !backupState.busy,
+                modifier = Modifier.tvFocusBorder(),
                 colors = ButtonDefaults.buttonColors(containerColor = SurfaceVariantDark, contentColor = OnSurfaceDark)
             ) {
                 Text("Desconectar GitHub")
@@ -239,7 +242,7 @@ private fun OverlayToggle(enabled: Boolean, onToggle: (Boolean) -> Unit) {
             text = stringResource(R.string.settings_overlay),
             style = MaterialTheme.typography.bodyLarge
         )
-        Switch(checked = enabled, onCheckedChange = onToggle)
+        Switch(checked = enabled, onCheckedChange = onToggle, modifier = Modifier.tvFocusBorder())
     }
 }
 
@@ -255,7 +258,7 @@ private fun LongPressSlider(thresholdMs: Long, onThresholdChanged: (Long) -> Uni
             onValueChange = { value -> onThresholdChanged(value.toLong()) },
             valueRange = LONG_PRESS_MIN_MS.toFloat()..LONG_PRESS_MAX_MS.toFloat(),
             steps = SLIDER_STEPS,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().tvFocusBorder()
         )
     }
 }
@@ -265,7 +268,7 @@ private fun AccessibilityButton() {
     val context = LocalContext.current
     Button(onClick = {
         context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-    }) {
+    }, modifier = Modifier.tvFocusBorder()) {
         Text(text = stringResource(R.string.settings_accessibility))
     }
 }
