@@ -157,10 +157,15 @@ private fun SettingsContent(
         }
         Spacer(modifier = Modifier.height(SectionSpacing))
 
-        // Copia privada de GitHub añadida sin introducir tarjetas ni estilos distintos.
-        Text("Copia de seguridad en GitHub", style = MaterialTheme.typography.titleLarge)
+        // Copia de seguridad no pública en GitHub, integrada con el estilo existente.
+        Text("Copia de seguridad no pública en GitHub", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
         Text(backupState.status, style = MaterialTheme.typography.bodyMedium)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            "El Gist no aparece en listados públicos, pero cualquiera que tenga su enlace puede acceder.",
+            style = MaterialTheme.typography.bodySmall
+        )
 
         if (backupState.userCode != null) {
             Spacer(modifier = Modifier.height(8.dp))
