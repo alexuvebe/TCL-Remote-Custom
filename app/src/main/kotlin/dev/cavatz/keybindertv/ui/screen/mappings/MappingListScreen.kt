@@ -159,7 +159,13 @@ private fun MappingItem(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-                Switch(checked = mapping.isEnabled, onCheckedChange = onToggle, colors = actionSwitchColors())
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        if (mapping.isEnabled) "Activado" else "Desactivado",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    Switch(checked = mapping.isEnabled, onCheckedChange = onToggle, colors = actionSwitchColors())
+                }
                 IconButton(onClick = onRemove) {
                     Text(
                         "×",
@@ -179,9 +185,13 @@ private fun MappingItem(
             )
             ActionRow(
                 title = "Pulsación larga",
-                destination = mapping.longPressAction?.appLabel
-                    ?: mapping.shortPressAction?.let { "Usar acción corta: ${it.appLabel}" }
-                    ?: "Sin asignar",
+                destination = when {
+                    mapping.longPressAction != null -> mapping.longPressAction.appLabel
+                    mapping.shortPressAction != null && mapping.shortPressEnabled ->
+                        "Usar acción corta: ${mapping.shortPressAction.appLabel}"
+                    mapping.shortPressAction != null -> "Acción corta desactivada"
+                    else -> "Sin asignar"
+                },
                 enabled = mapping.longPressEnabled,
                 onToggle = onToggleLong,
                 onEdit = onEditLong
@@ -206,7 +216,13 @@ private fun ActionRow(
             Text(title, style = MaterialTheme.typography.labelLarge)
             Text(destination, style = MaterialTheme.typography.bodySmall, maxLines = 1)
         }
-        Switch(checked = enabled, onCheckedChange = onToggle, colors = actionSwitchColors())
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                if (enabled) "Activado" else "Desactivado",
+                style = MaterialTheme.typography.labelSmall
+            )
+            Switch(checked = enabled, onCheckedChange = onToggle, colors = actionSwitchColors())
+        }
         TextButton(onClick = onEdit) {
             Text("Elegir")
         }
