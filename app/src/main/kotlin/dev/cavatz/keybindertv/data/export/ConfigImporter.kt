@@ -83,7 +83,10 @@ class ConfigImporter(
      */
     private fun validateConfig(config: KeyBinderConfig): ImportResult {
         if (config.version < 1) {
-            return ImportResult.Error("Version de configuration invalide : ${config.version}")
+            return ImportResult.Error("Versión de configuración no válida: ${config.version}")
+        }
+        if (config.backupRecoveryPending) {
+            return ImportResult.Error("La copia contiene un estado de recuperación local no válido")
         }
         if (config.mappings.any { it.id.isBlank() }) {
             return ImportResult.Error("La copia contiene una asignación sin identificador")
