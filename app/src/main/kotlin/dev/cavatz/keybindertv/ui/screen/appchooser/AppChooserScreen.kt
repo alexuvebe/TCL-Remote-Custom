@@ -51,7 +51,7 @@ private val ScreenPadding = 12.dp
 
 /**
  * Écran de sélection d'application pour un mapping.
- * Affiche une grille d'apps installées avec une barre de recherche.
+ * Affiche une grille compacte des applications installées.
  *
  * @param navController Contrôleur de navigation
  * @param repository Repository des mappings
