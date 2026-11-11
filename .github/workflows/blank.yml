@@ -7,6 +7,7 @@ on:
       - main
       - feature-spanish-high-contrast
       - audit-fixes
+      - fix-tv-ui-startup-update
 
 permissions:
   contents: read
