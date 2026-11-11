@@ -106,6 +106,10 @@ class MappingRepositoryImpl(
         }
     }
 
+    override suspend fun toggleGlobal(enabled: Boolean) {
+        dataStore.updateData { current -> current.copy(isGloballyEnabled = enabled) }
+    }
+
     override suspend fun updateSettings(showOverlay: Boolean, longPressThresholdMs: Long) {
         dataStore.updateData { current ->
             current.copy(
