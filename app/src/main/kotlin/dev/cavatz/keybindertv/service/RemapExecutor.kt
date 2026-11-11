@@ -32,13 +32,14 @@ class RemapExecutor(private val context: Context) {
      * @param target      Application à lancer
      * @param showOverlay Afficher un toast de confirmation
      */
-    fun launch(target: ActionTarget, showOverlay: Boolean) {
+    fun launch(target: ActionTarget, showOverlay: Boolean): Boolean {
         val launched: Boolean = startTargetApp(target)
-        if (!launched) return
+        if (!launched) return false
 
         if (showOverlay) {
             showConfirmationToast(target.appLabel)
         }
+        return true
     }
 
     /**
@@ -49,18 +50,21 @@ class RemapExecutor(private val context: Context) {
      * @param sourcePackage Package de l'app originale à tuer
      * @param showOverlay   Afficher un toast de confirmation
      */
-    fun launchAndKillSource(target: ActionTarget, sourcePackage: String, showOverlay: Boolean) {
+    fun launchAndKillSource(target: ActionTarget, sourcePackage: String, showOverlay: Boolean): Boolean {
         val launched: Boolean = startTargetApp(target)
-        if (!launched) return
+        if (!launched) return false
 
         if (showOverlay) {
             showConfirmationToast(target.appLabel)
         }
 
         // Tuer l'app source après un court délai pour laisser la cible s'initialiser
-        handler.postDelayed({
-            killBackgroundProcess(sourcePackage)
-        }, KILL_DELAY_MS)
+        if (sourcePackage != target.packageName) {
+            handler.postDelayed({
+                killBackgroundProcess(sourcePackage)
+            }, KILL_DELAY_MS)
+        }
+        return true
     }
 
     /**
@@ -68,8 +72,8 @@ class RemapExecutor(private val context: Context) {
      * Retourne false si le package manager ne trouve pas l'application.
      */
     private fun startTargetApp(target: ActionTarget): Boolean {
-        val launchIntent: Intent? = context.packageManager
-            .getLaunchIntentForPackage(target.packageName)
+        val launchIntent: Intent? = context.packageManager.getLaunchIntentForPackage(target.packageName)
+            ?: context.packageManager.getLeanbackLaunchIntentForPackage(target.packageName)
 
         if (launchIntent == null) {
             Log.w(TAG, "Package introuvable : ${target.packageName}")
