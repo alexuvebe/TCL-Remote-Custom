@@ -97,7 +97,7 @@ private fun AppChooserContent(
     ) {
         Text(
             text = stringResource(R.string.appchooser_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineSmall
         )
         when {
             uiState.isLoading -> LoadingGrid()
