@@ -43,6 +43,7 @@ import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 import dev.cavatz.keybindertv.update.AppUpdateManager
 import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
+import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
 import dev.cavatz.keybindertv.ui.theme.SuccessGreen
 import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
 import dev.cavatz.keybindertv.ui.theme.WarningAmber
@@ -219,7 +220,7 @@ private fun SettingsContent(
             Button(
                 onClick = { backupManager.disconnect() },
                 enabled = !backupState.busy,
-                colors = ButtonDefaults.buttonColors(containerColor = SurfaceVariantDark)
+                colors = ButtonDefaults.buttonColors(containerColor = SurfaceVariantDark, contentColor = OnSurfaceDark)
             ) {
                 Text("Desconectar GitHub")
             }
