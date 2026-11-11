@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,7 +38,7 @@ import kotlinx.coroutines.launch
 private const val GRID_COLUMNS: Int = 5
 
 /** Taille de l'icône d'application dans la grille */
-private val AppIconSize = 48.dp
+private val AppIconSize = 44.dp
 
 /** Espacement entre les éléments de la grille */
 private val GridSpacing = 8.dp
@@ -48,7 +47,7 @@ private val GridSpacing = 8.dp
 private val AppCardPadding = 8.dp
 
 /** Padding global de l'écran */
-private val ScreenPadding = 16.dp
+private val ScreenPadding = 12.dp
 
 /**
  * Écran de sélection d'application pour un mapping.
@@ -76,7 +75,6 @@ fun AppChooserScreen(
 
     AppChooserContent(
         uiState = uiState,
-        onSearchQueryChanged = { query -> viewModel.onSearchQueryChanged(query) },
         onAppSelected = { app ->
             coroutineScope.launch {
                 viewModel.selectApp(app)
@@ -90,7 +88,6 @@ fun AppChooserScreen(
 @Composable
 private fun AppChooserContent(
     uiState: AppChooserViewModel.AppChooserUiState,
-    onSearchQueryChanged: (String) -> Unit,
     onAppSelected: (InstalledAppsProvider.AppInfo) -> Unit
 ) {
     Column(
@@ -102,11 +99,6 @@ private fun AppChooserContent(
             text = stringResource(R.string.appchooser_title),
             style = MaterialTheme.typography.headlineMedium
         )
-        SearchBar(
-            query = uiState.searchQuery,
-            onQueryChanged = onSearchQueryChanged
-        )
-
         when {
             uiState.isLoading -> LoadingGrid()
             else -> AppGrid(
@@ -115,20 +107,6 @@ private fun AppChooserContent(
             )
         }
     }
-}
-
-/** Barre de recherche pour filtrer les applications */
-@Composable
-private fun SearchBar(query: String, onQueryChanged: (String) -> Unit) {
-    TextField(
-        value = query,
-        onValueChange = onQueryChanged,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = GridSpacing),
-        placeholder = { Text(text = stringResource(R.string.appchooser_search)) },
-        singleLine = true
-    )
 }
 
 /** Indicateur de chargement centré */
