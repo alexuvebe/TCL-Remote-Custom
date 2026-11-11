@@ -38,6 +38,7 @@ import dev.cavatz.keybindertv.ui.component.TvCard
 import dev.cavatz.keybindertv.ui.navigation.Screen
 import dev.cavatz.keybindertv.ui.theme.ErrorRed
 import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
+import dev.cavatz.keybindertv.ui.theme.OnSurfaceVariantDark
 import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
 import kotlinx.coroutines.launch
 
@@ -169,7 +170,7 @@ private fun MappingItem(
                 IconButton(onClick = onRemove) {
                     Text(
                         "×",
-                        color = SurfaceVariantDark,
+                        color = OnSurfaceVariantDark,
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
