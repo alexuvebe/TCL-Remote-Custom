@@ -206,6 +206,17 @@ class MappingRepositoryTest {
     }
 
     @Test
+    fun `should toggle global remapping without changing assignments`() = testScope.runTest {
+        repository.addMapping(mappingYoutube)
+        repository.setGlobalEnabled(false)
+        val disabled = repository.configFlow.first()
+        assertFalse(disabled.globalEnabled)
+        assertEquals(1, disabled.mappings.size)
+        repository.setGlobalEnabled(true)
+        assertTrue(repository.configFlow.first().globalEnabled)
+    }
+
+    @Test
     fun `should return synchronous config via getConfigSync after mutation`() = testScope.runTest {
         // Pré-condition : on ajoute un mapping
         repository.addMapping(mappingYoutube)
