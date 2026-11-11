@@ -6,7 +6,6 @@ import android.security.keystore.KeyProperties
 import android.util.Base64
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.repository.MappingRepository
-import dev.cavatz.keybindertv.data.repository.KeyBinderConfigSerializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -71,7 +70,7 @@ class GitHubBackupManager(
                 }
                 delay(1800)
                 // Nunca sustituir una copia remota por valores de fábrica tras una lectura dañada.
-                if (KeyBinderConfigSerializer.corruptionDetected || config == KeyBinderConfig()) return@collectLatest
+                if (config.backupRecoveryPending || config == KeyBinderConfig()) return@collectLatest
                 if (readToken() != null && prefs.getString(KEY_GIST_ID, null) != null) {
                     runCatching { uploadConfig(config) }
                         .onFailure {
@@ -113,7 +112,6 @@ class GitHubBackupManager(
             _state.value = _state.value.copy(busy = true, status = "Guardando copia privada…")
             try {
                 withContext(Dispatchers.IO) { uploadCurrentConfig() }
-                KeyBinderConfigSerializer.markRecovered()
                 _state.value = _state.value.copy(busy = false, status = "Copia de seguridad actualizada", connected = true)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(busy = false, status = "Error al guardar: ${e.message}")
@@ -127,7 +125,6 @@ class GitHubBackupManager(
             try {
                 val config = withContext(Dispatchers.IO) { downloadConfig() }
                 repository.replaceConfig(config)
-                KeyBinderConfigSerializer.markRecovered()
                 _state.value = _state.value.copy(busy = false, status = "Configuración restaurada correctamente", connected = true)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(busy = false, status = "Error al restaurar: ${e.message}")
@@ -194,19 +191,21 @@ class GitHubBackupManager(
         }
         if (existingId != null) {
             val local = repository.configFlow.first()
-            if (local == KeyBinderConfig()) {
+            if (local == KeyBinderConfig() || local.backupRecoveryPending) {
                 repository.replaceConfig(downloadConfig())
-                KeyBinderConfigSerializer.markRecovered()
                 return "GitHub conectado. Se ha recuperado la copia existente."
             }
             // No asumimos que la configuración local sea más reciente que la remota.
             return "GitHub conectado. Se ha detectado una copia existente y no se ha sobrescrito. Usa Restaurar si quieres recuperarla."
         }
 
-        if (KeyBinderConfigSerializer.corruptionDetected) {
+        if (localConfigNeedsRecovery()) {
             error("La configuración local se recuperó con valores de fábrica y no se ha encontrado una copia previa. No se creará una copia vacía para proteger tus datos.")
         }
         val local = repository.configFlow.first()
+        if (local.backupRecoveryPending) {
+            error("La configuración local se recuperó con valores de fábrica y no se ha encontrado una copia previa. No se creará una copia vacía para proteger tus datos.")
+        }
         val payload = backupPayload(local)
         val body = buildJsonObject {
             put("description", GIST_DESCRIPTION)
@@ -222,7 +221,11 @@ class GitHubBackupManager(
     }
 
     private suspend fun uploadCurrentConfig() {
-        uploadConfig(repository.configFlow.first())
+        val current = repository.configFlow.first()
+        uploadConfig(current.copy(backupRecoveryPending = false))
+        if (current.backupRecoveryPending) {
+            repository.replaceConfig(current.copy(backupRecoveryPending = false))
+        }
     }
 
     private suspend fun uploadConfig(config: KeyBinderConfig) {
@@ -250,6 +253,7 @@ class GitHubBackupManager(
 
     private fun validateBackupConfig(config: KeyBinderConfig) {
         require(config.version >= 1) { "La versión de la copia no es válida" }
+        require(!config.backupRecoveryPending) { "La copia no puede contener una recuperación local pendiente" }
         require(config.mappings.all { it.id.isNotBlank() }) {
             "La copia contiene una asignación sin identificador"
         }
@@ -270,11 +274,13 @@ class GitHubBackupManager(
         }
     }
 
+    private fun localConfigNeedsRecovery(): Boolean = repository.getConfigSync().backupRecoveryPending
+
     private fun backupPayload(config: KeyBinderConfig): String = buildJsonObject {
         put("schemaVersion", 1)
         put("updatedAt", System.currentTimeMillis())
         put("app", "MANDO TCL")
-        put("config", json.parseToJsonElement(json.encodeToString(KeyBinderConfig.serializer(), config)))
+        put("config", json.parseToJsonElement(json.encodeToString(KeyBinderConfig.serializer(), config.copy(backupRecoveryPending = false))))
     }.toString()
 
     private fun requestJson(url: String, method: String, body: String?, token: String?): kotlinx.serialization.json.JsonElement {
