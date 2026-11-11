@@ -159,7 +159,7 @@ private fun SettingsContent(
         Spacer(modifier = Modifier.height(SectionSpacing))
 
         // Copia de seguridad no pública en GitHub, integrada con el estilo existente.
-        Text("Copia de seguridad no pública en GitHub", style = MaterialTheme.typography.titleLarge)
+        Text("Copia de seguridad no pública en GitHub", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Text(backupState.status, style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(4.dp))
