@@ -12,6 +12,7 @@ import dev.cavatz.keybindertv.data.repository.MappingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -60,6 +61,22 @@ class MappingViewModel(
     fun toggleMapping(id: String, enabled: Boolean) {
         viewModelScope.launch {
             repository.toggleMapping(id, enabled)
+        }
+    }
+
+    /** Activa o desactiva solo la acción de pulsación corta, conservando su destino. */
+    fun toggleShortPress(id: String, enabled: Boolean) {
+        viewModelScope.launch {
+            val mapping = repository.configFlow.first().mappings.firstOrNull { it.id == id } ?: return@launch
+            repository.updateMapping(mapping.copy(shortPressEnabled = enabled))
+        }
+    }
+
+    /** Activa o desactiva solo la acción de pulsación larga, conservando su destino. */
+    fun toggleLongPress(id: String, enabled: Boolean) {
+        viewModelScope.launch {
+            val mapping = repository.configFlow.first().mappings.firstOrNull { it.id == id } ?: return@launch
+            repository.updateMapping(mapping.copy(longPressEnabled = enabled))
         }
     }
 
