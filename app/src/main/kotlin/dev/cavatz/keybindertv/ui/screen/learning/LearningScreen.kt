@@ -27,6 +27,7 @@ import dev.cavatz.keybindertv.data.model.ButtonIdentifier
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.service.KeyInterceptorService
 import dev.cavatz.keybindertv.ui.navigation.Screen
+import dev.cavatz.keybindertv.ui.component.tvFocusBorder
 import kotlinx.coroutines.launch
 
 /** Espacement vertical entre les éléments */
@@ -142,7 +143,7 @@ private fun WaitingContent(remainingSeconds: Int, onCancel: () -> Unit) {
         style = MaterialTheme.typography.titleLarge
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
-    TextButton(onClick = onCancel) {
+    TextButton(onClick = onCancel, modifier = Modifier.tvFocusBorder()) {
         Text(text = stringResource(R.string.learning_cancel))
     }
 }
@@ -163,10 +164,10 @@ private fun ButtonDetectedContent(
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
     Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
-        Button(onClick = onConfirm) {
+        Button(onClick = onConfirm, modifier = Modifier.tvFocusBorder()) {
             Text(text = stringResource(R.string.learning_confirm))
         }
-        TextButton(onClick = onRetry) {
+        TextButton(onClick = onRetry, modifier = Modifier.tvFocusBorder()) {
             Text(text = stringResource(R.string.learning_retry))
         }
     }
@@ -182,7 +183,7 @@ private fun TimeoutContent(onRetry: () -> Unit, onCancel: () -> Unit) {
     )
     Spacer(modifier = Modifier.height(VerticalSpacing))
     Row(horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)) {
-        Button(onClick = onRetry) {
+        Button(onClick = onRetry, modifier = Modifier.tvFocusBorder()) {
             Text(text = stringResource(R.string.learning_retry))
         }
         TextButton(onClick = onCancel) {
