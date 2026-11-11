@@ -85,9 +85,22 @@ class ConfigImporter(
         if (config.version < 1) {
             return ImportResult.Error("Version de configuration invalide : ${config.version}")
         }
-        val invalidMapping = config.mappings.firstOrNull { it.id.isBlank() }
+        if (config.mappings.any { it.id.isBlank() }) {
+            return ImportResult.Error("La copia contiene una asignación sin identificador")
+        }
+        if (config.mappings.map { it.id }.distinct().size != config.mappings.size) {
+            return ImportResult.Error("La copia contiene identificadores repetidos")
+        }
+        val invalidMapping = config.mappings.firstOrNull { mapping ->
+            (mapping.button.keyCode == null && mapping.button.sourcePackage.isNullOrBlank()) ||
+                listOfNotNull(mapping.shortPressAction, mapping.longPressAction)
+                    .any { it.packageName.isBlank() } ||
+                (mapping.button.sourcePackage != null &&
+                    listOfNotNull(mapping.shortPressAction, mapping.longPressAction)
+                        .any { it.packageName == mapping.button.sourcePackage })
+        }
         if (invalidMapping != null) {
-            return ImportResult.Error("Mapping avec id vide détecté")
+            return ImportResult.Error("La copia contiene una asignación o aplicación de destino no válida")
         }
         return ImportResult.Success(config)
     }
