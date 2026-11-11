@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,6 +37,9 @@ import dev.cavatz.keybindertv.data.model.KeyMapping
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.TvCard
 import dev.cavatz.keybindertv.ui.navigation.Screen
+import dev.cavatz.keybindertv.ui.theme.ErrorRed
+import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
+import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
 import kotlinx.coroutines.launch
 
 private val CardPadding = 10.dp
@@ -103,7 +108,8 @@ private fun MappingListContent(
         if (!uiState.isLoading) {
             Button(
                 onClick = onAddMapping,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(ScreenPadding)
+                modifier = Modifier.align(Alignment.BottomEnd).padding(ScreenPadding),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)
             ) {
                 Text(stringResource(R.string.mappings_add))
             }
@@ -154,11 +160,11 @@ private fun MappingItem(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-                Switch(checked = mapping.isEnabled, onCheckedChange = onToggle)
+                Switch(checked = mapping.isEnabled, onCheckedChange = onToggle, colors = actionSwitchColors())
                 IconButton(onClick = onRemove) {
                     Text(
                         "×",
-                        color = MaterialTheme.colorScheme.error,
+                        color = SurfaceVariantDark,
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
@@ -201,7 +207,7 @@ private fun ActionRow(
             Text(title, style = MaterialTheme.typography.labelLarge)
             Text(destination, style = MaterialTheme.typography.bodySmall, maxLines = 1)
         }
-        Switch(checked = enabled, onCheckedChange = onToggle)
+        Switch(checked = enabled, onCheckedChange = onToggle, colors = actionSwitchColors())
         TextButton(onClick = onEdit) {
             Text("Elegir")
         }
@@ -217,3 +223,9 @@ private fun factoryLabel(keyCode: Int?): String = when (keyCode) {
     4020 -> "TCL"
     else -> "Sin etiqueta"
 }
+
+@Composable
+private fun actionSwitchColors() = SwitchDefaults.colors(
+    checkedThumbColor = ErrorRed,
+    checkedTrackColor = ErrorRed.copy(alpha = 0.45f)
+)
