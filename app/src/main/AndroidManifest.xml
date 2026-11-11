@@ -5,20 +5,13 @@
     <!-- Nécessaire pour lister les applications installées (sélecteur d'app cible) -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
-    <!-- Internet : opcional, previsto para futuras funciones -->
+    <!-- Conexión HTTPS para consultar actualizaciones y copias de GitHub -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Démarrage automatique au boot (Phase 4) -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- Overlay pour le toast de confirmation de remapping -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
-    <!-- Statistiques d'usage pour détecter les apps lancées (Flux B) -->
-    <uses-permission
-        android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" />
 
     <!-- Kill de l'app source après remplacement (Flux B) -->
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
