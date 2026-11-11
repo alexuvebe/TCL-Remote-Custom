@@ -26,7 +26,7 @@ class ConfigExporter(
      * @return JSON multi-lignes indenté
      */
     fun exportToJson(config: KeyBinderConfig): String =
-        json.encodeToString(KeyBinderConfig.serializer(), config)
+        json.encodeToString(KeyBinderConfig.serializer(), config.copy(backupRecoveryPending = false))
 
     /**
      * Écrit le JSON dans un fichier via un URI (SAF — Storage Access Framework).
