@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KeyBinder TV</string>
+    <string name="app_name">MANDO TCL</string>
 
     <!-- Navigation -->
     <string name="screen_home">Accueil</string>
@@ -30,11 +30,11 @@
     <string name="settings_long_press_threshold">Durée appui long (ms)</string>
 
     <!-- Accessibilité -->
-    <string name="accessibility_service_label">KeyBinder TV — Remappeur de boutons</string>
-    <string name="accessibility_service_description">Intercepte les boutons de la télécommande pour les rediriger vers d\'autres applications.</string>
+    <string name="accessibility_service_label">MANDO TCL — Remappeur de boutons</string>
+    <string name="accessibility_service_description">Intercepte les boutons de la télécommande pour les rediriger vers d'autres applications.</string>
 
     <!-- Écrans Phase 3 -->
-    <string name="home_title">KeyBinderTv</string>
+    <string name="home_title">MANDO TCL</string>
     <string name="home_service_active">Service actif</string>
     <string name="home_service_inactive">Service inactif</string>
     <string name="home_enable_service">Activer le service</string>
@@ -50,20 +50,20 @@
     <string name="learning_confirm">Confirmer</string>
     <string name="learning_retry">Réessayer</string>
     <string name="learning_cancel">Annuler</string>
-    <string name="learning_service_inactive">Service inactif — activez le service d\'accessibilité</string>
-    <string name="appchooser_title">Choisir l\'application</string>
+    <string name="learning_service_inactive">Service inactif — activez le service d'accessibilité</string>
+    <string name="appchooser_title">Choisir l'application</string>
     <string name="appchooser_search">Rechercher une application...</string>
     <string name="settings_title">Paramètres</string>
-    <string name="settings_overlay">Notification lors du remapping</string>
+    <string name="settings_overlay">Afficher une notification lors du remapping</string>
     <string name="settings_longpress_threshold">Délai long press : %1$d ms</string>
-    <string name="settings_accessibility">Paramètres d\'accessibilité</string>
+    <string name="settings_accessibility">Paramètres d'accessibilité</string>
     <string name="importexport_title">Import / Export</string>
     <string name="importexport_export_file">Exporter en fichier JSON</string>
     <string name="importexport_generate_qr">Générer QR code</string>
     <string name="importexport_import_file">Importer depuis un fichier JSON</string>
     <string name="importexport_import_paste_hint">Ou collez votre JSON ici</string>
     <string name="importexport_import_button">Importer</string>
-    <string name="importexport_qr_too_large">Configuration trop grande pour un QR — utilisez l\'export fichier</string>
+    <string name="importexport_qr_too_large">Configuration trop grande pour un QR — utilisez l'export fichier</string>
     <string name="importexport_qr_prompt">Appuyez sur « Générer QR code » pour afficher</string>
     <string name="importexport_section_export">Export</string>
     <string name="importexport_section_import">Import</string>
