@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MANDO TCL</string>
+    <string name="update_section_title">Actualizaciones</string>
+    <string name="update_check_button">Buscar actualizaciones</string>
+    <string name="update_checking">Comprobando nueva versión…</string>
+    <string name="update_initial_status">Comprueba si hay una nueva versión de MANDO TCL.</string>
 
     <!-- Navigation -->
     <string name="screen_home">Home</string>
