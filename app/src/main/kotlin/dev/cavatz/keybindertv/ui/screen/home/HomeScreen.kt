@@ -36,6 +36,7 @@ import dev.cavatz.keybindertv.BuildConfig
 import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
+import dev.cavatz.keybindertv.ui.component.tvFocusBorder
 import dev.cavatz.keybindertv.ui.navigation.Screen
 import dev.cavatz.keybindertv.ui.theme.ErrorRed
 import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
@@ -121,7 +122,7 @@ private fun HomeContent(
         ) {
             Button(
                 onClick = onNavigateMappings,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).tvFocusBorder(),
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)
             ) {
                 Text(stringResource(R.string.home_manage_mappings), maxLines = 1)
@@ -132,7 +133,7 @@ private fun HomeContent(
             )
             Button(
                 onClick = onNavigateSettings,
-                modifier = Modifier.size(52.dp),
+                modifier = Modifier.size(52.dp).tvFocusBorder(CircleShape),
                 shape = CircleShape,
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -162,7 +163,7 @@ private fun ServiceAccessButton(
         onClick = {
             context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         },
-        modifier = modifier,
+        modifier = modifier.tvFocusBorder(),
         colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
     ) {
         Text(
