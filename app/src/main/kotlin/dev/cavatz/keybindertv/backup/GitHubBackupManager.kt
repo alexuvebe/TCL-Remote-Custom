@@ -109,7 +109,7 @@ class GitHubBackupManager(
 
     fun backupNow() {
         scope.launch {
-            _state.value = _state.value.copy(busy = true, status = "Guardando copia privada…")
+            _state.value = _state.value.copy(busy = true, status = "Guardando copia de seguridad…")
             try {
                 withContext(Dispatchers.IO) { uploadCurrentConfig() }
                 _state.value = _state.value.copy(busy = false, status = "Copia de seguridad actualizada", connected = true)
@@ -121,7 +121,7 @@ class GitHubBackupManager(
 
     fun restoreNow() {
         scope.launch {
-            _state.value = _state.value.copy(busy = true, status = "Buscando copia privada…")
+            _state.value = _state.value.copy(busy = true, status = "Buscando copia de seguridad…")
             try {
                 val config = withContext(Dispatchers.IO) { downloadConfig() }
                 repository.replaceConfig(config)
@@ -199,9 +199,6 @@ class GitHubBackupManager(
             return "GitHub conectado. Se ha detectado una copia existente y no se ha sobrescrito. Usa Restaurar si quieres recuperarla."
         }
 
-        if (localConfigNeedsRecovery()) {
-            error("La configuración local se recuperó con valores de fábrica y no se ha encontrado una copia previa. No se creará una copia vacía para proteger tus datos.")
-        }
         val local = repository.configFlow.first()
         if (local.backupRecoveryPending) {
             error("La configuración local se recuperó con valores de fábrica y no se ha encontrado una copia previa. No se creará una copia vacía para proteger tus datos.")
@@ -241,7 +238,7 @@ class GitHubBackupManager(
 
     private suspend fun downloadConfig(): KeyBinderConfig {
         val token = readToken() ?: error("Conecta primero con GitHub")
-        val id = prefs.getString(KEY_GIST_ID, null) ?: error("No hay copia privada asociada")
+        val id = prefs.getString(KEY_GIST_ID, null) ?: error("No hay copia asociada")
         val gist = requestJson("https://api.github.com/gists/$id", "GET", null, token).jsonObject
         val content = gist.getValue("files").jsonObject.getValue(BACKUP_FILE).jsonObject.getValue("content").jsonPrimitive.content
         val root = json.parseToJsonElement(content).jsonObject
@@ -273,8 +270,6 @@ class GitHubBackupManager(
             }) { "La copia contiene una reasignación que se apunta a sí misma" }
         }
     }
-
-    private fun localConfigNeedsRecovery(): Boolean = repository.getConfigSync().backupRecoveryPending
 
     private fun backupPayload(config: KeyBinderConfig): String = buildJsonObject {
         put("schemaVersion", 1)
