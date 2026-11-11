@@ -77,6 +77,7 @@ dependencies {
     // Compose BOM — aligne toutes les versions Compose
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.tooling.preview)
