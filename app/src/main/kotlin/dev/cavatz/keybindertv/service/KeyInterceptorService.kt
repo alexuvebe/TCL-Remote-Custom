@@ -192,7 +192,7 @@ class KeyInterceptorService : AccessibilityService() {
         if (target.packageName == packageName) return
 
         // A KeyEvent mapping may already have launched this target for the same key.
-        if (wasRecentlyHandled(target.packageName)) return
+        if (wasRecentlyHandled(packageName)) return
 
         if (remapExecutor.launchAndKillSource(target, packageName, config.showOverlayNotification)) {
             rememberTarget(target.packageName)
