@@ -95,6 +95,7 @@ private fun HomeContent(
                 Switch(
                     checked = uiState.globalEnabled,
                     onCheckedChange = onGlobalToggle,
+                    modifier = Modifier.tvFocusBorder(),
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = ErrorRed,
                         checkedTrackColor = ErrorRed.copy(alpha = 0.45f)
