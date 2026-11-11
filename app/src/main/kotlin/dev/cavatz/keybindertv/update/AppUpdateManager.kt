@@ -20,6 +20,40 @@ object AppUpdateManager {
     private const val RELEASE_API = "https://api.github.com/repos/alexuvebe/TCL-Remote-Custom/releases/latest"
     private const val APK_NAME = "mando-tcl.apk"
 
+    /**
+     * Consulta si existe una versión más reciente sin descargar ni abrir el instalador.
+     * Se usa al iniciar la aplicación para avisar al usuario, nunca para instalar sin permiso.
+     */
+    suspend fun checkForUpdate(activity: Activity): String? = withContext(Dispatchers.IO) {
+        val connection = (URL(RELEASE_API).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 10000
+            readTimeout = 15000
+            setRequestProperty("Accept", "application/vnd.github+json")
+            setRequestProperty("User-Agent", "MANDO-TCL-Android-Updater")
+        }
+        val release = try {
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                throw IllegalStateException("GitHub HTTP ${connection.responseCode}")
+            }
+            JSONObject(connection.inputStream.bufferedReader().use { it.readText() })
+        } finally {
+            connection.disconnect()
+        }
+
+        if (release.optBoolean("draft") || release.optBoolean("prerelease")) {
+            return@withContext null
+        }
+        val tag = release.optString("tag_name")
+        val remoteCode = tag.substringAfterLast("-").toLongOrNull()
+            ?: return@withContext null
+        val packageInfo = activity.packageManager.getPackageInfo(activity.packageName, 0)
+        val currentCode = if (Build.VERSION.SDK_INT >= 28) packageInfo.longVersionCode else {
+            @Suppress("DEPRECATION")
+            packageInfo.versionCode.toLong()
+        }
+        if (remoteCode > currentCode) tag else null
+    }
+
     suspend fun checkAndInstall(activity: Activity): String = withContext(Dispatchers.IO) {
         val releaseConnection = (URL(RELEASE_API).openConnection() as HttpURLConnection).apply {
             connectTimeout = 15000
