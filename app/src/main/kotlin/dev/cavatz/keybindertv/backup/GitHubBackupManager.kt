@@ -266,6 +266,9 @@ class GitHubBackupManager(
 
     private fun validateBackupConfig(config: KeyBinderConfig) {
         require(config.version >= 1) { "La versión de la copia no es válida" }
+        require(config.longPressThresholdMs in 200L..2000L) {
+            "El umbral de pulsación de la copia no está entre 200 y 2000 ms"
+        }
         require(!config.backupRecoveryPending) { "La copia no puede contener una recuperación local pendiente" }
         require(config.mappings.all { it.id.isNotBlank() }) {
             "La copia contiene una asignación sin identificador"
