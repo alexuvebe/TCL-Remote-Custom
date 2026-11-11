@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: android-apk-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -39,6 +39,7 @@ jobs:
           validate-wrappers: false
 
       - name: Preparar firma permanente
+        if: github.ref == 'refs/heads/main'
         id: signing
         env:
           ANDROID_SIGNING_BUNDLE_BASE64: ${{ secrets.ANDROID_SIGNING_BUNDLE_BASE64 }}
@@ -57,13 +58,13 @@ jobs:
         run: gradle --no-daemon testDebugUnitTest
 
       - name: Compilar APK firmado
-        if: steps.signing.outputs.enabled == 'true'
+        if: github.ref == 'refs/heads/main' && steps.signing.outputs.enabled == 'true'
         run: |
           gradle --no-daemon assembleRelease -PAPP_VERSION_CODE=${{ github.run_number }} -PAPP_VERSION_NAME=2026.11.10.${{ github.run_number }}
           cp app/build/outputs/apk/release/app-release.apk mando-tcl.apk
 
       - name: Compilar APK de prueba
-        if: steps.signing.outputs.enabled != 'true'
+        if: github.ref != 'refs/heads/main' || steps.signing.outputs.enabled != 'true'
         run: gradle --no-daemon assembleDebug -PAPP_VERSION_CODE=${{ github.run_number }} -PAPP_VERSION_NAME=2026.11.10.${{ github.run_number }}
 
       - name: Guardar APK firmado
