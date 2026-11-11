@@ -208,6 +208,7 @@ class GitHubBackupManager(
         if (local.backupRecoveryPending) {
             error("La configuración local se recuperó con valores de fábrica y no se ha encontrado una copia previa. No se creará una copia vacía para proteger tus datos.")
         }
+        validateBackupConfig(local)
         val payload = backupPayload(local)
         val body = buildJsonObject {
             put("description", GIST_DESCRIPTION)
@@ -231,6 +232,7 @@ class GitHubBackupManager(
     }
 
     private suspend fun uploadConfig(config: KeyBinderConfig) {
+        validateBackupConfig(config)
         val token = readToken() ?: error("Conecta primero con GitHub")
         val id = prefs.getString(KEY_GIST_ID, null) ?: error("No existe una copia; vuelve a conectar")
         val body = buildJsonObject {
