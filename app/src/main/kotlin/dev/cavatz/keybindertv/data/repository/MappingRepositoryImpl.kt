@@ -117,7 +117,7 @@ class MappingRepositoryImpl(
         dataStore.updateData { current ->
             current.copy(
                 showOverlayNotification = showOverlay,
-                longPressThresholdMs = longPressThresholdMs
+                longPressThresholdMs = longPressThresholdMs.coerceIn(200L, 2000L)
             )
         }
     }
