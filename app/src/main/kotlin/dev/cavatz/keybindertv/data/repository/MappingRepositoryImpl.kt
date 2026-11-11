@@ -1,6 +1,7 @@
 package dev.cavatz.keybindertv.data.repository
 
 import androidx.datastore.core.DataStore
+import android.util.Log
 import androidx.datastore.core.Serializer
 import dev.cavatz.keybindertv.data.model.KeyBinderConfig
 import dev.cavatz.keybindertv.data.model.KeyMapping
@@ -8,6 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.io.InputStream
@@ -20,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 object KeyBinderConfigSerializer : Serializer<KeyBinderConfig> {
 
-    private val json: Json = Json { ignoreUnknownKeys = true }
+    private val json: Json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
     override val defaultValue: KeyBinderConfig = KeyBinderConfig()
 
@@ -62,6 +65,11 @@ class MappingRepositoryImpl(
         AtomicReference(KeyBinderConfig())
 
     override val configFlow: Flow<KeyBinderConfig> = dataStore.data
+        .retryWhen { cause, attempt ->
+            Log.e("MappingRepository", "Error leyendo configuración; se reintentará", cause)
+            delay((1000L * (attempt + 1)).coerceAtMost(10000L))
+            true
+        }
         .shareIn(scope, SharingStarted.Eagerly, replay = 1)
 
     init {
