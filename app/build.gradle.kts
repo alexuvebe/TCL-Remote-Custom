@@ -57,6 +57,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -74,7 +75,6 @@ android {
 }
 
 dependencies {
-    // Compose BOM — aligne toutes les versions Compose
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     implementation("androidx.core:core-ktx:1.12.0")
@@ -82,38 +82,18 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
-
-    // TV Compose
     implementation(libs.tv.material)
-
-    // Navigation
     implementation(libs.navigation.compose)
-
-    // DataStore (Proto/preferences avec sérialisation manuelle)
     implementation(libs.datastore)
-
-    // Sérialisation JSON
     implementation(libs.kotlinx.serialization.json)
-
-    // Coil — chargement d'images
     implementation(libs.coil.compose)
-
-    // ZXing — génération QR codes
     implementation(libs.zxing.android)
-
-    // Lifecycle
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)
-
-    // Coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
-
-    // Tests unitaires
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.kotlinx.serialization.json)
-
-    // Tests instrumentés
     androidTestImplementation(libs.junit.ext)
 }
