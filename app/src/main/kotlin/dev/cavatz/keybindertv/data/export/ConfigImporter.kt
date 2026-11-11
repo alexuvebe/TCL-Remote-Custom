@@ -83,7 +83,7 @@ class ConfigImporter(
      */
     private fun validateConfig(config: KeyBinderConfig): ImportResult {
         if (config.version < 1) {
-            return ImportResult.Error("Versión de configuración no válida: ${config.version}")
+            return ImportResult.Error("Version de configuración no válida: ${config.version}")
         }
         if (config.backupRecoveryPending) {
             return ImportResult.Error("La copia contiene un estado de recuperación local no válido")
