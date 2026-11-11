@@ -31,7 +31,7 @@ private class MainThreadDelayedTaskScheduler : DelayedTaskScheduler {
  * configurado. Así no puede disparar una pulsación corta antes de un umbral largo
  * de hasta dos segundos.
  */
-class LongPressDetector(
+class LongPressDetector internal constructor(
     private val thresholdMs: Long = DEFAULT_THRESHOLD_MS,
     private val safetyTimeoutMs: Long = thresholdMs + SAFETY_TIMEOUT_MS,
     private val scheduler: DelayedTaskScheduler = MainThreadDelayedTaskScheduler(),
