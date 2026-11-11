@@ -94,7 +94,6 @@ dependencies {
     implementation(libs.coroutines.android)
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
-    testImplementation("org.robolectric:robolectric:4.13")
     testImplementation(libs.kotlinx.serialization.json)
     androidTestImplementation(libs.junit.ext)
 }
