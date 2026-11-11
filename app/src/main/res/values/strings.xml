@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KeyBinder TV</string>
+    <string name="app_name">MANDO TCL</string>
 
     <!-- Navigation -->
     <string name="screen_home">Home</string>
@@ -30,11 +30,11 @@
     <string name="settings_long_press_threshold">Long press duration (ms)</string>
 
     <!-- Accessibilité -->
-    <string name="accessibility_service_label">KeyBinder TV — Button Remapper</string>
+    <string name="accessibility_service_label">MANDO TCL — Remapeador de botones</string>
     <string name="accessibility_service_description">Intercepts remote control buttons to remap them to other applications.</string>
 
     <!-- Écrans Phase 3 -->
-    <string name="home_title">KeyBinderTv</string>
+    <string name="home_title">MANDO TCL</string>
     <string name="home_service_active">Service actif</string>
     <string name="home_service_inactive">Service inactif</string>
     <string name="home_enable_service">Activer le service</string>
@@ -50,13 +50,13 @@
     <string name="learning_confirm">Confirmer</string>
     <string name="learning_retry">Réessayer</string>
     <string name="learning_cancel">Annuler</string>
-    <string name="learning_service_inactive">Service inactif — activez le service d\'accessibilité</string>
-    <string name="appchooser_title">Choisir l\'application</string>
+    <string name="learning_service_inactive">Service inactif — activez le service d'accessibilité</string>
+    <string name="appchooser_title">Choisir l'application</string>
     <string name="appchooser_search">Rechercher une application...</string>
     <string name="settings_title">Paramètres</string>
     <string name="settings_overlay">Notification lors du remapping</string>
     <string name="settings_longpress_threshold">Délai long press : %1$d ms</string>
-    <string name="settings_accessibility">Paramètres d\'accessibilité</string>
+    <string name="settings_accessibility">Paramètres d'accessibilité</string>
     <string name="importexport_title">Import / Export</string>
     <string name="importexport_export_file">Export as JSON file</string>
     <string name="importexport_generate_qr">Generate QR code</string>
