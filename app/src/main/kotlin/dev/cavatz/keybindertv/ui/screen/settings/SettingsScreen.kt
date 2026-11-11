@@ -44,10 +44,10 @@ import dev.cavatz.keybindertv.update.AppUpdateManager
 import kotlinx.coroutines.launch
 
 /** Espacement vertical entre las secciones, conservando la distribución de la versión 155. */
-private val SectionSpacing = 24.dp
+private val SectionSpacing = 12.dp
 
 /** Padding global de la pantalla, igual que en la versión 155. */
-private val ScreenPadding = 32.dp
+private val ScreenPadding = 16.dp
 
 /** Número de pasos del control de pulsación larga. */
 private val SLIDER_STEPS: Int = ((LONG_PRESS_MAX_MS - LONG_PRESS_MIN_MS) / LONG_PRESS_STEP_MS - 1).toInt()
@@ -119,7 +119,7 @@ private fun SettingsContent(
     ) {
         Text(
             text = stringResource(R.string.settings_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineSmall
         )
         Spacer(modifier = Modifier.height(SectionSpacing))
 
@@ -144,7 +144,7 @@ private fun SettingsContent(
         // Actualizador incorporado en la versión 202, sin alterar los controles originales.
         Text(
             text = stringResource(R.string.update_section_title),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(updateStatus, style = MaterialTheme.typography.bodyMedium)
@@ -192,16 +192,18 @@ private fun SettingsContent(
                 Text(if (backupState.userCode == null) "Conectar con GitHub" else "Solicitar otro código")
             }
         } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = { backupManager.backupNow() },
-                    enabled = !backupState.busy
+                    enabled = !backupState.busy,
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text("Guardar copia")
                 }
                 Button(
                     onClick = { backupManager.restoreNow() },
-                    enabled = !backupState.busy
+                    enabled = !backupState.busy,
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text("Restaurar copia")
                 }
