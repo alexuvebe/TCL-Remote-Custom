@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
-import dev.cavatz.keybindertv.ui.component.tvFocusBorder
 
 /**
  * Carte réutilisable adaptée aux interfaces TV.
