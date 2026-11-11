@@ -56,7 +56,15 @@ class HomeViewModel(
             .onEach { config: KeyBinderConfig ->
                 _uiState.update { current ->
                     current.copy(
-                        activeMappingsCount = if (config.globalEnabled) config.mappings.count { it.isEnabled } else 0,
+                        activeMappingsCount = if (config.globalEnabled) config.mappings.count { mapping ->
+                            mapping.isEnabled && (
+                                (mapping.shortPressEnabled && mapping.shortPressAction != null) ||
+                                    (mapping.longPressEnabled && (
+                                        mapping.longPressAction != null ||
+                                            (mapping.shortPressEnabled && mapping.shortPressAction != null)
+                                        ))
+                                )
+                        } else 0,
                         totalMappingsCount = config.mappings.size,
                         globalEnabled = config.globalEnabled
                     )
