@@ -122,6 +122,10 @@ class MappingRepositoryImpl(
         }
     }
 
+    override suspend fun setGlobalEnabled(enabled: Boolean) {
+        dataStore.updateData { current -> current.copy(globalEnabled = enabled) }
+    }
+
     override suspend fun replaceConfig(config: KeyBinderConfig) {
         dataStore.updateData { config }
     }
