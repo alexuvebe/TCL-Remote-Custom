@@ -11,8 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -34,200 +39,185 @@ import dev.cavatz.keybindertv.ui.component.TvCard
 import dev.cavatz.keybindertv.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
-/** Espacement interne des cartes de mapping */
-private val CardPadding = 12.dp
+private val CardPadding = 10.dp
+private val ItemSpacing = 6.dp
+private val ScreenPadding = 12.dp
 
-/** Espacement entre les éléments de la liste */
-private val ItemSpacing = 8.dp
-
-/** Padding global de l'écran */
-private val ScreenPadding = 16.dp
-
-/**
- * Écran de liste des mappings configurés.
- * Permet d'activer/désactiver, supprimer et créer de nouveaux mappings.
- *
- * @param navController Contrôleur de navigation
- * @param repository Repository des mappings
- */
 @Composable
 fun MappingListScreen(
     navController: NavHostController,
     repository: MappingRepository
 ) {
-    val viewModel: MappingViewModel = viewModel(
-        factory = MappingViewModel.factory(repository)
-    )
+    val viewModel: MappingViewModel = viewModel(factory = MappingViewModel.factory(repository))
     val uiState: MappingViewModel.MappingListUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
 
     MappingListContent(
         uiState = uiState,
-        onToggle = { id, enabled -> viewModel.toggleMapping(id, enabled) },
-        onRemove = { id -> viewModel.removeMapping(id) },
+        onToggle = viewModel::toggleMapping,
+        onToggleShort = viewModel::toggleShortPress,
+        onToggleLong = viewModel::toggleLongPress,
+        onRemove = viewModel::removeMapping,
+        onEditShort = { id -> navController.navigate(Screen.AppChooser.createRoute(id, "short")) },
+        onEditLong = { id -> navController.navigate(Screen.AppChooser.createRoute(id, "long")) },
         onAddMapping = {
             coroutineScope.launch {
-                // Crée le mapping vide puis navigue vers LearningScreen avec son ID
-                val newMappingId: String = viewModel.createNewMapping()
+                val newMappingId = viewModel.createNewMapping()
                 navController.navigate(Screen.Learning.createRoute(newMappingId))
             }
         }
     )
 }
 
-/** Contenu stateless de la liste des mappings */
 @Composable
 private fun MappingListContent(
     uiState: MappingViewModel.MappingListUiState,
     onToggle: (String, Boolean) -> Unit,
+    onToggleShort: (String, Boolean) -> Unit,
+    onToggleLong: (String, Boolean) -> Unit,
     onRemove: (String) -> Unit,
+    onEditShort: (String) -> Unit,
+    onEditLong: (String) -> Unit,
     onAddMapping: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         when {
             uiState.isLoading -> LoadingIndicator()
-            uiState.mappings.isEmpty() -> EmptyMappingList(onAddMapping = onAddMapping)
-            else -> MappingList(
-                mappings = uiState.mappings,
-                onToggle = onToggle,
-                onRemove = onRemove
-            )
+            uiState.mappings.isEmpty() -> EmptyMappingList(onAddMapping)
+            else -> LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(ScreenPadding),
+                verticalArrangement = Arrangement.spacedBy(ItemSpacing)
+            ) {
+                items(items = uiState.mappings, key = { it.id }) { mapping ->
+                    MappingItem(
+                        mapping = mapping,
+                        onToggle = { onToggle(mapping.id, it) },
+                        onToggleShort = { onToggleShort(mapping.id, it) },
+                        onToggleLong = { onToggleLong(mapping.id, it) },
+                        onRemove = { onRemove(mapping.id) },
+                        onEditShort = { onEditShort(mapping.id) },
+                        onEditLong = { onEditLong(mapping.id) }
+                    )
+                }
+            }
         }
 
-        // Bouton "+" toujours visible sauf pendant le chargement
         if (!uiState.isLoading) {
             Button(
                 onClick = onAddMapping,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(ScreenPadding)
+                modifier = Modifier.align(Alignment.BottomEnd).padding(ScreenPadding)
             ) {
-                Text(text = stringResource(R.string.mappings_add))
+                Text(stringResource(R.string.mappings_add))
             }
         }
     }
 }
 
-/** Indicateur de chargement centré */
 @Composable
 private fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
 }
 
-/** Message affiché quand la liste est vide */
 @Composable
 private fun EmptyMappingList(onAddMapping: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = stringResource(R.string.mappings_empty),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Spacer(modifier = Modifier.height(ItemSpacing))
-            Button(onClick = onAddMapping) {
-                Text(text = stringResource(R.string.mappings_add))
-            }
+            Text(stringResource(R.string.mappings_empty), style = MaterialTheme.typography.bodyLarge)
+            Spacer(Modifier.height(ItemSpacing))
+            Button(onClick = onAddMapping) { Text(stringResource(R.string.mappings_add)) }
         }
     }
 }
 
-/** Liste scrollable des mappings */
-@Composable
-private fun MappingList(
-    mappings: List<KeyMapping>,
-    onToggle: (String, Boolean) -> Unit,
-    onRemove: (String) -> Unit
-) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(ScreenPadding),
-        verticalArrangement = Arrangement.spacedBy(ItemSpacing)
-    ) {
-        items(
-            items = mappings,
-            key = { mapping -> mapping.id }
-        ) { mapping ->
-            MappingItem(
-                mapping = mapping,
-                onToggle = { enabled -> onToggle(mapping.id, enabled) },
-                onRemove = { onRemove(mapping.id) }
-            )
-        }
-    }
-}
-
-/** Carte d'un mapping individuel */
 @Composable
 private fun MappingItem(
     mapping: KeyMapping,
     onToggle: (Boolean) -> Unit,
-    onRemove: () -> Unit
+    onToggleShort: (Boolean) -> Unit,
+    onToggleLong: (Boolean) -> Unit,
+    onRemove: () -> Unit,
+    onEditShort: () -> Unit,
+    onEditLong: () -> Unit
 ) {
-    TvCard(
-        onClick = {},
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(CardPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            MappingInfo(
-                mapping = mapping,
-                modifier = Modifier.weight(1f)
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(
-                    checked = mapping.isEnabled,
-                    onCheckedChange = onToggle
-                )
-                TextButton(onClick = onRemove) {
-                    Text(text = stringResource(R.string.action_delete))
+    TvCard(onClick = {}, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.fillMaxWidth().padding(CardPadding)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        mapping.button.userLabel.ifEmpty { "Botón configurado" },
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        "Código: ${mapping.button.keyCode ?: "—"} · De fábrica: ${factoryLabel(mapping.button.keyCode)}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Switch(checked = mapping.isEnabled, onCheckedChange = onToggle)
+                IconButton(onClick = onRemove) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Eliminar asignación y restaurar botón",
+                        tint = MaterialTheme.colorScheme.error
+                    )
                 }
             }
+
+            Divider(color = MaterialTheme.colorScheme.outlineVariant)
+            ActionRow(
+                title = "Pulsación corta",
+                destination = mapping.shortPressAction?.appLabel ?: "Sin asignar",
+                enabled = mapping.shortPressEnabled,
+                onToggle = onToggleShort,
+                onEdit = onEditShort
+            )
+            ActionRow(
+                title = "Pulsación larga",
+                destination = mapping.longPressAction?.appLabel
+                    ?: mapping.shortPressAction?.let { "Usar acción corta: ${it.appLabel}" }
+                    ?: "Sin asignar",
+                enabled = mapping.longPressEnabled,
+                onToggle = onToggleLong,
+                onEdit = onEditLong
+            )
         }
     }
 }
 
-/** Informations textuelles d'un mapping */
 @Composable
-private fun MappingInfo(
-    mapping: KeyMapping,
-    modifier: Modifier = Modifier
+private fun ActionRow(
+    title: String,
+    destination: String,
+    enabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+    onEdit: () -> Unit
 ) {
-    Column(modifier = modifier) {
-        Text(
-            text = mapping.button.userLabel.ifEmpty { "Bouton #${mapping.id.take(8)}" },
-            style = MaterialTheme.typography.titleMedium
-        )
-        mapping.shortPressAction?.let { action ->
-            Text(
-                text = "${stringResource(R.string.mapping_short_press)} : ${action.appLabel}",
-                style = MaterialTheme.typography.bodySmall
-            )
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.labelLarge)
+            Text(destination, style = MaterialTheme.typography.bodySmall, maxLines = 1)
         }
-        mapping.longPressAction?.let { action ->
-            Text(
-                text = "${stringResource(R.string.mapping_long_press)} : ${action.appLabel}",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-        if (mapping.shortPressAction == null && mapping.longPressAction == null) {
-            Text(
-                text = stringResource(R.string.mapping_no_action),
-                style = MaterialTheme.typography.bodySmall
-            )
+        Switch(checked = enabled, onCheckedChange = onToggle)
+        TextButton(onClick = onEdit) {
+            Text("Elegir")
         }
     }
+}
+
+private fun factoryLabel(keyCode: Int?): String = when (keyCode) {
+    4062 -> "Netflix"
+    4099 -> "Prime Video"
+    4140 -> "Guard"
+    4057 -> "Media"
+    4065 -> "YouTube"
+    4020 -> "TCL"
+    else -> "Sin etiqueta"
 }
