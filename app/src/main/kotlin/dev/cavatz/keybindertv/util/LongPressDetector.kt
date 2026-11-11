@@ -47,7 +47,7 @@ class LongPressDetector internal constructor(
 
     private var isPending = false
 
-    private val longPressRunnable = Runnable {
+    private val longPressRunnable: Runnable = Runnable {
         if (isPending) {
             isPending = false
             scheduler.removeCallbacks(safetyRunnable)
@@ -55,7 +55,7 @@ class LongPressDetector internal constructor(
         }
     }
 
-    private val safetyRunnable = Runnable {
+    private val safetyRunnable: Runnable = Runnable {
         if (isPending) {
             isPending = false
             scheduler.removeCallbacks(longPressRunnable)
