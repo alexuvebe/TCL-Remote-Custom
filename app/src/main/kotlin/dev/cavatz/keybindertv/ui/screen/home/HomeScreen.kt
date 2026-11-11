@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +31,9 @@ import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.repository.MappingRepository
 import dev.cavatz.keybindertv.ui.component.StatusIndicator
 import dev.cavatz.keybindertv.ui.navigation.Screen
+import dev.cavatz.keybindertv.ui.theme.ErrorRed
+import dev.cavatz.keybindertv.ui.theme.PrimaryBlueDark
+import dev.cavatz.keybindertv.ui.theme.SecondaryPurpleDark
 
 private val VerticalSpacing = 10.dp
 private val ContentPadding = 16.dp
@@ -80,7 +85,11 @@ private fun HomeContent(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Remapeo global", style = MaterialTheme.typography.titleMedium)
-            Switch(checked = uiState.globalEnabled, onCheckedChange = onGlobalToggle)
+            Switch(
+                checked = uiState.globalEnabled,
+                onCheckedChange = onGlobalToggle,
+                colors = SwitchDefaults.colors(checkedThumbColor = ErrorRed, checkedTrackColor = ErrorRed.copy(alpha = 0.45f))
+            )
         }
 
         Spacer(modifier = Modifier.height(VerticalSpacing))
@@ -99,10 +108,10 @@ private fun HomeContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(VerticalSpacing)
         ) {
-            Button(onClick = onNavigateMappings, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = onNavigateMappings, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlueDark)) {
                 Text(stringResource(R.string.home_manage_mappings))
             }
-            Button(onClick = onNavigateSettings, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = onNavigateSettings, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = SecondaryPurpleDark)) {
                 Text(stringResource(R.string.home_settings))
             }
         }
