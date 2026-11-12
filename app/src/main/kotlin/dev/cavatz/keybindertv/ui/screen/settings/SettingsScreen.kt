@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
-import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -115,7 +114,7 @@ private fun SettingsContent(
 ) {
     val context = LocalContext.current
 
-    // Se conserva el orden visual de la versión 155: estado, preferencias y accesibilidad.
+    // Se conserva el orden visual de la versión 155: estado y preferencias.
     // Las funciones nuevas quedan después, integradas con la misma tipografía y espaciado.
     Column(
         modifier = Modifier
@@ -143,9 +142,6 @@ private fun SettingsContent(
             thresholdMs = uiState.longPressThresholdMs,
             onThresholdChanged = onSetLongPressThreshold
         )
-        Spacer(modifier = Modifier.height(SectionSpacing))
-
-        AccessibilityButton()
         Spacer(modifier = Modifier.height(SectionSpacing))
 
         // Actualizador incorporado en la versión 202, sin alterar los controles originales.
@@ -260,16 +256,6 @@ private fun LongPressSlider(thresholdMs: Long, onThresholdChanged: (Long) -> Uni
             steps = SLIDER_STEPS,
             modifier = Modifier.fillMaxWidth().tvFocusBorder()
         )
-    }
-}
-
-@Composable
-private fun AccessibilityButton() {
-    val context = LocalContext.current
-    Button(onClick = {
-        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-    }, modifier = Modifier.tvFocusBorder()) {
-        Text(text = stringResource(R.string.settings_accessibility))
     }
 }
 
