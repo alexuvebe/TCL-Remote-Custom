@@ -4,8 +4,20 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Monograma TCL geométrico -->
-    <path android:fillColor="#FFFFFF" android:pathData="M18,29 L48,29 L48,39 L38,39 L38,79 L27,79 L27,39 L18,39 Z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M78,29 C61,29 51,39 51,54 C51,69 61,79 78,79 C84,79 89,77 94,74 L89,64 C86,67 82,68 78,68 C68,68 63,62 63,54 C63,46 68,40 78,40 C82,40 86,41 89,44 L94,34 C89,31 84,29 78,29 Z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M56,83 L94,83 L94,73 L68,73 L68,54 L56,54 Z"/>
+
+    <!-- Logotipo TCL simplificado: letras blancas separadas sobre el rojo corporativo. -->
+    <!-- T -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,29 L39,29 L39,40 L31,40 L31,79 L20,79 L20,40 L12,40 Z" />
+
+    <!-- C -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M67,36 C62,31 56,28 49,28 C34,28 25,39 25,54 C25,69 34,80 49,80 C56,80 62,77 67,72 L59,64 C56,67 53,69 49,69 C41,69 36,63 36,54 C36,45 41,39 49,39 C53,39 56,41 59,44 Z" />
+
+    <!-- L -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M75,29 L86,29 L86,68 L99,68 L99,79 L75,79 Z" />
 </vector>
