@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.tv.material3.Button
+import androidx.tv.material3.ButtonDefaults
 import dev.cavatz.keybindertv.R
 import dev.cavatz.keybindertv.data.model.KeyMapping
 import dev.cavatz.keybindertv.data.repository.MappingRepository
@@ -48,6 +49,18 @@ private val ScreenPadding = 14.dp
 private val CardPadding = 7.dp
 private val CardSpacing = 5.dp
 private val CardShape = RoundedCornerShape(10.dp)
+
+@Composable
+private fun mappingButtonColors() = ButtonDefaults.colors(
+    containerColor = SurfaceVariantDark,
+    contentColor = OnSurfaceDark,
+    focusedContainerColor = SurfaceVariantDark,
+    focusedContentColor = OnSurfaceDark,
+    pressedContainerColor = SurfaceVariantDark,
+    pressedContentColor = OnSurfaceDark,
+    disabledContainerColor = SurfaceVariantDark,
+    disabledContentColor = OnSurfaceDark
+)
 
 @Composable
 fun MappingListScreen(
@@ -116,7 +129,8 @@ private fun MappingListContent(
 
         Button(
             onClick = onAddMapping,
-            modifier = Modifier.align(Alignment.BottomEnd).tvFocusBorder()
+            modifier = Modifier.align(Alignment.BottomEnd).tvFocusBorder(),
+            colors = mappingButtonColors()
         ) {
             Text(stringResource(R.string.mappings_add))
         }
@@ -159,11 +173,11 @@ private fun MappingItem(
                     maxLines = 1
                 )
             }
-            Button(onClick = { onToggle(!mapping.isEnabled) }, modifier = Modifier.tvFocusBorder(), contentPadding = PaddingValues(horizontal = 7.dp, vertical = 1.dp)) {
+            Button(onClick = { onToggle(!mapping.isEnabled) }, modifier = Modifier.tvFocusBorder(), contentPadding = PaddingValues(horizontal = 7.dp, vertical = 1.dp), colors = mappingButtonColors()) {
                 Text(if (mapping.isEnabled) "ACTIVO" else "INACTIVO")
             }
             Spacer(Modifier.width(6.dp))
-            Button(onClick = onRemove, modifier = Modifier.tvFocusBorder(), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
+            Button(onClick = onRemove, modifier = Modifier.tvFocusBorder(), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp), colors = mappingButtonColors()) {
                 Text("×")
             }
         }
@@ -212,7 +226,7 @@ private fun ActionControl(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(onClick = onEdit, modifier = Modifier.weight(1f).tvFocusBorder().height(46.dp), contentPadding = PaddingValues(horizontal = 6.dp, vertical = 1.dp)) {
+        Button(onClick = onEdit, modifier = Modifier.weight(1f).tvFocusBorder().height(46.dp), contentPadding = PaddingValues(horizontal = 6.dp, vertical = 1.dp), colors = mappingButtonColors()) {
             Column {
                 Text(title, style = MaterialTheme.typography.labelSmall)
                 Text(
@@ -223,7 +237,7 @@ private fun ActionControl(
                 )
             }
         }
-        Button(onClick = onToggle, modifier = Modifier.tvFocusBorder().height(46.dp), contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp)) {
+        Button(onClick = onToggle, modifier = Modifier.tvFocusBorder().height(46.dp), contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp), colors = mappingButtonColors()) {
             Text(if (enabled) "✓" else "OFF")
         }
     }

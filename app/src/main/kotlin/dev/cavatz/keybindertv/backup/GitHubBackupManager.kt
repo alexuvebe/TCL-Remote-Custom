@@ -88,9 +88,11 @@ class GitHubBackupManager(
                 if (readToken() != null && prefs.getString(KEY_GIST_ID, null) != null) {
                     runCatching { uploadConfig(config) }
                         .onFailure {
-                            _state.value = _state.value.copy(
-                                status = "No se pudo actualizar la copia: ${it.message}"
-                            )
+                            if (!handleAuthenticationError(it)) {
+                                _state.value = _state.value.copy(
+                                    status = "No se pudo actualizar la copia: ${it.message}"
+                                )
+                            }
                         }
                 }
             }
@@ -116,7 +118,9 @@ class GitHubBackupManager(
                 val connectionStatus = withContext(Dispatchers.IO) { initializeGist() }
                 _state.value = UiState(status = connectionStatus, connected = true)
             } catch (e: Exception) {
-                _state.value = UiState(status = "No se pudo conectar: ${e.message ?: "error desconocido"}", connected = readToken() != null)
+                if (!handleAuthenticationError(e)) {
+                    _state.value = UiState(status = "No se pudo conectar: ${e.message ?: "error desconocido"}", connected = readToken() != null)
+                }
             }
         }
     }
@@ -128,7 +132,9 @@ class GitHubBackupManager(
                 withContext(Dispatchers.IO) { uploadCurrentConfig() }
                 _state.value = _state.value.copy(busy = false, status = "Copia de seguridad actualizada", connected = true)
             } catch (e: Exception) {
-                _state.value = _state.value.copy(busy = false, status = "Error al guardar: ${e.message}")
+                if (!handleAuthenticationError(e)) {
+                    _state.value = _state.value.copy(busy = false, status = "Error al guardar: ${e.message}")
+                }
             }
         }
     }
@@ -141,7 +147,9 @@ class GitHubBackupManager(
                 repository.replaceConfig(config)
                 _state.value = _state.value.copy(busy = false, status = "Configuración restaurada correctamente", connected = true)
             } catch (e: Exception) {
-                _state.value = _state.value.copy(busy = false, status = "Error al restaurar: ${e.message}")
+                if (!handleAuthenticationError(e)) {
+                    _state.value = _state.value.copy(busy = false, status = "Error al restaurar: ${e.message}")
+                }
             }
         }
     }
@@ -151,6 +159,22 @@ class GitHubBackupManager(
         _state.value = UiState(
             status = "Desconectado en MANDO TCL. Para revocar el permiso concedido, elimina la autorización de la aplicación en GitHub > Settings > Applications."
         )
+    }
+
+    private fun handleAuthenticationError(error: Throwable): Boolean {
+        if (!error.message.orEmpty().contains("GitHub HTTP 401")) return false
+
+        // El token ha sido revocado o ha caducado. Conservamos el ID del Gist
+        // para poder recuperar la misma copia tras volver a autorizar GitHub.
+        prefs.edit().remove(KEY_TOKEN).apply()
+        _state.value = _state.value.copy(
+            status = "GitHub ha rechazado la autorización (401). Pulsa «Conectar con GitHub» y autoriza de nuevo; tu copia guardada se conservará.",
+            busy = false,
+            connected = false,
+            userCode = null,
+            verificationUrl = null
+        )
+        return true
     }
 
     private data class DeviceCode(val deviceCode: String, val userCode: String, val verificationUri: String, val expiresIn: Int, val interval: Int)
