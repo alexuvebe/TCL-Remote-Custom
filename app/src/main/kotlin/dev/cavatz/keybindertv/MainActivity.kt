@@ -12,26 +12,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
+import dev.cavatz.keybindertv.ui.component.tvFocusBorder
 import dev.cavatz.keybindertv.ui.navigation.KeyBinderNavGraph
 import dev.cavatz.keybindertv.ui.theme.KeyBinderTvTheme
-import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
-import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
 import dev.cavatz.keybindertv.update.AppUpdateManager
 import kotlinx.coroutines.launch
 
 @androidx.compose.runtime.Composable
 private fun updateDialogButtonColors() = ButtonDefaults.colors(
-    containerColor = SurfaceVariantDark,
-    contentColor = OnSurfaceDark,
-    focusedContainerColor = SurfaceVariantDark,
-    focusedContentColor = OnSurfaceDark,
-    pressedContainerColor = SurfaceVariantDark,
-    pressedContentColor = OnSurfaceDark,
-    disabledContainerColor = SurfaceVariantDark,
-    disabledContentColor = OnSurfaceDark
+    containerColor = androidx.compose.ui.graphics.Color(0xFF53697D),
+    contentColor = androidx.compose.ui.graphics.Color.White,
+    focusedContainerColor = androidx.compose.ui.graphics.Color(0xFF7893AA),
+    focusedContentColor = androidx.compose.ui.graphics.Color(0xFF101820),
+    pressedContainerColor = androidx.compose.ui.graphics.Color(0xFF667F94),
+    pressedContentColor = androidx.compose.ui.graphics.Color.White,
+    disabledContainerColor = androidx.compose.ui.graphics.Color(0xFF465765),
+    disabledContentColor = androidx.compose.ui.graphics.Color(0xFFE2E8ED)
 )
 
 /**
@@ -73,26 +73,34 @@ class MainActivity : ComponentActivity() {
                             Text("Hay una nueva versión de MANDO TCL (${availableUpdate}). ¿Quieres descargarla e instalarla ahora?")
                         },
                         confirmButton = {
-                            Button(onClick = {
-                                availableUpdate = null
-                                scope.launch {
-                                    try {
-                                        val result = AppUpdateManager.checkAndInstall(this@MainActivity)
-                                        Toast.makeText(this@MainActivity, result, Toast.LENGTH_LONG).show()
-                                    } catch (error: Exception) {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            "No se pudo actualizar: ${error.message ?: "error desconocido"}",
-                                            Toast.LENGTH_LONG
-                                        ).show()
+                            Button(
+                                onClick = {
+                                    availableUpdate = null
+                                    scope.launch {
+                                        try {
+                                            val result = AppUpdateManager.checkAndInstall(this@MainActivity)
+                                            Toast.makeText(this@MainActivity, result, Toast.LENGTH_LONG).show()
+                                        } catch (error: Exception) {
+                                            Toast.makeText(
+                                                this@MainActivity,
+                                                "No se pudo actualizar: ${error.message ?: "error desconocido"}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
                                     }
-                                }
-                            }, colors = updateDialogButtonColors()) {
+                                },
+                                modifier = Modifier.tvFocusBorder(),
+                                colors = updateDialogButtonColors()
+                            ) {
                                 Text("Actualizar")
                             }
                         },
                         dismissButton = {
-                            Button(onClick = { availableUpdate = null }, colors = updateDialogButtonColors()) {
+                            Button(
+                                onClick = { availableUpdate = null },
+                                modifier = Modifier.tvFocusBorder(),
+                                colors = updateDialogButtonColors()
+                            ) {
                                 Text("Más tarde")
                             }
                         }
