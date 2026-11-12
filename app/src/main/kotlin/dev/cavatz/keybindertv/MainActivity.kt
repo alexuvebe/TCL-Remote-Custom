@@ -14,10 +14,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.Button
+import androidx.tv.material3.ButtonDefaults
 import dev.cavatz.keybindertv.ui.navigation.KeyBinderNavGraph
 import dev.cavatz.keybindertv.ui.theme.KeyBinderTvTheme
+import dev.cavatz.keybindertv.ui.theme.OnSurfaceDark
+import dev.cavatz.keybindertv.ui.theme.SurfaceVariantDark
 import dev.cavatz.keybindertv.update.AppUpdateManager
 import kotlinx.coroutines.launch
+
+@androidx.compose.runtime.Composable
+private fun updateDialogButtonColors() = ButtonDefaults.colors(
+    containerColor = SurfaceVariantDark,
+    contentColor = OnSurfaceDark,
+    focusedContainerColor = SurfaceVariantDark,
+    focusedContentColor = OnSurfaceDark,
+    pressedContainerColor = SurfaceVariantDark,
+    pressedContentColor = OnSurfaceDark,
+    disabledContainerColor = SurfaceVariantDark,
+    disabledContentColor = OnSurfaceDark
+)
 
 /**
  * Punto de entrada de MANDO TCL.
@@ -72,12 +87,12 @@ class MainActivity : ComponentActivity() {
                                         ).show()
                                     }
                                 }
-                            }) {
+                            }, colors = updateDialogButtonColors()) {
                                 Text("Actualizar")
                             }
                         },
                         dismissButton = {
-                            Button(onClick = { availableUpdate = null }) {
+                            Button(onClick = { availableUpdate = null }, colors = updateDialogButtonColors()) {
                                 Text("Más tarde")
                             }
                         }
