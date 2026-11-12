@@ -5,19 +5,16 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Logotipo TCL simplificado: letras blancas separadas sobre el rojo corporativo. -->
-    <!-- T -->
+    <!-- TCL en letras blancas separadas sobre el rojo corporativo. -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M12,29 L39,29 L39,40 L31,40 L31,79 L20,79 L20,40 L12,40 Z" />
+        android:pathData="M18,32 L39,32 L39,41 L33,41 L33,76 L24,76 L24,41 L18,41 Z" />
 
-    <!-- C -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M67,36 C62,31 56,28 49,28 C34,28 25,39 25,54 C25,69 34,80 49,80 C56,80 62,77 67,72 L59,64 C56,67 53,69 49,69 C41,69 36,63 36,54 C36,45 41,39 49,39 C53,39 56,41 59,44 Z" />
+        android:pathData="M69,38 C65,34 60,32 55,32 C44,32 43,42 43,54 C43,67 48,76 56,76 C61,76 66,74 70,70 L63,63 C61,65 59,67 56,67 C51,67 52,62 52,54 C52,46 51,41 56,41 C59,41 61,42 63,45 Z" />
 
-    <!-- L -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M75,29 L86,29 L86,68 L99,68 L99,79 L75,79 Z" />
+        android:pathData="M75,32 L84,32 L84,67 L91,67 L91,76 L75,76 Z" />
 </vector>
