@@ -26,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,14 +53,15 @@ private val CardShape = RoundedCornerShape(10.dp)
 
 @Composable
 private fun mappingButtonColors() = ButtonDefaults.colors(
-    containerColor = SurfaceVariantDark,
-    contentColor = OnSurfaceDark,
-    focusedContainerColor = SurfaceVariantDark,
-    focusedContentColor = OnSurfaceDark,
-    pressedContainerColor = SurfaceVariantDark,
-    pressedContentColor = OnSurfaceDark,
-    disabledContainerColor = SurfaceVariantDark,
-    disabledContentColor = OnSurfaceDark
+    // Suave azul grisáceo: se distingue del fondo sin resultar demasiado claro.
+    containerColor = Color(0xFF53697D),
+    contentColor = Color(0xFFFFFFFF),
+    focusedContainerColor = Color(0xFF7893AA),
+    focusedContentColor = Color(0xFF101820),
+    pressedContainerColor = Color(0xFF667F94),
+    pressedContentColor = Color(0xFFFFFFFF),
+    disabledContainerColor = Color(0xFF465765),
+    disabledContentColor = Color(0xFFE2E8ED)
 )
 
 @Composable
